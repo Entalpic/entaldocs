@@ -30,9 +30,9 @@ Typical workflow
     3. The *draft* / *WIP* status means everyone knows this is work in progress, they won't expect it to work or to be finished. But it means **they can see what you're working on**.
 
 4. Try to make a coherent and ideally small PR in order to ease the review process. If the PR is to large or it has too diverse changes, consider breaking it into multiple PRs. You may find ``git cherry-pick`` and ``git rebase -i`` helpful for spinning off certain commits into a new branch/PR.
-5. Make sure that you have written all the :doc:`appropriate docstrings </contributors/write-docstrings>`.
+5. Make sure that you have written all the :doc:`appropriate docstrings </guide/write-docstrings>`.
 6. Make sure the PR's comment is complete. Emphasize major changes, especially breaking ones like new dependencies and provide examples of how to use a new feature.
-7. Before you are done, run ``black``, ``isort`` and ``flake8`` on your code (see our :doc:`conventions </contributors/conventions>`).
+7. Before you are done, run ``black``, ``isort`` and ``flake8`` on your code (see our :doc:`conventions </guide/conventions>`).
 8. When you are done, remove the ``[WIP]`` from the PR's title and the *Draft* status.
 9. Wait for the CI to pass.
 10. Ask for reviewers

@@ -95,4 +95,4 @@ An actual tutorial on ``.rst``:
         :read-time: 5 min read
         :class-container: sd-p-2 sd-outline-muted sd-rounded-1
 
-    This is all documented in `Sphinx-Design`_.
+    This is all documented in `Sphinx-Design <https://sphinx-design.readthedocs.io/en/furo-theme/>`_.

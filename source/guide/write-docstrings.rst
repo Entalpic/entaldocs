@@ -11,7 +11,7 @@ How to write docstrings
 Basics
 ------
 
-In the :doc:`previous section </contributors/write-documentation>`, we learned about the syntax of ``rst`` to write documentation and docstrings. In this section, we'll look at how to write the content of a good docstring.
+In the :doc:`previous section </guide/write-documentation>`, we learned about the syntax of ``rst`` to write documentation and docstrings. In this section, we'll look at how to write the content of a good docstring.
 
 .. caution::
 

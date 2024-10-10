@@ -11,7 +11,8 @@ Home
    :maxdepth: 4
 
    self
-   contributors/index
+   guide/index
+   contributing/index
 
 Ideas:
 

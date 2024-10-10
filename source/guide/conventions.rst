@@ -7,25 +7,20 @@ Coding conventions
 Python
 ------
 
-.. dropdown:: TL;DR
+TL;DR
+~~~~~
 
-    We use ``black`` to format our code, ``flake8`` to lint it, and ``isort`` to sort our imports.
+Use `Ruff <https://docs.astral.sh/ruff/>`_ and associated `Ruff VSCode Extension <https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff>`_ to:
 
-    .. important::
+- Format your code (Black-compatible)
+- Sort your imports (isort-compatible)
+- Lint your code (Flake8-compatible)
 
-        ``flake8`` and ``isort`` are not mandatory, but ``black`` is.
+.. tip::
 
-    .. note::
+    `Set your default formatter <https://code.visualstudio.com/docs/python/formatting#_set-a-default-formatter>`_ to ``Ruff`` then enable `Format on save <https://stackoverflow.com/a/54665086/3867406>`_ in VSCode not to think about it.
 
-        For ``flake8`` to play nicely with ``black``, you need to use a couple extra flags:
-
-        .. code-block:: bash
-
-            flake8 --max-line-length=88 --ignore=E203 path/to/file.py
-
-        ``--max-line-length=88`` is to match ``black``'s default line length.
-
-        ``--ignore=E203`` is to avoid conflicts between ``black`` and ``flake8``. ``black`` will add a space before ``:`` in slices, ``flake8`` will complain about it. This flag tells ``flake8`` to ignore this particular error.
+In the following section we'll describe how popular formatters / linters / sorters work, keeping in mind this is all bundled (and extended) in Ruff.
 
 Black
 ~~~~~
