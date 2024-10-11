@@ -8,7 +8,7 @@
 
 from pathlib import Path
 
-project = "𝚫 Entalpic Develoment Guidelines"
+project = "𝚫 Entalpic Development Guidelines"
 copyright = "2024, Victor Schmidt"
 author = "Victor Schmidt"
 release = "0.1.0"
@@ -43,7 +43,7 @@ rst_prolog = """
 
 html_theme = "furo"
 html_static_path = ["_static"]
-html_title = "𝚫 Entalpic Develoment Guidelines"
+html_title = "𝚫 Entalpic Development Guidelines"
 html_css_files = [
     "css/custom.css",
 ]
