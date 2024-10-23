@@ -13,3 +13,6 @@ dependencies = [
     "sphinx-design>=0.6.1",
     "sphinx-math-dollar>=1.2.1",
 ]
+
+[tool.uv]
+dev-dependencies = ["ipython>=8.28.0"]
