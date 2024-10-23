@@ -100,9 +100,10 @@ intersphinx_mapping = {
 
 # sphinx.ext.autodoc & autoapi.extension
 # https://autoapi.readthedocs.io/
-autodoc_typehints = "description"
+autodoc_typehints = "signature"
 autoapi_type = "python"
 autoapi_dirs = [str(Path(__file__).resolve().parent.parent / "demo")]
+autoapi_ignore = ["*.venv/*", "*/tests/*"]
 autoapi_member_order = "bysource"
 autoapi_template_dir = "_templates/autoapi"
 autoapi_python_class_content = "init"
@@ -111,8 +112,7 @@ autoapi_options = [
     "undoc-members",
     "show-inheritance",
     "show-module-summary",
-    # "imported-members",
-    "special-members",
+    "imported-members",
 ]
 autoapi_keep_files = False
 
