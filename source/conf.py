@@ -95,6 +95,7 @@ html_theme_options = {
 # sphinx.ext.intersphinx
 intersphinx_mapping = {
     "torch": ("https://pytorch.org/docs/stable", None),
+    "python": ("https://docs.python.org/3", None),
     "omegaconf": ("https://omegaconf.readthedocs.io/en/latest", None),
 }
 
