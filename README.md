@@ -1,4 +1,4 @@
-# dev-guidelines
+# 𝚫 Entaldocs
 
 Entalpic's Development Guidelines
 
