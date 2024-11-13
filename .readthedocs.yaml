@@ -9,4 +9,4 @@ build:
         - asdf install uv latest
         - asdf global uv latest
         - uv sync
-        - uv run sphinx-build -M html docs/source $READTHEDOCS_OUTPUT/html
+        - uv run sphinx-build -M html docs/source $READTHEDOCS_OUTPUT
