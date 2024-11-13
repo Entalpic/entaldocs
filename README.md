@@ -2,10 +2,15 @@
 
 Entalpic's Development Guidelines
 
-Using [Poetry](https://python-poetry.org):
+## CLI
 
-```shell
-$ poetry install
-$ poetry run make html
-$ open ./build/html/index.html
-```
+Use `entaldocs` to initialize a documentation infrastructure in your current codebase. Refer to the docs for usage [WIP].
+
+## Contributing
+
+Using `uv`:
+
+1. Clone this repository
+2. `$ uv sync`
+
+That's it 🤓
