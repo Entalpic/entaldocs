@@ -18,3 +18,11 @@ Using `uv`:
 (Read The Docs to come)
 
 That's it 🤓
+
+## Status 🏗️
+
+This is still very WIP. In particular, next steps:
+
+-   Document `entaldocs` usage
+-   Update Contribution Guide
+-   Add ReadTheDocs deployment instructions
