@@ -8,7 +8,7 @@ from rich import print
 
 from entaldocs.logger import Logger
 
-logger = Logger()
+logger = Logger("entaldocs")
 """A logger to log messages to the console."""
 
 
