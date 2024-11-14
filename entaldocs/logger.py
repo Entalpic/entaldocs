@@ -57,3 +57,13 @@ class Logger:
             The message to print.
         """
         print(f"[green]{message}[/green]")
+
+    def warning(self, message: str):
+        """Print a warning message.
+
+        Parameters
+        ----------
+        message : str
+            The message to print.
+        """
+        print(f"[yellow]{message}[/yellow]")
