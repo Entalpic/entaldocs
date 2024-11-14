@@ -66,8 +66,13 @@ class Logger:
         str
             The value entered by the user.
         """
-        text = f"{self.prefix}{message} [{default}]" if default else message
-        return input(text).strip() or default
+        text = (
+            f"{self.prefix}{message} [{default}]"
+            if default
+            else f"{self.prefix}{message}"
+        )
+        print(text, end="")
+        return input(": ").strip() or default
 
     def confirm(self, message: str) -> bool:
         """Confirm a message with the user.
@@ -82,7 +87,7 @@ class Logger:
         bool
             Whether the user confirmed the message.
         """
-        return self.prompt(f"{self.prefix}{message} (y/N)", "N").lower() == "y"
+        return self.prompt(f"{message} (y/N)", "N").lower() == "y"
 
     def abort(self, message: str):
         """Abort the program with a message.
@@ -114,3 +119,20 @@ class Logger:
             The message to print.
         """
         print(f"{self.prefix}[yellow]{message}[/yellow]")
+
+    def info(self, message: str):
+        """Print an info message.
+
+        Parameters
+        ----------
+        message : str
+            The message to print.
+        """
+        print(f"{self.prefix}[blue]{message}[/blue]")
+
+    def clear_line(self):
+        """Clear the current line."""
+        import shutil
+
+        cols = shutil.get_terminal_size().columns
+        print(" " * cols, end="\r")
