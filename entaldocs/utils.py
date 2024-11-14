@@ -1,4 +1,5 @@
 import json
+import re
 import sys
 from filecmp import cmp as compare_files
 from os.path import expandvars, relpath
@@ -131,7 +132,7 @@ def copy_boilerplate(
         The directory or file to fetch from the repository
     """
     with TemporaryDirectory() as tmpdir:
-        fetch_github_files(content_path=content_path, branch=branch, dir=tmpdir)
+        fetch_github_files(branch=branch, content_path=content_path, dir=tmpdir)
         dest = resolve_path(dest)
 
         assert dest.exists(), f"Destination folder not found: {dest}"
@@ -307,7 +308,7 @@ def overwrite_docs_files(dest: Path, with_defaults: bool):
 
 
 def search_contents(
-    repo: Repository, contents_path: str, branch: str = "main"
+    repo: Repository, branch: str = "main", content_path: str = "boilerplate"
 ) -> list[tuple[str, str]]:
     """Get the (deep) contents of a directory.
 
@@ -315,7 +316,7 @@ def search_contents(
     ----------
     repo : Repository
         The repository to get the contents from.
-    contents_path : str
+    content_path : str
         The path to the directory to get the contents of.
     branch : str, optional
         The branch to fetch the files from, by default ``"main"``.
@@ -326,30 +327,48 @@ def search_contents(
         The list of tuples containing the file path and content as ``(path, bytes content)``.
 
     """
-    contents = repo.get_contents(contents_path, ref=branch)
+    contents = repo.get_contents(content_path, ref=branch)
+
+    dest = content_path
+    # trying to download a folder
+    if not dest.endswith("/"):
+        # we'll remove the hierarchy of the folder from the path
+        dest = dest + "/"
+    # trying to dowload a file
+    if re.match(r".+\.\w+", dest.split("/")[-1]):
+        # we'll just keep the file name
+        dest = "/".join(dest.split("/")[:-1])
+
     data = []
     while contents:
         file_content = contents.pop(0)
         if file_content.type == "dir":
-            contents.extend(repo.get_contents(file_content.path))
+            contents.extend(repo.get_contents(file_content.path, ref=branch))
         else:
             logger.clear_line()
             print(f"Getting contents of '{file_content.path}'", end="\r")
-            data.append((file_content.path, file_content.decoded_content))
+            data.append(
+                (
+                    file_content.path.replace(dest, ""),  # adjust file path
+                    file_content.decoded_content,
+                )
+            )
     logger.clear_line()
-    logger.info(f"Downloaded contents of '{repo.html_url}/{contents_path}'")
+    logger.info(f"Downloaded contents of '{repo.html_url}/{content_path}'")
     return data
 
 
-def fetch_github_files(content_path: str, branch: str = "main", dir: str = ".") -> Path:
+def fetch_github_files(
+    branch: str = "main", content_path: str = "boilerplate", dir: str = "."
+) -> Path:
     """Download a file or directory from a GitHub repository.
 
     Parameters
     ----------
-    content_path : str
-        The directory or file to fetch from the repository
     branch : str, optional
         The branch to fetch the files from, by default ``"main"``.
+    content_path : str
+        The directory or file to fetch from the repository
     dir : str, optional
         The directory to save the files to, by default ``"."``.
 
@@ -369,19 +388,21 @@ def fetch_github_files(content_path: str, branch: str = "main", dir: str = ".") 
     g = Github(auth=auth)
     repo = g.get_repo("entalpic/entaldocs")
     try:
-        contents = search_contents(repo, content_path, branch)
+        contents = search_contents(repo, branch=branch, content_path=content_path)
     except UnknownObjectException:
         branches = repo.get_branches()
         has_branch = any(b.name == branch for b in branches)
         if not has_branch:
             logger.abort(f"Branch not found: {branch}", exit=1)
         else:
-            logger.abort(f"Could not find repository contents: {content_path}", exit=1)
+            logger.abort(
+                f"Could not find repository contents: {content_path} on branch {branch}",
+                exit=1,
+            )
         return
 
-    data = search_contents(contents, [])
     base_dir = resolve_path(dir)
-    for name, content in data:
+    for name, content in contents:
         path = Path(base_dir) / name
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(content)
