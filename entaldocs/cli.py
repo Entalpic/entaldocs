@@ -165,7 +165,7 @@ def init(
         print("Skipping dependency installation.")
 
     # copy entaldocs pre-filled folder structure to the target directory
-    copy_boilerplate(path)
+    copy_boilerplate(path, branch="main", content_path="boilerplate", overwrite=True)
     # make empty dirs (_build and _static) in target directory
     make_empty_folders(path)
     # update defaults from user config
