@@ -15,6 +15,7 @@ You can also refer to the :ref:`entaldocs-cli-tutorial` for more information.
 import sys
 from shutil import rmtree
 from subprocess import run
+from typing import Optional
 
 from cyclopts import App, Parameter
 from rich import print
@@ -29,14 +30,24 @@ from entaldocs.utils import (
     resolve_path,
 )
 
-app = App(
+_app = App(
     help="A CLI tool to initialize a Sphinx documentation project with standard Entalpic config.",
     default_parameter=Parameter(negative=()),
 )
 """:py:class:`cyclopts.App`: The main CLI application."""
 
 
-@app.command
+def app():
+    """Run the CLI."""
+    try:
+        _app()
+    except KeyboardInterrupt:
+        logger.abort("\nAborted.")
+        sys.exit(1)
+    sys.exit(0)
+
+
+@_app.command
 def init(
     path: str = "./docs",
     as_main: bool = None,
@@ -164,7 +175,7 @@ def init(
     sys.exit(0)
 
 
-@app.command
+@_app.command
 def show_deps(as_pip: bool = False):
     """Show the recommended dependencies for the documentation that would be installed with `entaldocs init`.
 
@@ -182,7 +193,7 @@ def show_deps(as_pip: bool = False):
             print("  • " + dep_and_ver)
 
 
-@app.command
+@_app.command
 def update(path: str = "./docs"):
     """
     Update the static files in the docs folder like CSS, JS and images.
