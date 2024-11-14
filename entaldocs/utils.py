@@ -1,4 +1,5 @@
 import json
+from filecmp import cmp as compare_files
 from os.path import expandvars, relpath
 from pathlib import Path
 from shutil import copy2, copytree
@@ -60,7 +61,7 @@ def _copy_not_overwrite(src: str | Path, dest: str | Path):
     dest : str | Path
         The path to copy the target file to.
     """
-    if Path(dest).exists():
+    if Path(dest).exists() and not compare_files(src, dest, shallow=False):
         backed_up = backup(dest)
         logger.warning(f"Backing up {dest} to {backed_up}")
     copy2(src, dest)
