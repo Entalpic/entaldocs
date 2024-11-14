@@ -45,7 +45,25 @@ def load_deps() -> list[str]:
     return json.loads(path.read_text())
 
 
-def copy_defaults_folder(to: Path):
+def _copy_not_overwrite(src: str | Path, dest: str | Path):
+    """Private function to copy the src file to the destination if it doesn't exist.
+
+    To be used by :func:`copy_defaults_folder` and :func:`~shutil.copytree` to update files recursively
+    without overwriting existing files.
+
+    Inspiration: `Stackoverflow <https://stackoverflow.com/a/78638812/3867406>`_
+
+    Parameters
+    ----------
+    src : str | Path
+        The path to the src file.
+    dest : str | Path
+        The path to copy the target file to.
+    """
+    if not Path(dest).exists():
+        copy2(src, dest)
+
+
     """Copy the target files to the specified path.
 
     Parameters
