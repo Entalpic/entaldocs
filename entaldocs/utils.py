@@ -46,7 +46,7 @@ def load_deps() -> list[str]:
 
 
 def _copy_not_overwrite(src: str | Path, dest: str | Path):
-    """Private function to copy the src file to the destination if it doesn't exist.
+    """Private function to copy a file, backing up the destination if it exists.
 
     To be used by :func:`copy_defaults_folder` and :func:`~shutil.copytree` to update files recursively
     without overwriting existing files.
@@ -60,8 +60,37 @@ def _copy_not_overwrite(src: str | Path, dest: str | Path):
     dest : str | Path
         The path to copy the target file to.
     """
-    if not Path(dest).exists():
-        copy2(src, dest)
+    if Path(dest).exists():
+        backed_up = backup(dest)
+        logger.warning(f"Backing up {dest} to {backed_up}")
+    copy2(src, dest)
+
+
+def backup(path: Path) -> Path:
+    """Backup a file by copying it to the same directory with a .bak extension.
+
+    If the file already exists, it will be copied with a .bak.1, .bak.2, etc. extension.
+
+    Parameters
+    ----------
+    path : Path
+        The path to backup the target files to.
+    overwrite : bool
+        Whether to overwrite the files if they already exist.
+
+    Returns
+    -------
+    Path
+        The path to the backup file.
+    """
+    src = resolve_path(path)
+    dest = src.parent / f"{src.name}.bak"
+    if dest.exists():
+        b = 1
+        while (dest := src.parent / f"{src.name}.bak.{b}").exists():
+            b += 1
+    copy2(src, dest)
+    return dest
 
 
 def copy_defaults_folder(dest: Path, overwrite: bool):
