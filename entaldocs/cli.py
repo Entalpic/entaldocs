@@ -191,9 +191,7 @@ def update(path: str = "./docs"):
     path = resolve_path(path)
     if not path.exists():
         logger.abort(f"Path not found: {path}")
-    if "y" not in logger.prompt(
-        "This will overwrite the static files. Continue? [y/N]"
-    ):
+    if not logger.confirm("This will overwrite the static files. Continue?"):
         logger.abort("Aborting.")
     static = path / "source" / "_static"
     if not static.exists():
