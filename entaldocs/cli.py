@@ -194,9 +194,33 @@ def show_deps(as_pip: bool = False):
 
 
 @_app.command
-def update(path: str = "./docs"):
+def update(
+    path: str = "./docs", branch: str = "main", contents: str = "entaldocs/__defaults"
+):
     """
     Update the static files in the docs folder like CSS, JS and images.
+
+    Basically will download the remote repository's static files into a local temporary
+    folder, then will copy them in your docs ``source/_static`` folder.
+
+    .. important::
+
+        ``$ entaldocs update`` requires a GitHub Personal Access Token (PAT) to fetch the latest
+        version of the documentation's static files etc. from the repository.
+        Run ``$ entaldocs set-github-pat`` to do so.
+
+    .. note::
+
+        Existing files will be backed up to ``{filename}.bak`` before new files are copied.
+
+    Parameters
+    ----------
+    path : str, optional
+        The path to your documentation folder.
+    branch : str, optional
+        The branch to fetch the static files from.
+    contents : str, optional
+        The path to the static files in the repository.
     """
 
     path = resolve_path(path)
@@ -209,3 +233,49 @@ def update(path: str = "./docs"):
         logger.abort(f"Static folder not found: {static}")
     copy_defaults_folder(path, overwrite=False)
     logger.success("Static files updated.")
+
+
+@_app.command
+def set_github_pat(pat: Optional[str] = ""):
+    """
+    Store a GitHub Personal Access Token (PAT) in your keyring.
+
+    A Github PAT is required to fetch the latest version of the
+    documentation's static files etc. from the repository.
+
+    `About GitHub PAT <https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#about-personal-access-tokens>`_
+
+    `Creating Github a PAT <https://github.com/settings/tokens>`_
+
+
+    1. Go to ``Settings > Developer settings > Personal access tokens (fine-grained) > Generate new token``.
+    2. Name it ``entaldocs``.
+    3. Set ``Entalpic`` as resource owner
+    4. Expire it in 1 year.
+    5. Only select the ``entaldocs`` repository
+    6. Set *Repository Permissions* to *Contents: Read* and *Metadata: Read*.
+    7. Click on *Generate token*.
+
+
+    Parameters
+    ----------
+    pat : str, optional
+        The GitHub Personal Access Token.
+    """
+    from keyring import set_password
+
+    assert isinstance(pat, str), "PAT must be a string."
+
+    logger.warning(
+        "Run [r]$ entaldocs set-github-pat --help[/r]"
+        + " if you're not sure how to generate a PAT."
+    )
+    logger.info(
+        "You may want to use the 'Always Allow' option to"
+        + " avoid future prompts if you get one from your OS."
+    )
+    if not pat:
+        pat = logger.prompt("Enter your GitHub PAT")
+    logger.confirm("Are you sure you want to set the GitHub PAT?")
+    set_password("entaldocs", "github_pat", pat)
+    logger.success("GitHub PAT set.")

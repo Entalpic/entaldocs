@@ -1,10 +1,16 @@
 import json
+import sys
 from filecmp import cmp as compare_files
 from os.path import expandvars, relpath
 from pathlib import Path
 from shutil import copy2, copytree
 from subprocess import run
+from tempfile import TemporaryDirectory
 
+from github import Github, UnknownObjectException
+from github.Auth import Token
+from github.Repository import Repository
+from keyring import get_password
 from rich import print
 
 from entaldocs.logger import Logger
@@ -94,7 +100,12 @@ def backup(path: Path) -> Path:
     return dest
 
 
-def copy_defaults_folder(dest: Path, overwrite: bool):
+def copy_defaults_folder(
+    dest: Path,
+    overwrite: bool,
+    branch: str = "main",
+    contents: str = "entaldocs/__defaults",
+):
     """Copy the target files to the specified path.
 
     Parameters
@@ -103,17 +114,22 @@ def copy_defaults_folder(dest: Path, overwrite: bool):
         The path to copy the target files to.
     overwrite : bool
         Whether to overwrite the files if they already exist.
+    branch: str
+        The branch to fetch the files from, by default ``"main"``.
+    contents: str
+        The directory or file to fetch from the repository
     """
-    src = resolve_path(__file__).parent / "__defaults"
-    dest = resolve_path(dest)
+    with TemporaryDirectory() as tmpdir:
+        fetch_github_files(contents="entaldocs/__defaults", branch="branch", dir=tmpdir)
+        dest = resolve_path(dest)
 
-    assert dest.exists(), f"Destination folder not found: {dest}"
-    copytree(
-        src,
-        dest,
-        dirs_exist_ok=True,
-        copy_function=copy2 if overwrite else _copy_not_overwrite,
-    )
+        assert dest.exists(), f"Destination folder not found: {dest}"
+        copytree(
+            tmpdir,
+            dest,
+            dirs_exist_ok=True,
+            copy_function=copy2 if overwrite else _copy_not_overwrite,
+        )
 
 
 def install_dependencies(uv: bool, dev: bool):
@@ -277,3 +293,82 @@ def overwrite_docs_files(dest: Path, with_defaults: bool):
     index_text = index_text.replace("$PROJECT_NAME", project)
     index_text = index_text.replace("$PROJECT_URL", url)
     index_rst.write_text(index_text)
+
+
+def search_contents(
+    repo: Repository, contents_path: str, branch: str = "main"
+) -> list[tuple[str, str]]:
+    """Get the (deep) contents of a directory.
+
+    Parameters
+    ----------
+    repo : Repository
+        The repository to get the contents from.
+    contents_path : str
+        The path to the directory to get the contents of.
+    branch : str, optional
+        The branch to fetch the files from, by default ``"main"``.
+
+    Returns
+    -------
+    list[tuple[str, bytes]]
+        The list of tuples containing the file path and content as ``(path, bytes content)``.
+
+    """
+    contents = repo.get_contents(contents_path, ref=branch)
+    data = []
+    while contents:
+        file_content = contents.pop(0)
+        if file_content.type == "dir":
+            contents.extend(repo.get_contents(file_content.path))
+        else:
+            logger.clear_line()
+            print(f"Getting contents of '{file_content.path}'", end="\r")
+            data.append((file_content.path, file_content.decoded_content))
+    logger.clear_line()
+    logger.info(f"Downloaded contents of '{repo.html_url}/{contents_path}'")
+    return data
+
+
+def fetch_github_files(contents: str, branch: str = "main", dir: str = ".") -> Path:
+    """Get the ``__defaults`` folder from the GitHub repository to a local temp folder.
+
+    Parameters
+    ----------
+    contents : str
+        The directory or file to fetch from the repository
+    branch : str, optional
+        The branch to fetch the files from, by default ``"main"``.
+    dir : str, optional
+
+    Returns
+    -------
+    Path
+        The path to the temporary folder containing the files.
+    """
+    pat = get_password("entaldocs", "github_pat")
+    if not pat:
+        logger.abort(
+            "GitHub Personal Access Token (PAT) not found. Run 'entaldocs set-github-pat' to set it."
+        )
+        sys.exit(1)
+    auth = Token(pat)
+    g = Github(auth=auth)
+    repo = g.get_repo("entalpic/entaldocs")
+    try:
+        repo_contents = search_contents(repo, contents, branch)
+    except UnknownObjectException:
+        branches = repo.get_branches()
+        has_branch = any(b.name == branch for b in branches)
+        if not has_branch:
+            logger.abort(f"Branch not found: {branch}")
+        else:
+            logger.abort(f"Could not find repository contents: {contents}")
+        return
+
+    data = search_contents(repo_contents, [])
+    base_dir = resolve_path(dir)
+    for name, content in data:
+        path = Path(base_dir) / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(content)
