@@ -1,7 +1,7 @@
 import json
 from os.path import expandvars, relpath
 from pathlib import Path
-from shutil import copytree
+from shutil import copy2, copytree
 from subprocess import run
 
 from rich import print
@@ -64,19 +64,26 @@ def _copy_not_overwrite(src: str | Path, dest: str | Path):
         copy2(src, dest)
 
 
+def copy_defaults_folder(dest: Path, overwrite: bool):
     """Copy the target files to the specified path.
 
     Parameters
     ----------
-    to : Path
+    dest : Path
         The path to copy the target files to.
+    overwrite : bool
+        Whether to overwrite the files if they already exist.
     """
-    target = resolve_path(__file__).parent / "__defaults"
-    to = resolve_path(to)
+    src = resolve_path(__file__).parent / "__defaults"
+    dest = resolve_path(dest)
 
-    assert to.exists(), f"Destination folder not found: {to}"
-
-    copytree(target, to, dirs_exist_ok=True)
+    assert dest.exists(), f"Destination folder not found: {dest}"
+    copytree(
+        src,
+        dest,
+        dirs_exist_ok=True,
+        copy_function=copy2 if overwrite else _copy_not_overwrite,
+    )
 
 
 def install_dependencies(uv: bool, dev: bool):
