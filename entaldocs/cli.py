@@ -180,3 +180,23 @@ def show_deps(as_pip: bool = False):
         print("Dependencies:")
         for dep_and_ver in deps:
             print("  • " + dep_and_ver)
+
+
+@app.command
+def update(path: str = "./docs"):
+    """
+    Update the static files in the docs folder like CSS, JS and images.
+    """
+
+    path = resolve_path(path)
+    if not path.exists():
+        logger.abort(f"Path not found: {path}")
+    if "y" not in logger.prompt(
+        "This will overwrite the static files. Continue? [y/N]"
+    ):
+        logger.abort("Aborting.")
+    static = path / "source" / "_static"
+    if not static.exists():
+        logger.abort(f"Static folder not found: {static}")
+    copy_defaults_folder(path, overwrite=False)
+    logger.success("Static files updated.")
