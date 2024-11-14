@@ -55,6 +55,8 @@ def init(
     deps: bool = None,
     uv: bool = None,
     with_defaults: bool = False,
+    branch: str = "main",
+    contents: str = "boilerplate",
 ):
     """Initialize a Sphinx documentation project with Entalpic's standard configuration.
 
@@ -95,6 +97,10 @@ def init(
         Prevent uv prompt by forcing its value to ``True`` or ``False``.
     with_defaults: bool, optional
         Whether to trust the defaults and skip all prompts.
+    branch : str, optional
+        The branch to fetch the static files from.
+    contents : str, optional
+        The path to the static files in the repository.
 
     Raises
     ------
@@ -165,7 +171,7 @@ def init(
         print("Skipping dependency installation.")
 
     # copy entaldocs pre-filled folder structure to the target directory
-    copy_boilerplate(path, branch="main", content_path="boilerplate", overwrite=True)
+    copy_boilerplate(path, branch=branch, content_path=contents, overwrite=True)
     # make empty dirs (_build and _static) in target directory
     make_empty_folders(path)
     # update defaults from user config
