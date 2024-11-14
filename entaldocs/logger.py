@@ -47,3 +47,13 @@ class Logger:
         """
         print(f"[red]{message}[/red]")
         exit(1)
+
+    def success(self, message: str):
+        """Print a success message.
+
+        Parameters
+        ----------
+        message : str
+            The message to print.
+        """
+        print(f"[green]{message}[/green]")
