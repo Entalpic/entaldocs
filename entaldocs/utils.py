@@ -100,11 +100,11 @@ def backup(path: Path) -> Path:
     return dest
 
 
-def copy_defaults_folder(
+def copy_boilerplate(
     dest: Path,
     overwrite: bool,
     branch: str = "main",
-    contents: str = "entaldocs/__defaults",
+    content_path: str = "boilerplate",
 ):
     """Copy the target files to the specified path.
 
@@ -116,11 +116,11 @@ def copy_defaults_folder(
         Whether to overwrite the files if they already exist.
     branch: str
         The branch to fetch the files from, by default ``"main"``.
-    contents: str
+    content_path: str
         The directory or file to fetch from the repository
     """
     with TemporaryDirectory() as tmpdir:
-        fetch_github_files(contents="entaldocs/__defaults", branch="branch", dir=tmpdir)
+        fetch_github_files(content_path=content_path, branch=branch, dir=tmpdir)
         dest = resolve_path(dest)
 
         assert dest.exists(), f"Destination folder not found: {dest}"

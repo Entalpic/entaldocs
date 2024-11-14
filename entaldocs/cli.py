@@ -21,7 +21,7 @@ from cyclopts import App, Parameter
 from rich import print
 
 from entaldocs.utils import (
-    copy_defaults_folder,
+    copy_boilerplate,
     install_dependencies,
     load_deps,
     logger,
@@ -155,7 +155,7 @@ def init(
         print("Skipping dependency installation.")
 
     # copy entaldocs pre-filled folder structure to the target directory
-    copy_defaults_folder(path)
+    copy_boilerplate(path)
     # make empty dirs (_build and _static) in target directory
     make_empty_folders(path)
     # update defaults from user config
@@ -196,9 +196,7 @@ def show_deps(as_pip: bool = False):
 
 
 @_app.command
-def update(
-    path: str = "./docs", branch: str = "main", contents: str = "entaldocs/__defaults"
-):
+def update(path: str = "./docs", branch: str = "main", contents: str = "boilerplate"):
     """
     Update the static files in the docs folder like CSS, JS and images.
 
@@ -233,7 +231,7 @@ def update(
     static = path / "source" / "_static"
     if not static.exists():
         logger.abort(f"Static folder not found: {static}", exit=1)
-    copy_defaults_folder(path, overwrite=False)
+    copy_boilerplate(dest=path, branch=branch, content_path=contents, overwrite=False)
     logger.success("Static files updated.")
 
 
@@ -271,10 +269,6 @@ def set_github_pat(pat: Optional[str] = ""):
     logger.warning(
         "Run [r]$ entaldocs set-github-pat --help[/r]"
         + " if you're not sure how to generate a PAT."
-    )
-    logger.info(
-        "You may want to use the 'Always Allow' option to"
-        + " avoid future prompts if you get one from your OS."
     )
     if not pat:
         pat = logger.prompt("Enter your GitHub PAT")
