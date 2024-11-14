@@ -171,7 +171,10 @@ def init(
     print(
         f"🚀 [blue]Docs built![/blue] Open {path / 'build/html/index.html'} to see them."
     )
-    print("[green]Happy documenting![/green]")
+    logger.info("You should now run the following commands")
+    logger.info("  $ entaldocs set-github-pat")
+    logger.info("  $ entaldocs update")
+    logger.success("[green]Happy documenting![/green]")
     sys.exit(0)
 
 
