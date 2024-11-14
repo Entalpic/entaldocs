@@ -19,6 +19,17 @@ logger = Logger("entaldocs")
 """A logger to log messages to the console."""
 
 
+def get_user_pat():
+    """Get the GitHub Personal Access Token (PAT) from the user.
+
+    Returns
+    -------
+    str
+        The GitHub Personal Access Token (PAT).
+    """
+    return get_password("entaldocs", "github_pat")
+
+
 def resolve_path(path: str | Path) -> Path:
     """Resolve a path and expand environment variables.
 
@@ -330,23 +341,24 @@ def search_contents(
     return data
 
 
-def fetch_github_files(contents: str, branch: str = "main", dir: str = ".") -> Path:
-    """Get the ``__defaults`` folder from the GitHub repository to a local temp folder.
+def fetch_github_files(content_path: str, branch: str = "main", dir: str = ".") -> Path:
+    """Download a file or directory from a GitHub repository.
 
     Parameters
     ----------
-    contents : str
+    content_path : str
         The directory or file to fetch from the repository
     branch : str, optional
         The branch to fetch the files from, by default ``"main"``.
     dir : str, optional
+        The directory to save the files to, by default ``"."``.
 
     Returns
     -------
     Path
         The path to the temporary folder containing the files.
     """
-    pat = get_password("entaldocs", "github_pat")
+    pat = get_user_pat()
     if not pat:
         logger.abort(
             "GitHub Personal Access Token (PAT) not found. Run 'entaldocs set-github-pat' to set it.",
@@ -357,7 +369,7 @@ def fetch_github_files(contents: str, branch: str = "main", dir: str = ".") -> P
     g = Github(auth=auth)
     repo = g.get_repo("entalpic/entaldocs")
     try:
-        repo_contents = search_contents(repo, contents, branch)
+        contents = search_contents(repo, content_path, branch)
     except UnknownObjectException:
         branches = repo.get_branches()
         has_branch = any(b.name == branch for b in branches)
@@ -367,7 +379,7 @@ def fetch_github_files(contents: str, branch: str = "main", dir: str = ".") -> P
             logger.abort(f"Could not find repository contents: {content_path}", exit=1)
         return
 
-    data = search_contents(repo_contents, [])
+    data = search_contents(contents, [])
     base_dir = resolve_path(dir)
     for name, content in data:
         path = Path(base_dir) / name

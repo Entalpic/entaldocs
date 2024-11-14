@@ -22,6 +22,7 @@ from rich import print
 
 from entaldocs.utils import (
     copy_boilerplate,
+    get_user_pat,
     install_dependencies,
     load_deps,
     logger,
@@ -101,6 +102,15 @@ def init(
         If the path already exists and ``--overwrite`` is not provided.
     """
     # where the docs will be stored, typically `$CWD/docs`
+    pat = get_user_pat()
+    if not pat:
+        logger.warning(
+            "You need to set a GitHub Personal Access Token"
+            + " to fetch the latest static files."
+        )
+        logger.warning("Run [r]$ entaldocs set-github-pat --help[/r] to learn how to.")
+        logger.abort("Aborting.", exit=1)
+
     path = resolve_path(path)
     print(f"[blue]Initializing at path:[/blue] {path}")
     if path.exists():
