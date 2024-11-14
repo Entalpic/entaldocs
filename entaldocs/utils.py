@@ -104,21 +104,21 @@ def install_dependencies(uv: bool, dev: bool):
     print(output.stdout or "")
 
 
-def make_empty_folders(to: Path):
+def make_empty_folders(dest: Path):
     """Make the static and build folders in the target folder.
 
     Parameters
     ----------
-    to : Path
+    dest : Path
         The path to make the empty folders in.
     """
-    to = resolve_path(to)
+    dest = resolve_path(dest)
 
-    assert to.exists(), f"Destination folder not found: {to}"
+    assert dest.exists(), f"Destination folder not found: {dest}"
 
-    (to / "build").mkdir(parents=True, exist_ok=True)
-    (to / "source/_static").mkdir(parents=True, exist_ok=True)
-    (to / "source/_templates").mkdir(parents=True, exist_ok=True)
+    (dest / "build").mkdir(parents=True, exist_ok=True)
+    (dest / "source/_static").mkdir(parents=True, exist_ok=True)
+    (dest / "source/_templates").mkdir(parents=True, exist_ok=True)
 
 
 def get_project_name(with_defaults) -> str:
@@ -141,7 +141,7 @@ def get_project_name(with_defaults) -> str:
     return default if with_defaults else logger.prompt("Project name", default=default)
 
 
-def discover_packages(to: Path, with_defaults: str) -> str:
+def discover_packages(dest: Path, with_defaults: str) -> str:
     """Discover packages in the current directory.
 
     Directories will be returned relatively to the conf.py file in the documentation
@@ -149,7 +149,7 @@ def discover_packages(to: Path, with_defaults: str) -> str:
 
     Parameters
     ----------
-    to : Path
+    dest : Path
         The path to the documentation folder
     with_defaults : bool
         Whether to trust the defaults and skip all prompts.
@@ -174,7 +174,7 @@ def discover_packages(to: Path, with_defaults: str) -> str:
         if not p.exists():
             logger.abort(f"Package not found: {p}")
 
-    ref = to / "source"
+    ref = dest / "source"
     packages = [relpath(p, ref) for p in packages]
 
     return json.dumps([str(p) for p in packages])
@@ -214,35 +214,35 @@ def get_repo_url(with_defaults: bool) -> str:
         return url
 
 
-def overwrite_docs_files(to: Path, with_defaults: bool):
+def overwrite_docs_files(dest: Path, with_defaults: bool):
     """Overwrite the conf.py file with the project name.
 
     Parameters
     ----------
-    to : Path
+    dest : Path
         The path to the conf.py file.
     with_defaults : bool
         Whether to trust the defaults and skip all prompts.
     """
-    to = resolve_path(to)
+    dest = resolve_path(dest)
     # get the packages to list in autoapi_dirs
-    packages = discover_packages(to, with_defaults)
+    packages = discover_packages(dest, with_defaults)
     # get project name from $CWD or user prompt
     project = get_project_name(with_defaults)
     # get repo URL from git or user prompt
     url = get_repo_url(with_defaults)
 
     # setup conf.py based on project name and packages
-    conf_py = to / "source/conf.py"
-    assert conf_py.exists(), f"conf.py not found: {to}"
+    conf_py = dest / "source/conf.py"
+    assert conf_py.exists(), f"conf.py not found: {dest}"
     conf_text = conf_py.read_text()
     conf_text = conf_text.replace("$PROJECT_NAME", project)
     conf_text = conf_text.replace("autoapi_dirs = []", f"autoapi_dirs = {packages}")
     conf_py.write_text(conf_text)
 
     # setup autoapi index.rst based on project name and repo URL
-    index_rst = to / "source/_templates/autoapi/index.rst"
-    assert index_rst.exists(), f"autoapi/index.rst not found: {to}"
+    index_rst = dest / "source/_templates/autoapi/index.rst"
+    assert index_rst.exists(), f"autoapi/index.rst not found: {dest}"
     index_text = index_rst.read_text()
     index_text = index_text.replace("$PROJECT_NAME", project)
     index_text = index_text.replace("$PROJECT_URL", url)
