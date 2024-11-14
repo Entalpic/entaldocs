@@ -218,7 +218,7 @@ def discover_packages(dest: Path, with_defaults: str) -> str:
         packages = [resolve_path(p.strip()) for p in user_packages.split(",")]
     for p in packages:
         if not p.exists():
-            logger.abort(f"Package not found: {p}")
+            logger.abort(f"Package not found: {p}", exit=1)
 
     ref = dest / "source"
     packages = [relpath(p, ref) for p in packages]
@@ -349,7 +349,8 @@ def fetch_github_files(contents: str, branch: str = "main", dir: str = ".") -> P
     pat = get_password("entaldocs", "github_pat")
     if not pat:
         logger.abort(
-            "GitHub Personal Access Token (PAT) not found. Run 'entaldocs set-github-pat' to set it."
+            "GitHub Personal Access Token (PAT) not found. Run 'entaldocs set-github-pat' to set it.",
+            exit=1,
         )
         sys.exit(1)
     auth = Token(pat)
@@ -361,9 +362,9 @@ def fetch_github_files(contents: str, branch: str = "main", dir: str = ".") -> P
         branches = repo.get_branches()
         has_branch = any(b.name == branch for b in branches)
         if not has_branch:
-            logger.abort(f"Branch not found: {branch}")
+            logger.abort(f"Branch not found: {branch}", exit=1)
         else:
-            logger.abort(f"Could not find repository contents: {contents}")
+            logger.abort(f"Could not find repository contents: {content_path}", exit=1)
         return
 
     data = search_contents(repo_contents, [])

@@ -1,3 +1,4 @@
+import sys
 from datetime import datetime
 
 from rich import print
@@ -89,7 +90,7 @@ class Logger:
         """
         return self.prompt(f"{message} (y/N)", "N").lower() == "y"
 
-    def abort(self, message: str):
+    def abort(self, message: str, exit=1):
         """Abort the program with a message.
 
         Parameters
@@ -98,7 +99,7 @@ class Logger:
             The message to print before aborting.
         """
         print(f"{self.prefix}[red]{message}[/red]")
-        exit(1)
+        sys.exit(exit)
 
     def success(self, message: str):
         """Print a success message.

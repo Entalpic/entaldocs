@@ -42,8 +42,7 @@ def app():
     try:
         _app()
     except KeyboardInterrupt:
-        logger.abort("\nAborted.")
-        sys.exit(1)
+        logger.abort("\nAborted.", exit=1)
     sys.exit(0)
 
 
@@ -110,7 +109,7 @@ def init(
             # user doesn't want to overwrite -> abort
             print(f"Path already exists: {path}")
             print("Use --overwrite to overwrite.")
-            logger.abort("Aborting.")
+            logger.abort("Aborting.", exit=1)
         # user wants to overwrite -> remove the folder and warn
         print("🚧 Overwriting path.")
         rmtree(path)
@@ -228,12 +227,12 @@ def update(
 
     path = resolve_path(path)
     if not path.exists():
-        logger.abort(f"Path not found: {path}")
+        logger.abort(f"Path not found: {path}", exit=1)
     if not logger.confirm("This will overwrite the static files. Continue?"):
-        logger.abort("Aborting.")
+        logger.abort("Aborting.", exit=1)
     static = path / "source" / "_static"
     if not static.exists():
-        logger.abort(f"Static folder not found: {static}")
+        logger.abort(f"Static folder not found: {static}", exit=1)
     copy_defaults_folder(path, overwrite=False)
     logger.success("Static files updated.")
 
