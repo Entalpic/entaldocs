@@ -149,8 +149,8 @@ def init(
     should_install = deps is not None or logger.confirm(
         "Would you like to install recommended dependencies?"
     )
+    with_uv = False
     if should_install:
-        with_uv = False
         # check if uv.lock exists in order to decide whether to use uv or not
         if resolve_path("./uv.lock").exists():
             with_uv = (
