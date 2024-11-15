@@ -92,12 +92,12 @@ class Logger:
             The value entered by the user.
         """
         text = (
-            f"{self.prefix}{message} [{default}]"
+            f"{self.prefix}{message} \[default:{default}]"
             if default
             else f"{self.prefix}{message}"
         )
         print(text, end="")
-        return input(": ").strip() or default
+        return input(":").strip() or default
 
     def confirm(self, message: str) -> bool:
         """Confirm a message with the user.
