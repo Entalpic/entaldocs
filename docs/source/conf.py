@@ -90,6 +90,7 @@ todo_include_todos = True
 # sphinx.ext.intersphinx
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
+    "github": ("https://pygithub.readthedocs.io/en/stable/", None),
 }
 
 # sphinx.ext.autodoc & autoapi.extension
