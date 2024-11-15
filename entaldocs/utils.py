@@ -324,20 +324,28 @@ def search_contents(
     Returns
     -------
     list[tuple[str, bytes]]
-        The list of tuples containing the file path and content as ``(path, bytes content)``.
+        The list of tuples containing the file path and content as
+        ``(path, bytes content)``.
 
     """
     contents = repo.get_contents(content_path, ref=branch)
 
-    dest = content_path
-    # trying to download a folder
-    if not dest.endswith("/"):
-        # we'll remove the hierarchy of the folder from the path
-        dest = dest + "/"
+    # If we don't ajust the content path, fetching a folder will include the full content
+    # path and the files will be copied to the wrong location:
+    # eg: if we fetch boilerplate/ and the content is boilerplate/docs/source/conf.py
+    #     the file will be copied to "boilerplate/docs/source/conf.py" instead of
+    #     "docs/source/conf.py"
+    # so we'll remove the hierarchy of the folder from the path
     # trying to dowload a file
-    if re.match(r".+\.\w+", dest.split("/")[-1]):
+    extra_path = content_path
+    if re.match(r".+\.\w+", extra_path.split("/")[-1]):
         # we'll just keep the file name
-        dest = "/".join(dest.split("/")[:-1])
+        extra_path = "/".join(extra_path.split("/")[:-1])
+    else:
+        # trying to download a folder
+        if not extra_path.endswith("/"):
+            # we'll remove the hierarchy of the folder from the path
+            extra_path = extra_path + "/"
 
     data = []
     while contents:
@@ -349,7 +357,7 @@ def search_contents(
             print(f"Getting contents of '{file_content.path}'", end="\r")
             data.append(
                 (
-                    file_content.path.replace(dest, ""),  # adjust file path
+                    file_content.path.replace(extra_path, ""),  # adjust file path
                     file_content.decoded_content,
                 )
             )
