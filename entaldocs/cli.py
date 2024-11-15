@@ -172,26 +172,36 @@ def init(
     else:
         print("Skipping dependency installation.")
 
-    # copy entaldocs pre-filled folder structure to the target directory
+    # download and copy entaldocs pre-filled folder structure to the target directory
     copy_boilerplate(path, branch=branch, content_path=contents, overwrite=True)
     # make empty dirs (_build and _static) in target directory
     make_empty_folders(path)
     # update defaults from user config
     overwrite_docs_files(path, with_defaults)
 
-    print(
-        "[blue]Now go to your newly created docs folder and update placehodlers in"
-        + " [r] conf.py [/r] with the appropriate values.[/blue]",
+    logger.info(
+        "Now go to your newly created docs folder and update placehodlers in"
+        + " [r] conf.py [/r] with the appropriate values.",
     )
-    print("Building your docs with [r] cd docs && make html [/r]")
-    run(["make", "html"], cwd=str(path), check=True)
-    print(
-        f"🚀 [blue]Docs built![/blue] Open {path / 'build/html/index.html'} to see them."
-    )
-    logger.info("You should now run the following commands")
-    logger.info("  $ entaldocs set-github-pat")
-    logger.info("  $ entaldocs update")
-    logger.success("[green]Happy documenting![/green]")
+    try:
+        command = ["make", "html"]
+        if with_uv:
+            command = ["uv", "run"] + command
+        logger.info(
+            f"Building your docs with [r] cd docs && {' '.join(command)} [/r]..."
+        )
+        run(command, cwd=str(path), check=True)
+        print(
+            f"🚀 [blue]Docs built![/blue] Open {path / 'build/html/index.html'} to see them."
+        )
+        logger.success("[green]Happy documenting![/green]")
+    except Exception as e:
+        logger.warning("Failed to build the docs.")
+        logger.warning(e)
+        print()
+        logger.info(
+            "You can try to build the docs manually by running the above command."
+        )
     sys.exit(0)
 
 
