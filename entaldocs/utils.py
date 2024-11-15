@@ -1,3 +1,8 @@
+"""
+A set of utilities to help with the ``entaldocs`` CLI and the
+initialization of Entalpic-style documentation projects.
+"""
+
 import json
 import re
 import sys

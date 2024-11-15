@@ -6,8 +6,10 @@ Learn how to use with:
 .. code-block:: bash
 
     $ entaldocs --help
+    $ entaldocs set-github-pat --help
     $ entaldocs init --help
     $ entaldocs show-deps --help
+    $ entaldocs update --help
 
 You can also refer to the :ref:`entaldocs-cli-tutorial` for more information.
 """

@@ -25,9 +25,31 @@ It also serves as a demo for how to write a Sphinx documentation project.
     While you may use ``\`` (e.g. ``$\exp$``) for *inline* maths, you currently have to use ``\\``
     (e.g ``$$\\exp$$`` for block-maths. Fix welcome.
 
-Currently ``entaldocs`` has 2 main commands:
+    You can also still use the ``.. math::`` directive for block-maths.
 
+Getting Started
+===============
+
+The goal is to create a Sphinx documentation project with the standard Entalpic configuration.
+
+This is done by creating a ``.docs/`` folder in your project and installing the necessary dependencies.
+Some of the contents of the ``.docs/`` folder are copied from the Entalpic Github repository and therefore
+requires you to set a Github Personal Access Token (PAT) to access the files.
+
+.. code-block:: bash
+
+    $ entaldocs set-github-pat
+    $ entaldocs init --uv --with-defaults
+
+Going further
+=============
+
+Currently ``entaldocs`` has 4 main commands:
+
+- ``set-github-pat`` to set your Github Personal Access Token (PAT) to access remote files
+  **required** for the ``entaldocs init`` and ``entaldocs update`` commands.
 - ``init`` to create a docs folder and get started with your current project's documentation.
+- ``update`` to update the documentation boilerplate files in your project from Github.
 - ``show-deps`` to show the dependencies that will be added to your project to make docs.
 
 .. tip::
@@ -46,12 +68,5 @@ When running ``$ entaldocs init`` the following happens:
 
     ``entaldocs`` will abort if the target folder already exists. Use ``--overwrite`` to delete
     the folder if it exists before setting up the documentation.
-
-
-Typical usage:
-
-.. code-block:: bash
-
-    $ entaldocs init --with-defaults
 
 """

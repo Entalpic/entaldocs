@@ -1,3 +1,27 @@
+"""
+A module to log messages to the console.
+
+This module provides a class to log messages to the console with different levels of severity,
+along with methods to prompt the user for input, confirm messages, abort the program, and clear the
+current line.
+
+Example
+-------
+
+.. code-block:: python
+
+    from entaldocs.logger import Logger
+
+    logger = Logger("MyLogger")
+    logger.success("This is a success message.")
+    c = logger.confirm("Do you want to continue?")
+    if not c:
+        logger.abort("Aborting.")
+    logger.success("Continuing...")
+
+
+"""
+
 import sys
 from datetime import datetime
 
