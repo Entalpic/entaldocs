@@ -73,7 +73,7 @@ class Logger:
         else:
             prefix += self.now()
         if prefix:
-            return f"[grey50 bold]\[{prefix}][/grey50 bold] "
+            return f"[grey50 bold]\\[{prefix}][/grey50 bold] "
         return prefix
 
     def prompt(self, message: str, default: str = None) -> str:
@@ -92,7 +92,7 @@ class Logger:
             The value entered by the user.
         """
         text = (
-            f"{self.prefix}{message} \[default:{default}]"
+            f"{self.prefix}{message} \\[default: {default}]"
             if default
             else f"{self.prefix}{message}"
         )
