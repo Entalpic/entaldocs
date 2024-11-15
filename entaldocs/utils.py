@@ -164,7 +164,8 @@ def install_dependencies(uv: bool, dev: bool):
         cmd.append("--dev")
     cmd.extend(load_deps())
     output = run(cmd, check=True)
-    print(output.stdout or "")
+    if output.stdout:
+        print(output.stdout)
 
 
 def make_empty_folders(dest: Path):
