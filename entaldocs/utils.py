@@ -1,15 +1,39 @@
+"""
+A set of utilities to help with the ``entaldocs`` CLI and the
+initialization of Entalpic-style documentation projects.
+"""
+
 import json
+import re
+import sys
+from filecmp import cmp as compare_files
 from os.path import expandvars, relpath
 from pathlib import Path
-from shutil import copytree
+from shutil import copy2, copytree
 from subprocess import run
+from tempfile import TemporaryDirectory
 
+from github import Github, UnknownObjectException
+from github.Auth import Token
+from github.Repository import Repository
+from keyring import get_password
 from rich import print
 
 from entaldocs.logger import Logger
 
-logger = Logger()
+logger = Logger("entaldocs")
 """A logger to log messages to the console."""
+
+
+def get_user_pat():
+    """Get the GitHub Personal Access Token (PAT) from the user.
+
+    Returns
+    -------
+    str
+        The GitHub Personal Access Token (PAT).
+    """
+    return get_password("entaldocs", "github_pat")
 
 
 def resolve_path(path: str | Path) -> Path:
@@ -45,20 +69,84 @@ def load_deps() -> list[str]:
     return json.loads(path.read_text())
 
 
-def copy_defaults_folder(to: Path):
+def _copy_not_overwrite(src: str | Path, dest: str | Path):
+    """Private function to copy a file, backing up the destination if it exists.
+
+    To be used by :func:`copy_defaults_folder` and :func:`~shutil.copytree` to update files recursively
+    without overwriting existing files.
+
+    Inspiration: `Stackoverflow <https://stackoverflow.com/a/78638812/3867406>`_
+
+    Parameters
+    ----------
+    src : str | Path
+        The path to the src file.
+    dest : str | Path
+        The path to copy the target file to.
+    """
+    if Path(dest).exists() and not compare_files(src, dest, shallow=False):
+        backed_up = backup(dest)
+        logger.warning(f"Backing up {dest} to {backed_up}")
+    copy2(src, dest)
+
+
+def backup(path: Path) -> Path:
+    """Backup a file by copying it to the same directory with a .bak extension.
+
+    If the file already exists, it will be copied with a .bak.1, .bak.2, etc. extension.
+
+    Parameters
+    ----------
+    path : Path
+        The path to backup the target files to.
+    overwrite : bool
+        Whether to overwrite the files if they already exist.
+
+    Returns
+    -------
+    Path
+        The path to the backup file.
+    """
+    src = resolve_path(path)
+    dest = src.parent / f"{src.name}.bak"
+    if dest.exists():
+        b = 1
+        while (dest := src.parent / f"{src.name}.bak.{b}").exists():
+            b += 1
+    copy2(src, dest)
+    return dest
+
+
+def copy_boilerplate(
+    dest: Path,
+    overwrite: bool,
+    branch: str = "main",
+    content_path: str = "boilerplate",
+):
     """Copy the target files to the specified path.
 
     Parameters
     ----------
-    to : Path
+    dest : Path
         The path to copy the target files to.
+    overwrite : bool
+        Whether to overwrite the files if they already exist.
+    branch: str
+        The branch to fetch the files from, by default ``"main"``.
+    content_path: str
+        The directory or file to fetch from the repository
     """
-    target = resolve_path(__file__).parent / "__defaults"
-    to = resolve_path(to)
+    with TemporaryDirectory() as tmpdir:
+        fetch_github_files(branch=branch, content_path=content_path, dir=tmpdir)
+        dest = resolve_path(dest)
 
-    assert to.exists(), f"Destination folder not found: {to}"
-
-    copytree(target, to, dirs_exist_ok=True)
+        assert dest.exists(), f"Destination folder not found: {dest}"
+        copytree(
+            tmpdir,
+            dest,
+            dirs_exist_ok=True,
+            copy_function=copy2 if overwrite else _copy_not_overwrite,
+        )
 
 
 def install_dependencies(uv: bool, dev: bool):
@@ -76,24 +164,25 @@ def install_dependencies(uv: bool, dev: bool):
         cmd.append("--dev")
     cmd.extend(load_deps())
     output = run(cmd, check=True)
-    print(output.stdout or "")
+    if output.stdout:
+        print(output.stdout)
 
 
-def make_empty_folders(to: Path):
+def make_empty_folders(dest: Path):
     """Make the static and build folders in the target folder.
 
     Parameters
     ----------
-    to : Path
+    dest : Path
         The path to make the empty folders in.
     """
-    to = resolve_path(to)
+    dest = resolve_path(dest)
 
-    assert to.exists(), f"Destination folder not found: {to}"
+    assert dest.exists(), f"Destination folder not found: {dest}"
 
-    (to / "build").mkdir(parents=True, exist_ok=True)
-    (to / "source/_static").mkdir(parents=True, exist_ok=True)
-    (to / "source/_templates").mkdir(parents=True, exist_ok=True)
+    (dest / "build").mkdir(parents=True, exist_ok=True)
+    (dest / "source/_static").mkdir(parents=True, exist_ok=True)
+    (dest / "source/_templates").mkdir(parents=True, exist_ok=True)
 
 
 def get_project_name(with_defaults) -> str:
@@ -116,7 +205,7 @@ def get_project_name(with_defaults) -> str:
     return default if with_defaults else logger.prompt("Project name", default=default)
 
 
-def discover_packages(to: Path, with_defaults: str) -> str:
+def discover_packages(dest: Path, with_defaults: str) -> str:
     """Discover packages in the current directory.
 
     Directories will be returned relatively to the conf.py file in the documentation
@@ -124,7 +213,7 @@ def discover_packages(to: Path, with_defaults: str) -> str:
 
     Parameters
     ----------
-    to : Path
+    dest : Path
         The path to the documentation folder
     with_defaults : bool
         Whether to trust the defaults and skip all prompts.
@@ -147,9 +236,9 @@ def discover_packages(to: Path, with_defaults: str) -> str:
         packages = [resolve_path(p.strip()) for p in user_packages.split(",")]
     for p in packages:
         if not p.exists():
-            logger.abort(f"Package not found: {p}")
+            logger.abort(f"Package not found: {p}", exit=1)
 
-    ref = to / "source"
+    ref = dest / "source"
     packages = [relpath(p, ref) for p in packages]
 
     return json.dumps([str(p) for p in packages])
@@ -189,36 +278,145 @@ def get_repo_url(with_defaults: bool) -> str:
         return url
 
 
-def overwrite_docs_files(to: Path, with_defaults: bool):
+def overwrite_docs_files(dest: Path, with_defaults: bool):
     """Overwrite the conf.py file with the project name.
 
     Parameters
     ----------
-    to : Path
+    dest : Path
         The path to the conf.py file.
     with_defaults : bool
         Whether to trust the defaults and skip all prompts.
     """
-    to = resolve_path(to)
+    dest = resolve_path(dest)
     # get the packages to list in autoapi_dirs
-    packages = discover_packages(to, with_defaults)
+    packages = discover_packages(dest, with_defaults)
     # get project name from $CWD or user prompt
     project = get_project_name(with_defaults)
     # get repo URL from git or user prompt
     url = get_repo_url(with_defaults)
 
     # setup conf.py based on project name and packages
-    conf_py = to / "source/conf.py"
-    assert conf_py.exists(), f"conf.py not found: {to}"
+    conf_py = dest / "source/conf.py"
+    assert conf_py.exists(), f"conf.py not found: {dest}"
     conf_text = conf_py.read_text()
     conf_text = conf_text.replace("$PROJECT_NAME", project)
     conf_text = conf_text.replace("autoapi_dirs = []", f"autoapi_dirs = {packages}")
     conf_py.write_text(conf_text)
 
     # setup autoapi index.rst based on project name and repo URL
-    index_rst = to / "source/_templates/autoapi/index.rst"
-    assert index_rst.exists(), f"autoapi/index.rst not found: {to}"
+    index_rst = dest / "source/_templates/autoapi/index.rst"
+    assert index_rst.exists(), f"autoapi/index.rst not found: {dest}"
     index_text = index_rst.read_text()
     index_text = index_text.replace("$PROJECT_NAME", project)
     index_text = index_text.replace("$PROJECT_URL", url)
     index_rst.write_text(index_text)
+
+
+def search_contents(
+    repo: Repository, branch: str = "main", content_path: str = "boilerplate"
+) -> list[tuple[str, str]]:
+    """Get the (deep) contents of a directory.
+
+    Parameters
+    ----------
+    repo : Repository
+        The repository to get the contents from.
+    content_path : str
+        The path to the directory to get the contents of.
+    branch : str, optional
+        The branch to fetch the files from, by default ``"main"``.
+
+    Returns
+    -------
+    list[tuple[str, bytes]]
+        The list of tuples containing the file path and content as
+        ``(path, bytes content)``.
+
+    """
+    contents = repo.get_contents(content_path, ref=branch)
+
+    # If we don't ajust the content path, fetching a folder will include the full content
+    # path and the files will be copied to the wrong location:
+    # eg: if we fetch boilerplate/ and the content is boilerplate/docs/source/conf.py
+    #     the file will be copied to "boilerplate/docs/source/conf.py" instead of
+    #     "docs/source/conf.py"
+    # so we'll remove the hierarchy of the folder from the path
+    # trying to dowload a file
+    extra_path = content_path
+    if re.match(r".+\.\w+", extra_path.split("/")[-1]):
+        # we'll just keep the file name
+        extra_path = "/".join(extra_path.split("/")[:-1])
+    else:
+        # trying to download a folder
+        if not extra_path.endswith("/"):
+            # we'll remove the hierarchy of the folder from the path
+            extra_path = extra_path + "/"
+
+    data = []
+    while contents:
+        file_content = contents.pop(0)
+        if file_content.type == "dir":
+            contents.extend(repo.get_contents(file_content.path, ref=branch))
+        else:
+            logger.clear_line()
+            print(f"Getting contents of '{file_content.path}'", end="\r")
+            data.append(
+                (
+                    file_content.path.replace(extra_path, ""),  # adjust file path
+                    file_content.decoded_content,
+                )
+            )
+    logger.clear_line()
+    logger.info(f"Downloaded contents of '{repo.html_url}/{content_path}'")
+    return data
+
+
+def fetch_github_files(
+    branch: str = "main", content_path: str = "boilerplate", dir: str = "."
+) -> Path:
+    """Download a file or directory from a GitHub repository.
+
+    Parameters
+    ----------
+    branch : str, optional
+        The branch to fetch the files from, by default ``"main"``.
+    content_path : str
+        The directory or file to fetch from the repository
+    dir : str, optional
+        The directory to save the files to, by default ``"."``.
+
+    Returns
+    -------
+    Path
+        The path to the temporary folder containing the files.
+    """
+    pat = get_user_pat()
+    if not pat:
+        logger.abort(
+            "GitHub Personal Access Token (PAT) not found. Run 'entaldocs set-github-pat' to set it.",
+            exit=1,
+        )
+        sys.exit(1)
+    auth = Token(pat)
+    g = Github(auth=auth)
+    repo = g.get_repo("entalpic/entaldocs")
+    try:
+        contents = search_contents(repo, branch=branch, content_path=content_path)
+    except UnknownObjectException:
+        branches = repo.get_branches()
+        has_branch = any(b.name == branch for b in branches)
+        if not has_branch:
+            logger.abort(f"Branch not found: {branch}", exit=1)
+        else:
+            logger.abort(
+                f"Could not find repository contents: {content_path} on branch {branch}",
+                exit=1,
+            )
+        return
+
+    base_dir = resolve_path(dir)
+    for name, content in contents:
+        path = Path(base_dir) / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(content)

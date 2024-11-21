@@ -39,7 +39,9 @@ rst_prolog = """
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_title = "entaldocs"  # Title for the HTML output for the docs, typically the project's name
+html_title = (
+    "entaldocs"  # Title for the HTML output for the docs, typically the project's name
+)
 html_theme = "shibuya"
 html_static_path = ["_static"]
 html_css_files = ["css/custom.css"]
@@ -88,6 +90,7 @@ todo_include_todos = True
 # sphinx.ext.intersphinx
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
+    "github": ("https://pygithub.readthedocs.io/en/stable/", None),
 }
 
 # sphinx.ext.autodoc & autoapi.extension
@@ -95,7 +98,7 @@ intersphinx_mapping = {
 autodoc_typehints = "signature"
 autoapi_type = "python"
 autoapi_dirs = ["../../entaldocs"]  # list of paths to the packages to document
-autoapi_ignore = ["*.venv/*", "*/tests/*", "*__defaults/*"]
+autoapi_ignore = ["*.venv/*", "*/tests/*", "*boilerplate/*"]
 autoapi_member_order = "bysource"
 autoapi_template_dir = "_templates/autoapi"
 autoapi_python_class_content = "init"
