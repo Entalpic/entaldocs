@@ -31,12 +31,14 @@ from entaldocs.utils import (
     make_empty_folders,
     overwrite_docs_files,
     resolve_path,
+    run_command,
     update_conf_py,
+    write_pre_commit_file,
+    write_rtd_config,
 )
 
 _app = App(
     help="A CLI tool to initialize a Sphinx documentation project with standard Entalpic config.",
-    default_parameter=Parameter(negative=()),
 )
 """:py:class:`cyclopts.App`: The main CLI application."""
 
@@ -314,3 +316,119 @@ def set_github_pat(pat: Optional[str] = ""):
     set_password("entaldocs", "github_pat", pat)
     logger.success("GitHub PAT set.")
     logger.success("GitHub PAT set.")
+
+
+@_app.command
+def quickstart(
+    as_app: bool = False,
+    precommit: bool | None = None,
+    docs: bool | None = None,
+    deps: bool | None = None,
+    docs_path: str = "./docs",
+    as_main: bool | None = None,
+    overwrite: bool = False,
+    with_defaults: bool = False,
+    branch: str = "main",
+    contents: str = "boilerplate",
+):
+    """Start a ``uv``-based Python project from scratch, with initial project structure and docs.
+
+    Overall:
+
+    * Initializes a new ``uv`` project with ``$ uv init``.
+    * Installs recommended dependencies with ``$ uv add --dev [...]``.
+    * Initializes a new Sphinx project at the specified path as per ``$ entaldocs init``.
+    * Initializes pre-commit hooks with ``$ uv run pre-commit install``.
+
+    .. note::
+
+        The default behavior is to initialize the project as a library (with a package structure within a ``src/`` folder).
+        Use the ``--as-app`` flag to initialize the project as an app (just a script file to start with).
+
+    .. important::
+
+        Using ``--with-defaults`` will trust the defaults and skip all prompts:
+
+        - Install recommended dependencies.
+        - Initialize pre-commit hooks.
+        - Initialize the docs.
+
+    Parameters
+    ----------
+    as_app : bool, optional
+        Whether to initialize the project as an app (just a script file to start with) or
+        a library (with a package structure within a ``src/`` folder).
+    precommit : bool, optional
+        Whether to install pre-commit hooks, by default ``None`` (i.e. prompt the user).
+    docs : bool, optional
+        Whether to initialize the docs, by default ``None`` (i.e. prompt the user).
+    deps : bool, optional
+        Whether to install dependencies, by default ``None`` (i.e. prompt the user).
+    docs_path : str, optional
+        Where to build the docs.
+    as_main : bool, optional
+        Whether to include docs dependencies in the main dependencies, by default ``None`` (i.e. prompt the user).
+    overwrite : bool, optional
+        Whether to overwrite existing docs (if any).
+    with_defaults : bool, optional
+        Whether to trust the defaults and skip all prompts.
+    branch : str, optional
+        The branch to fetch the static files from.
+    contents : str, optional
+        The path to the static files in the repository.
+    """
+    has_uv = bool(run_command(["uv", "--version"]))
+    if not has_uv:
+        logger.abort(
+            "uv not found. Please install it first -> https://docs.astral.sh/uv/getting-started/installation/"
+        )
+
+    if with_defaults:
+        if precommit is not None:
+            logger.warning("Ignoring precommit argument because of --with-defaults.")
+        precommit = True
+        if docs is not None:
+            logger.warning("Ignoring docs argument because of --with-defaults.")
+        docs = True
+        if deps is not None:
+            logger.warning("Ignoring deps argument because of --with-defaults.")
+        deps = True
+        if as_main is not None:
+            logger.warning("Ignoring as_main argument because of --with-defaults.")
+        as_main = False
+
+    initialized = run_command(["uv", "init"] + ([] if as_app else ["--lib"]))
+    if initialized is False:
+        logger.abort("Failed to initialize the project.")
+
+    if deps is None:
+        deps = logger.confirm("Would you like to install recommended dependencies?")
+    if deps:
+        dev_deps = load_deps()["dev"]
+        installed = run_command(["uv", "add", "--dev"] + dev_deps)
+        if installed is False:
+            logger.abort("Failed to install the dev dependencies.")
+        logger.success("Dev dpendencies installed.")
+
+    if precommit is None:
+        precommit = logger.confirm("Would you like to install pre-commit hooks?")
+    if precommit:
+        write_pre_commit_file()
+        pre_commit_installed = run_command(["uv", "run", "pre-commit", "install"])
+        if pre_commit_installed is False:
+            logger.abort("Failed to install pre-commit hooks.")
+
+    if docs is None:
+        docs = logger.confirm("Would you like to initialize the docs?")
+    if docs:
+        write_rtd_config()
+        init(
+            path=docs_path,
+            as_main=as_main,
+            overwrite=overwrite,
+            deps=deps,
+            with_defaults=with_defaults,
+            branch=branch,
+            contents=contents,
+        )
+    logger.success("Done.")
