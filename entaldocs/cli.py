@@ -31,6 +31,7 @@ from entaldocs.utils import (
     make_empty_folders,
     overwrite_docs_files,
     resolve_path,
+    update_conf_py,
 )
 
 _app = App(
@@ -259,7 +260,14 @@ def update(path: str = "./docs", branch: str = "main", contents: str = "boilerpl
     static = path / "source" / "_static"
     if not static.exists():
         logger.abort(f"Static folder not found: {static}", exit=1)
-    copy_boilerplate(dest=path, branch=branch, content_path=contents, overwrite=False)
+    copy_boilerplate(
+        dest=path,
+        branch=branch,
+        content_path=contents,
+        overwrite=False,
+        include_files_regex="_static",
+    )
+    update_conf_py(path, branch=branch)
     logger.success("Static files updated.")
 
 
@@ -302,4 +310,5 @@ def set_github_pat(pat: Optional[str] = ""):
         pat = logger.prompt("Enter your GitHub PAT")
     logger.confirm("Are you sure you want to set the GitHub PAT?")
     set_password("entaldocs", "github_pat", pat)
+    logger.success("GitHub PAT set.")
     logger.success("GitHub PAT set.")
