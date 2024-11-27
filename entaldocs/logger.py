@@ -145,6 +145,16 @@ class Logger:
         """
         print(f"{self.prefix}[yellow]{message}[/yellow]")
 
+    def error(self, message: str):
+        """Print an error message.
+
+        Parameters
+        ----------
+        message : str
+            The message to print.
+        """
+        print(f"{self.prefix}[red]{message}[/red]")
+
     def info(self, message: str):
         """Print an info message.
 
