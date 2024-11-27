@@ -148,3 +148,25 @@ hoverxref_mathjax = True
 #     "enable": True,
 #     # "image": "./_static/images/logo.png",
 # }
+
+
+# :entaldocs: <update>
+# DO NOT change what is between <update> and </update>
+# it may be overwritten in subsequent `entaldocs update` calls
+# ----------------------------X---------------------------------
+
+
+def skip_submodules(app, what, name, obj, skip, options):
+    if what == "attribute":
+        if obj.is_undoc_member:
+            print(f"  • Skipping {what} {name} because it is not documented.")
+            return True
+    return skip
+
+
+def setup(sphinx):
+    sphinx.connect("autoapi-skip-member", skip_submodules)
+
+
+# ----------------------------X---------------------------------
+# :entaldocs: </update>
