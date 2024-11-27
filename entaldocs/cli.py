@@ -219,11 +219,11 @@ def show_deps(as_pip: bool = False):
     """
     deps = load_deps()
     if as_pip:
-        print(" ".join(deps))
+        print(" ".join([d for k in deps for d in deps[k]]))
     else:
         print("Dependencies:")
-        for dep_and_ver in deps:
-            print("  • " + dep_and_ver)
+        for scope in deps:
+            print("  • " + scope + ": " + " ".join(deps[scope]))
 
 
 @_app.command
