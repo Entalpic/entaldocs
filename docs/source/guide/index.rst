@@ -12,20 +12,11 @@ Contribution Guide
 
     :doc:`write-docstrings` contains a guide on how to write docstrings in particular (which requires basic understanding of reStructuredText).
 
-.. .. toctree::
-..     :maxdepth: 1
-
-..     self
-..     /guide/conventions
-..     /guide/write-documentation
-..     /guide/write-docstrings
-..     /guide/github
-..     /guide/example
-
 .. toctree::
-  :glob:
-  :titlesonly:
-  :maxdepth: 2
+    :maxdepth: 1
 
-  self
-  **
+    /guide/conventions
+    /guide/write-documentation
+    /guide/write-docstrings
+    /guide/github
+    /guide/example
