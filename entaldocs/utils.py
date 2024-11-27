@@ -193,19 +193,22 @@ def update_conf_py(dest: Path, branch: str = "main"):
         dest_content = dest.read_text()
         # get the content between the start and end patterns in the source file
         pattern = f"{start_pattern}(.+){end_pattern}"
-        incoming = re.search(pattern, src_content, re.DOTALL)
+        incoming = re.search(pattern, src_content, flags=re.DOTALL)
         if not incoming:
             return
         incoming = incoming.group(1)
 
         # replace the content between the start and end patterns in the destination file
         replacement = f"{start_pattern}{incoming}{end_pattern}"
-        if re.search(pattern, dest_content, re.DOTALL):
+        if re.search(pattern, dest_content, flags=re.DOTALL):
             # pattern exists, replace it
-            dest_content = re.sub(pattern, replacement, dest_content, re.DOTALL)
+            dest_content = re.sub(pattern, replacement, dest_content, flags=re.DOTALL)
         else:
             # pattern does not exist, add it
             dest_content += f"\n{replacement}\n"
+
+        if not dest_content.endswith("\n"):
+            dest_content += "\n"
 
         # write the updated content to the destination file
         dest.write_text(dest_content)
