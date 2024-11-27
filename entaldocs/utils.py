@@ -122,8 +122,17 @@ def copy_boilerplate(
     overwrite: bool,
     branch: str = "main",
     content_path: str = "boilerplate",
+    include_files_regex: str = ".*",
 ):
     """Copy the target files to the specified path.
+
+    You can specify specific files to include using a regex pattern,
+    used (approximately) as follows:
+
+    .. code-block:: python
+
+        with TemporaryDirectory() as tmpdir:
+            keep_file = re.findall(regex, str(file.relative_to(tmpdir)))
 
     Parameters
     ----------
@@ -135,9 +144,18 @@ def copy_boilerplate(
         The branch to fetch the files from, by default ``"main"``.
     content_path: str
         The directory or file to fetch from the repository
+    include_files_regex: str
+        A regex pattern to include only files that match the pattern with :func:`re.findall`.
     """
     with TemporaryDirectory() as tmpdir:
         fetch_github_files(branch=branch, content_path=content_path, dir=tmpdir)
+        tmpdir = Path(tmpdir)
+        if include_files_regex:
+            for f in tmpdir.rglob("*"):
+                fn = str(f.relative_to(tmpdir))
+                if f.is_file() and not re.match(include_files_regex, fn):
+                    f.unlink()
+
         dest = resolve_path(dest)
 
         assert dest.exists(), f"Destination folder not found: {dest}"
