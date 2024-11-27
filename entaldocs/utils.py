@@ -122,8 +122,17 @@ def copy_boilerplate(
     overwrite: bool,
     branch: str = "main",
     content_path: str = "boilerplate",
+    include_files_regex: str = ".*",
 ):
     """Copy the target files to the specified path.
+
+    You can specify specific files to include using a regex pattern,
+    used (approximately) as follows:
+
+    .. code-block:: python
+
+        with TemporaryDirectory() as tmpdir:
+            keep_file = re.findall(regex, str(file.relative_to(tmpdir)))
 
     Parameters
     ----------
@@ -135,9 +144,18 @@ def copy_boilerplate(
         The branch to fetch the files from, by default ``"main"``.
     content_path: str
         The directory or file to fetch from the repository
+    include_files_regex: str
+        A regex pattern to include only files that match the pattern with :func:`re.findall`.
     """
     with TemporaryDirectory() as tmpdir:
         fetch_github_files(branch=branch, content_path=content_path, dir=tmpdir)
+        tmpdir = Path(tmpdir)
+        if include_files_regex:
+            for f in tmpdir.rglob("*"):
+                fn = str(f.relative_to(tmpdir))
+                if f.is_file() and not re.match(include_files_regex, fn):
+                    f.unlink()
+
         dest = resolve_path(dest)
 
         assert dest.exists(), f"Destination folder not found: {dest}"
@@ -147,6 +165,53 @@ def copy_boilerplate(
             dirs_exist_ok=True,
             copy_function=copy2 if overwrite else _copy_not_overwrite,
         )
+
+
+def update_conf_py(dest: Path, branch: str = "main"):
+    """Update the ``conf.py`` file with the latest content from the boilerplate.
+
+    Parameters
+    ----------
+    dest : Path
+        The path to the ``conf.py`` file.
+    branch : str, optional
+        Which remote branch to get ``conf.py`` from, by default ``"main"``
+    """
+    with TemporaryDirectory() as tmpdir:
+        fetch_github_files(
+            branch=branch, content_path="boilerplate/source/conf.py", dir=tmpdir
+        )
+        tmpdir = Path(tmpdir)
+        src = tmpdir / "conf.py"
+        dest = resolve_path(dest / "source/conf.py")
+        assert dest.exists(), f"Destination file (conf.py) not found: {dest}"
+        start_pattern = "# :entaldocs: <update>"
+        end_pattern = "# :entaldocs: </update>"
+
+        # load the source and destination files contents
+        src_content = src.read_text()
+        dest_content = dest.read_text()
+        # get the content between the start and end patterns in the source file
+        pattern = f"{start_pattern}(.+){end_pattern}"
+        incoming = re.search(pattern, src_content, flags=re.DOTALL)
+        if not incoming:
+            return
+        incoming = incoming.group(1)
+
+        # replace the content between the start and end patterns in the destination file
+        replacement = f"{start_pattern}{incoming}{end_pattern}"
+        if re.search(pattern, dest_content, flags=re.DOTALL):
+            # pattern exists, replace it
+            dest_content = re.sub(pattern, replacement, dest_content, flags=re.DOTALL)
+        else:
+            # pattern does not exist, add it
+            dest_content += f"\n{replacement}\n"
+
+        if not dest_content.endswith("\n"):
+            dest_content += "\n"
+
+        # write the updated content to the destination file
+        dest.write_text(dest_content)
 
 
 def install_dependencies(uv: bool, dev: bool):
@@ -335,6 +400,8 @@ def search_contents(
 
     """
     contents = repo.get_contents(content_path, ref=branch)
+    if not isinstance(contents, list):
+        contents = [contents]
 
     # If we don't ajust the content path, fetching a folder will include the full content
     # path and the files will be copied to the wrong location:
@@ -361,9 +428,13 @@ def search_contents(
         else:
             logger.clear_line()
             print(f"Getting contents of '{file_content.path}'", end="\r")
+            # adjust file path
+            new_relative_path = file_content.path.replace(extra_path, "")
+            if new_relative_path.startswith("/"):
+                new_relative_path = new_relative_path[1:]
             data.append(
                 (
-                    file_content.path.replace(extra_path, ""),  # adjust file path
+                    new_relative_path,
                     file_content.decoded_content,
                 )
             )
@@ -375,7 +446,7 @@ def search_contents(
 def fetch_github_files(
     branch: str = "main", content_path: str = "boilerplate", dir: str = "."
 ) -> Path:
-    """Download a file or directory from a GitHub repository.
+    """Download a file or directory from a GitHub repository and write it to ``dir``.
 
     Parameters
     ----------
