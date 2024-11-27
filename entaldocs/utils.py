@@ -10,7 +10,7 @@ from filecmp import cmp as compare_files
 from os.path import expandvars, relpath
 from pathlib import Path
 from shutil import copy2, copytree
-from subprocess import run
+from subprocess import CalledProcessError, run
 from tempfile import TemporaryDirectory
 
 from github import Github, UnknownObjectException
@@ -23,6 +23,28 @@ from entaldocs.logger import Logger
 
 logger = Logger("entaldocs")
 """A logger to log messages to the console."""
+
+
+def run_command(cmd: list[str], check: bool = True) -> str | bool:
+    """Run a command in the shell.
+
+    Parameters
+    ----------
+    cmd : list[str]
+        The command to run.
+    check : bool, optional
+        Whether to raise an error if the command fails, by default ``True``.
+
+    Returns
+    -------
+    str | bool
+        The result of the command.
+    """
+    try:
+        return run(cmd, check=check, capture_output=True, text=True, encoding="utf-8")
+    except CalledProcessError as e:
+        logger.error(e.stderr)
+        return False
 
 
 def get_user_pat():
@@ -228,6 +250,10 @@ def install_dependencies(uv: bool, dev: bool):
     if dev:
         cmd.append("--dev")
     cmd.extend(load_deps()["docs"])
+    # capture error and output
+    output = run_command(cmd)
+    if output is not False:
+        print(output.stdout.strip())
 
 
 def make_empty_folders(dest: Path):
@@ -323,10 +349,8 @@ def get_repo_url(with_defaults: bool) -> str:
     """
     url = ""
     try:
-        ssh_url = run(
-            ["git", "config", "--get", "remote.origin.url"],
-            capture_output=True,
-            text=True,
+        ssh_url = run_command(
+            ["git", "config", "--get", "remote.origin.url"]
         ).stdout.strip()
         html_url = "https://github.com/" + ssh_url.split(":")[-1].replace(".git", "")
         url = (
