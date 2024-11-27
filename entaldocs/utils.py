@@ -12,6 +12,7 @@ from pathlib import Path
 from shutil import copy2, copytree
 from subprocess import CalledProcessError, run
 from tempfile import TemporaryDirectory
+from textwrap import dedent
 
 from github import Github, UnknownObjectException
 from github.Auth import Token
@@ -531,3 +532,56 @@ def fetch_github_files(
         path = Path(base_dir) / name
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(content)
+
+
+def write_pre_commit_file() -> None:
+    """Write the pre-commit file to the current directory."""
+    pre_commit = Path(".pre-commit-config.yaml")
+    if pre_commit.exists():
+        logger.warning("pre-commit file already exists. Skipping.")
+        return
+    pre_commit.write_text(
+        dedent(
+            """\
+            repos:
+                - repo: https://github.com/astral-sh/ruff-pre-commit
+                # Ruff version.
+                rev: v0.7.4
+                hooks:
+                    # Run the linter.
+                    - id: ruff
+                    # Run the formatter.
+                    - id: ruff-format
+                        args: [--check]
+            """
+        )
+    )
+    logger.info("pre-commit file written.")
+
+
+def write_rtd_config() -> None:
+    """Write the ReadTheDocs configuration file to the current directory."""
+    rtd = Path(".readthedocs.yml")
+    if rtd.exists():
+        logger.warning("ReadTheDocs file already exists. Skipping.")
+        return
+    pyver = get_pyver()
+    rtd.write_text(
+        dedent(
+            f"""\
+            version: 2
+
+            build:
+                os: "ubuntu-22.04"
+                tools:
+                    python: "{pyver}"
+                commands:
+                    - asdf plugin add uv
+                    - asdf install uv latest
+                    - asdf global uv latest
+                    - uv sync
+                    - uv run sphinx-build -M html docs/source $READTHEDOCS_OUTPUT_DIR
+            """
+        )
+    )
+    logger.info("ReadTheDocs file written.")
