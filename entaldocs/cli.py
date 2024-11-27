@@ -19,7 +19,7 @@ from shutil import rmtree
 from subprocess import run
 from typing import Optional
 
-from cyclopts import App, Parameter
+from cyclopts import App
 from rich import print
 
 from entaldocs.utils import (
