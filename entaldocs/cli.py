@@ -255,20 +255,22 @@ def update(path: str = "./docs", branch: str = "main", contents: str = "boilerpl
     path = resolve_path(path)
     if not path.exists():
         logger.abort(f"Path not found: {path}", exit=1)
-    if not logger.confirm("This will overwrite the static files. Continue?"):
-        logger.abort("Aborting.", exit=1)
-    static = path / "source" / "_static"
-    if not static.exists():
-        logger.abort(f"Static folder not found: {static}", exit=1)
-    copy_boilerplate(
-        dest=path,
-        branch=branch,
-        content_path=contents,
-        overwrite=False,
-        include_files_regex="_static",
-    )
-    update_conf_py(path, branch=branch)
-    logger.success("Static files updated.")
+    if logger.confirm("This will overwrite the static files. Continue?"):
+        static = path / "source" / "_static"
+        if not static.exists():
+            logger.abort(f"Static folder not found: {static}", exit=1)
+        copy_boilerplate(
+            dest=path,
+            branch=branch,
+            content_path=contents,
+            overwrite=False,
+            include_files_regex="_static",
+        )
+        logger.success("Static files updated.")
+    if logger.confirm("Would you like to update the conf.py file?"):
+        update_conf_py(path, branch=branch)
+        logger.success("[r]conf.py[/r] updated.")
+    logger.success("Done.")
 
 
 @_app.command
