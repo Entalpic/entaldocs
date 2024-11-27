@@ -205,7 +205,7 @@ def update_conf_py(dest: Path, branch: str = "main"):
             dest_content = re.sub(pattern, replacement, dest_content, re.DOTALL)
         else:
             # pattern does not exist, add it
-            dest_content += f"\n{replacement}"
+            dest_content += f"\n{replacement}\n"
 
         # write the updated content to the destination file
         dest.write_text(dest_content)
@@ -397,6 +397,8 @@ def search_contents(
 
     """
     contents = repo.get_contents(content_path, ref=branch)
+    if not isinstance(contents, list):
+        contents = [contents]
 
     # If we don't ajust the content path, fetching a folder will include the full content
     # path and the files will be copied to the wrong location:
@@ -423,9 +425,13 @@ def search_contents(
         else:
             logger.clear_line()
             print(f"Getting contents of '{file_content.path}'", end="\r")
+            # adjust file path
+            new_relative_path = file_content.path.replace(extra_path, "")
+            if new_relative_path.startswith("/"):
+                new_relative_path = new_relative_path[1:]
             data.append(
                 (
-                    file_content.path.replace(extra_path, ""),  # adjust file path
+                    new_relative_path,
                     file_content.decoded_content,
                 )
             )
@@ -437,7 +443,7 @@ def search_contents(
 def fetch_github_files(
     branch: str = "main", content_path: str = "boilerplate", dir: str = "."
 ) -> Path:
-    """Download a file or directory from a GitHub repository.
+    """Download a file or directory from a GitHub repository and write it to ``dir``.
 
     Parameters
     ----------
