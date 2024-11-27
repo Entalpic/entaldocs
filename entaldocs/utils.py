@@ -58,6 +58,25 @@ def get_user_pat():
     return get_password("entaldocs", "github_pat")
 
 
+def get_pyver():
+    """Get the Python version from the user.
+
+    Returns
+    -------
+    str
+        The Python version.
+    """
+    python_version_file = Path(".python-version")
+    if python_version_file.exists():
+        return python_version_file.read_text().strip()
+    if run_command(["which", "uv"]):
+        # e.g. "Python 3.12.1"
+        full_version = run_command(["uv", "run", "python", "--version"]).stdout.strip()
+        version = full_version.split()[1]
+        major, minor, _ = version.split(".")
+        return f"{major}.{minor}"
+
+
 def resolve_path(path: str | Path) -> Path:
     """Resolve a path and expand environment variables.
 
