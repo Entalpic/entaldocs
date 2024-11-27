@@ -167,6 +167,50 @@ def copy_boilerplate(
         )
 
 
+def update_conf_py(dest: Path, branch: str = "main"):
+    """Update the ``conf.py`` file with the latest content from the boilerplate.
+
+    Parameters
+    ----------
+    dest : Path
+        The path to the ``conf.py`` file.
+    branch : str, optional
+        Which remote branch to get ``conf.py`` from, by default ``"main"``
+    """
+    with TemporaryDirectory() as tmpdir:
+        fetch_github_files(
+            branch=branch, content_path="boilerplate/source/conf.py", dir=tmpdir
+        )
+        tmpdir = Path(tmpdir)
+        src = tmpdir / "conf.py"
+        dest = resolve_path(dest / "source/conf.py")
+        assert dest.exists(), f"Destination file (conf.py) not found: {dest}"
+        start_pattern = "# :entaldocs: <update>"
+        end_pattern = "# :entaldocs: </update>"
+
+        # load the source and destination files contents
+        src_content = src.read_text()
+        dest_content = dest.read_text()
+        # get the content between the start and end patterns in the source file
+        pattern = f"{start_pattern}(.+){end_pattern}"
+        incoming = re.search(pattern, src_content, re.DOTALL)
+        if not incoming:
+            return
+        incoming = incoming.group(1)
+
+        # replace the content between the start and end patterns in the destination file
+        replacement = f"{start_pattern}{incoming}{end_pattern}"
+        if re.search(pattern, dest_content, re.DOTALL):
+            # pattern exists, replace it
+            dest_content = re.sub(pattern, replacement, dest_content, re.DOTALL)
+        else:
+            # pattern does not exist, add it
+            dest_content += f"\n{replacement}"
+
+        # write the updated content to the destination file
+        dest.write_text(dest_content)
+
+
 def install_dependencies(uv: bool, dev: bool):
     """Install dependencies for the docs.
 
