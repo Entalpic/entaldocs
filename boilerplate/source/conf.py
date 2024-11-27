@@ -153,6 +153,28 @@ hoverxref_mathjax = True
 
 
 def skip_submodules(app, what, name, obj, skip, options):
+    """Function used by ``autoapi-skip-member`` event to skip submodules.
+
+    Parameters
+    ----------
+    app : Sphinx
+        The Sphinx application object.
+    what : str
+        The type of the member.
+    name : str
+        The name of the member (like ``module.Class.attribute`` for instance).
+    obj : object
+        The Sphinx object representing the member.
+    skip : bool
+        Whether the member should be skipped (at this point, from the configuration).
+    options : list[str]
+        The options passed to the directive from ``conf.py``.
+
+    Returns
+    -------
+    bool
+        Whether the member should be skipped.
+    """
     if what == "attribute":
         if obj.is_undoc_member:
             print(f"  • Skipping {what} {name} because it is not documented.")
@@ -161,6 +183,13 @@ def skip_submodules(app, what, name, obj, skip, options):
 
 
 def setup(sphinx):
+    """Function to setup the Sphinx application.
+
+    Parameters
+    ----------
+    sphinx : Sphinx
+        The Sphinx application object.
+    """
     sphinx.connect("autoapi-skip-member", skip_submodules)
 
 
