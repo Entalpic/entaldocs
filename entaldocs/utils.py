@@ -227,10 +227,7 @@ def install_dependencies(uv: bool, dev: bool):
     cmd = ["uv", "add"] if uv else ["python", "-m", "pip", "install"]
     if dev:
         cmd.append("--dev")
-    cmd.extend(load_deps())
-    output = run(cmd, check=True)
-    if output.stdout:
-        print(output.stdout)
+    cmd.extend(load_deps()["docs"])
 
 
 def make_empty_folders(dest: Path):
