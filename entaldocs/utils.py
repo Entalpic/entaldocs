@@ -580,7 +580,7 @@ def write_rtd_config() -> None:
                     - asdf install uv latest
                     - asdf global uv latest
                     - uv sync
-                    - uv run sphinx-build -M html docs/source $READTHEDOCS_OUTPUT_DIR
+                    - uv run sphinx-build -M html docs/source $READTHEDOCS_OUTPUT
             """
         )
     )

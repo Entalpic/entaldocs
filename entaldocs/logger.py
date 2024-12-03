@@ -1,9 +1,9 @@
 """
 A module to log messages to the console.
 
-This module provides a class to log messages to the console with different levels of
-severity, along with methods to prompt the user for input, confirm messages, abort the
-program, and clear the current line.
+This module provides a class to log messages to the console with different levels of severity,
+along with methods to prompt the user for input, confirm messages, abort the program, and clear the
+current line.
 
 Example
 -------
