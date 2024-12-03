@@ -545,13 +545,13 @@ def write_pre_commit_file() -> None:
             """\
             repos:
                 - repo: https://github.com/astral-sh/ruff-pre-commit
-                # Ruff version.
-                rev: v0.7.4
-                hooks:
-                    # Run the linter.
-                    - id: ruff
-                    # Run the formatter.
-                    - id: ruff-format
+                  # Ruff version.
+                  rev: v0.7.4
+                  hooks:
+                      # Run the linter.
+                      - id: ruff
+                      # Run the formatter.
+                      - id: ruff-format
                         args: [--check]
             """
         )
