@@ -7,7 +7,8 @@ Learn how to use with:
 
     $ entaldocs --help
     $ entaldocs set-github-pat --help
-    $ entaldocs init --help
+    $ entaldocs quickstart-project --help
+    $ entaldocs init-docs --help
     $ entaldocs show-deps --help
     $ entaldocs update --help
 
@@ -53,7 +54,7 @@ def app():
 
 
 @_app.command
-def init(
+def init_docs(
     path: str = "./docs",
     as_main: bool = None,
     overwrite: bool = False,
@@ -63,13 +64,14 @@ def init(
     branch: str = "main",
     contents: str = "boilerplate",
 ):
-    """Initialize a Sphinx documentation project with Entalpic's standard configuration.
+    """Initialize a Sphinx documentation project with Entalpic's standard configuration (also called within `entaldocs quickstart-project`).
 
     In particular:
 
     - Initializes a new Sphinx project at the specified path.
 
-    - Optionally installs recommended dependencies (run `entaldocs show-deps` to see them).
+    - Optionally installs recommended dependencies (run `entaldocs show-deps` to see
+      them).
 
     - Uses the split source / build folder structure.
 
@@ -77,16 +79,18 @@ def init(
 
     .. warning::
 
-        If you don't install the dependencies here, you will need to install them manually.
+        If you don't install the dependencies here, you will need to install them
+        manually.
 
     .. important::
 
-        Update the placeholders (``$FILL_HERE``) in the generated files with the appropriate values before you
-        build the documentation.
+        Update the placeholders (``$FILL_HERE``) in the generated files with the
+        appropriate values before you build the documentation.
 
     .. tip::
 
-        Build the local HTML docs by running ``$ make clean && make html`` from the documentation folder.
+        Build the local HTML docs by running ``$ make clean && make html`` from the
+        documentation folder.
 
     Parameters
     ----------
@@ -210,7 +214,7 @@ def init(
 
 @_app.command
 def show_deps(as_pip: bool = False):
-    """Show the recommended dependencies for the documentation that would be installed with `entaldocs init`.
+    """Show the recommended dependencies for the documentation that would be installed with `entaldocs init-docs`.
 
     Parameters
     ----------
@@ -236,13 +240,14 @@ def update(path: str = "./docs", branch: str = "main", contents: str = "boilerpl
 
     .. important::
 
-        ``$ entaldocs update`` requires a GitHub Personal Access Token (PAT) to fetch the latest
-        version of the documentation's static files etc. from the repository.
+        ``$ entaldocs update`` requires a GitHub Personal Access Token (PAT) to fetch
+        the latest version of the documentation's static files etc. from the repository.
         Run ``$ entaldocs set-github-pat`` to do so.
 
     .. note::
 
-        Existing files will be backed up to ``{filename}.bak`` before new files are copied.
+        Existing files will be backed up to ``{filename}.bak`` before new files are
+        copied.
 
     Parameters
     ----------
@@ -280,15 +285,16 @@ def set_github_pat(pat: Optional[str] = ""):
     """
     Store a GitHub Personal Access Token (PAT) in your keyring.
 
-    A Github PAT is required to fetch the latest version of the
-    documentation's static files etc. from the repository.
+    A Github PAT is required to fetch the latest version of the documentation's static
+    files etc. from the repository.
 
     `About GitHub PAT <https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#about-personal-access-tokens>`_
 
     `Creating Github a PAT <https://github.com/settings/tokens>`_
 
 
-    1. Go to ``Settings > Developer settings > Personal access tokens (fine-grained) > Generate new token``.
+    1. Go to ``Settings > Developer settings > Personal access tokens (fine-grained) >
+       Generate new token``.
     2. Name it ``entaldocs``.
     3. Set ``Entalpic`` as resource owner
     4. Expire it in 1 year.
@@ -319,7 +325,7 @@ def set_github_pat(pat: Optional[str] = ""):
 
 
 @_app.command
-def quickstart(
+def quickstart_project(
     as_app: bool = False,
     precommit: bool | None = None,
     docs: bool | None = None,
@@ -337,13 +343,15 @@ def quickstart(
 
     * Initializes a new ``uv`` project with ``$ uv init``.
     * Installs recommended dependencies with ``$ uv add --dev [...]``.
-    * Initializes a new Sphinx project at the specified path as per ``$ entaldocs init``.
+    * Initializes a new Sphinx project at the specified path as per ``$ entaldocs
+      init-docs``.
     * Initializes pre-commit hooks with ``$ uv run pre-commit install``.
 
     .. note::
 
-        The default behavior is to initialize the project as a library (with a package structure within a ``src/`` folder).
-        Use the ``--as-app`` flag to initialize the project as an app (just a script file to start with).
+        The default behavior is to initialize the project as a library (with a package
+        structure within a ``src/`` folder). Use the ``--as-app`` flag to initialize the
+        project as an app (just a script file to start with).
 
     .. important::
 
@@ -353,11 +361,17 @@ def quickstart(
         - Initialize pre-commit hooks.
         - Initialize the docs.
 
+    .. important::
+
+        If you generate the docs, (with ``--docs`` or ``--with-defaults``) parameters
+        like ``--deps`` and ``--as_main`` will passed to the ``entaldocs init-docs``
+        command so it may be worth checking ``$ entaldocs init-docs --help``.
+
     Parameters
     ----------
     as_app : bool, optional
-        Whether to initialize the project as an app (just a script file to start with) or
-        a library (with a package structure within a ``src/`` folder).
+        Whether to initialize the project as an app (just a script file to start with)
+        or a library (with a package structure within a ``src/`` folder).
     precommit : bool, optional
         Whether to install pre-commit hooks, by default ``None`` (i.e. prompt the user).
     docs : bool, optional
@@ -367,9 +381,11 @@ def quickstart(
     docs_path : str, optional
         Where to build the docs.
     as_main : bool, optional
-        Whether to include docs dependencies in the main dependencies, by default ``None`` (i.e. prompt the user).
+        Whether to include docs dependencies in the main dependencies, by default
+        ``None`` (i.e. prompt the user).
     overwrite : bool, optional
-        Whether to overwrite existing docs (if any).
+        Whether to overwrite existing files (if any). Will be passed to ``entaldocs
+        init-docs``.
     with_defaults : bool, optional
         Whether to trust the defaults and skip all prompts.
     branch : str, optional
@@ -422,7 +438,7 @@ def quickstart(
         docs = logger.confirm("Would you like to initialize the docs?")
     if docs:
         write_rtd_config()
-        init(
+        init_docs(
             path=docs_path,
             as_main=as_main,
             overwrite=overwrite,
