@@ -282,6 +282,7 @@ def update(path: str = "./docs", branch: str = "main", contents: str = "boilerpl
         write_or_update_pre_commit_file()
         has_uv = Path("uv.lock").exists()
         if has_uv:
+            run_command(["uv", "add", "--dev", "pre-commit"])
             run_command(["uv", "run", "pre-commit", "install"])
         else:
             run_command(["pre-commit", "install"])
