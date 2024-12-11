@@ -263,7 +263,7 @@ def update(path: str = "./docs", branch: str = "main", contents: str = "boilerpl
     path = resolve_path(path)
     if not path.exists():
         logger.abort(f"Path not found: {path}", exit=1)
-    if logger.confirm("Overwrite the documentation's HTMLstatic files. Continue?"):
+    if logger.confirm("Overwrite the documentation's HTML static files. Continue?"):
         static = path / "source" / "_static"
         if not static.exists():
             logger.abort(f"Static folder not found: {static}", exit=1)
