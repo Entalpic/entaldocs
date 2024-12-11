@@ -18,12 +18,50 @@ from github.Auth import Token
 from github.Repository import Repository
 from keyring import get_password
 from rich import print
-from yaml import safe_dump, safe_load
+from ruamel.yaml import YAML
 
 from entaldocs.logger import Logger
 
 logger = Logger("entaldocs")
 """A logger to log messages to the console."""
+
+
+def safe_dump(data, file, **kwargs):
+    """Uses ``ruamel.yaml`` to dump data to a file.
+
+    Parameters
+    ----------
+    data : dict
+        The data to dump to the file.
+    file : str | Path | IO
+        The file to dump the data to.
+    """
+    handle = file
+    if isinstance(file, str):
+        handle = open(file, "w")
+    else:
+        handle = file
+
+    yaml = YAML(typ="rt", pure=True)
+    yaml.default_flow_style = False
+    yaml.dump(data, handle, **kwargs)
+    if isinstance(file, str):
+        handle.close()
+
+
+def safe_load(file):
+    """Uses ``ruamel.yaml`` to load data from a file.
+
+    Parameters
+    ----------
+    file : str | Path | IO
+        The file to load the data from.
+    """
+    handle = file
+    if isinstance(file, str):
+        handle = open(file, "r")
+    yaml = YAML(typ="safe", pure=True)
+    return yaml.load(handle)
 
 
 def run_command(cmd: list[str], check: bool = True) -> str | bool:
@@ -548,6 +586,14 @@ def write_or_update_pre_commit_file() -> None:
             reference = safe_load(f)
 
         # Update existing config with reference repos
+        if not isinstance(current, dict):
+            current = {}
+        if not isinstance(reference, dict):
+            reference = {}
+        if "repos" not in current:
+            current["repos"] = []
+        if "repos" not in reference:
+            reference["repos"] = []
         current_repos = {repo["repo"]: repo for repo in current["repos"]}
         for repo in reference["repos"]:
             current_repos[repo["repo"]] = repo
@@ -555,8 +601,7 @@ def write_or_update_pre_commit_file() -> None:
         current["repos"] = list(current_repos.values())
 
         # Write updated config
-        with open(pre_commit, "w") as f:
-            safe_dump(current, f, sort_keys=False)
+        safe_dump(current, pre_commit)
         logger.info("pre-commit file updated.")
         return
 
@@ -587,7 +632,6 @@ def write_rtd_config() -> None:
             ],
         },
     }
-    with open(rtd, "w") as f:
-        safe_dump(config, f, sort_keys=False)
 
+    safe_dump(config, rtd)
     logger.info("ReadTheDocs file written.")
