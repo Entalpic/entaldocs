@@ -16,6 +16,7 @@ You can also refer to the :ref:`entaldocs-cli-tutorial` for more information.
 """
 
 import sys
+from pathlib import Path
 from shutil import rmtree
 from subprocess import run
 from typing import Optional
@@ -34,7 +35,7 @@ from entaldocs.utils import (
     resolve_path,
     run_command,
     update_conf_py,
-    write_pre_commit_file,
+    write_or_update_pre_commit_file,
     write_rtd_config,
 )
 
@@ -262,7 +263,7 @@ def update(path: str = "./docs", branch: str = "main", contents: str = "boilerpl
     path = resolve_path(path)
     if not path.exists():
         logger.abort(f"Path not found: {path}", exit=1)
-    if logger.confirm("This will overwrite the static files. Continue?"):
+    if logger.confirm("Overwrite the documentation's HTMLstatic files. Continue?"):
         static = path / "source" / "_static"
         if not static.exists():
             logger.abort(f"Static folder not found: {static}", exit=1)
@@ -277,6 +278,9 @@ def update(path: str = "./docs", branch: str = "main", contents: str = "boilerpl
     if logger.confirm("Would you like to update the conf.py file?"):
         update_conf_py(path, branch=branch)
         logger.success("[r]conf.py[/r] updated.")
+    if logger.confirm("Would you like to update the pre-commit hooks?"):
+        write_or_update_pre_commit_file()
+        logger.success("Pre-commit hooks updated.")
     logger.success("Done.")
 
 
@@ -413,31 +417,55 @@ def quickstart_project(
             logger.warning("Ignoring as_main argument because of --with-defaults.")
         as_main = False
 
-    initialized = run_command(["uv", "init"] + ([] if as_app else ["--lib"]))
-    if initialized is False:
-        logger.abort("Failed to initialize the project.")
+    has_uv_lock = Path("uv.lock").exists()
+    if not has_uv_lock:
+        initialized = run_command(["uv", "init"] + ([] if as_app else ["--lib"]))
+        if initialized is False:
+            logger.abort("Failed to initialize the project.")
+        logger.success("Project initialized with uv.")
+    else:
+        logger.info("Project already initialized with uv.")
 
     if deps is None:
         deps = logger.confirm("Would you like to install recommended dependencies?")
     if deps:
         dev_deps = load_deps()["dev"]
-        installed = run_command(["uv", "add", "--dev"] + dev_deps)
-        if installed is False:
-            logger.abort("Failed to install the dev dependencies.")
-        logger.success("Dev dpendencies installed.")
+        # Check which dependencies are already installed
+        missing_deps = []
+        for dep in dev_deps:
+            try:
+                __import__(dep.split("[")[0])  # Handle cases like package[extra]
+            except ImportError:
+                missing_deps.append(dep)
+
+        if missing_deps:
+            installed = run_command(["uv", "add", "--dev"] + missing_deps)
+            if installed is False:
+                logger.abort("Failed to install the dev dependencies.")
+            logger.success("Dev dependencies installed.")
+        else:
+            logger.info("All dev dependencies already installed.")
 
     if precommit is None:
-        precommit = logger.confirm("Would you like to install pre-commit hooks?")
+        precommit = logger.confirm(
+            "Would you like to update & install pre-commit hooks?"
+        )
     if precommit:
-        write_pre_commit_file()
+        write_or_update_pre_commit_file()
         pre_commit_installed = run_command(["uv", "run", "pre-commit", "install"])
         if pre_commit_installed is False:
             logger.abort("Failed to install pre-commit hooks.")
+        logger.success("Pre-commit hooks installed.")
 
-    if docs is None:
+    has_rtd = Path(".readthedocs.yml").exists()
+    if docs is None and not has_rtd:
         docs = logger.confirm("Would you like to initialize the docs?")
     if docs:
-        write_rtd_config()
+        if not has_rtd:
+            write_rtd_config()
+            logger.success("ReadTheDocs config written.")
+        else:
+            logger.info("ReadTheDocs config already exists.")
         init_docs(
             path=docs_path,
             as_main=as_main,

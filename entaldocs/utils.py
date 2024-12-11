@@ -12,13 +12,13 @@ from pathlib import Path
 from shutil import copy2, copytree
 from subprocess import CalledProcessError, run
 from tempfile import TemporaryDirectory
-from textwrap import dedent
 
 from github import Github, UnknownObjectException
 from github.Auth import Token
 from github.Repository import Repository
 from keyring import get_password
 from rich import print
+from yaml import safe_dump, safe_load
 
 from entaldocs.logger import Logger
 
@@ -534,29 +534,36 @@ def fetch_github_files(
         path.write_bytes(content)
 
 
-def write_pre_commit_file() -> None:
+def write_or_update_pre_commit_file() -> None:
     """Write the pre-commit file to the current directory."""
     pre_commit = Path(".pre-commit-config.yaml")
+    ref = Path(__file__).parent / "precommits.yaml"
     if pre_commit.exists():
-        logger.warning("pre-commit file already exists. Skipping.")
+        # Load existing config
+        with open(pre_commit, "r") as f:
+            current = safe_load(f)
+
+        # Load reference config
+        with open(ref, "r") as f:
+            reference = safe_load(f)
+
+        # Update existing config with reference repos
+        current_repos = {repo["repo"]: repo for repo in current["repos"]}
+        for repo in reference["repos"]:
+            current_repos[repo["repo"]] = repo
+
+        current["repos"] = list(current_repos.values())
+
+        # Write updated config
+        with open(pre_commit, "w") as f:
+            safe_dump(current, f, sort_keys=False)
+        logger.info("pre-commit file updated.")
         return
-    pre_commit.write_text(
-        dedent(
-            """\
-            repos:
-                - repo: https://github.com/astral-sh/ruff-pre-commit
-                  # Ruff version.
-                  rev: v0.7.4
-                  hooks:
-                      # Run the linter.
-                      - id: ruff
-                      # Run the formatter.
-                      - id: ruff-format
-                        args: [--check]
-            """
-        )
-    )
+
+    # Copy reference file if no existing config
+    copy2(ref, pre_commit)
     logger.info("pre-commit file written.")
+    return
 
 
 def write_rtd_config() -> None:
