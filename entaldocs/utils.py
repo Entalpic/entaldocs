@@ -566,22 +566,21 @@ def write_rtd_config() -> None:
         logger.warning("ReadTheDocs file already exists. Skipping.")
         return
     pyver = get_pyver()
-    rtd.write_text(
-        dedent(
-            f"""\
-            version: 2
+    config = {
+        "version": 2,
+        "build": {
+            "os": "ubuntu-22.04",
+            "tools": {"python": pyver},
+            "commands": [
+                "asdf plugin add uv",
+                "asdf install uv latest",
+                "asdf global uv latest",
+                "uv sync",
+                "uv run sphinx-build -M html docs/source $READTHEDOCS_OUTPUT",
+            ],
+        },
+    }
+    with open(rtd, "w") as f:
+        safe_dump(config, f, sort_keys=False)
 
-            build:
-                os: "ubuntu-22.04"
-                tools:
-                    python: "{pyver}"
-                commands:
-                    - asdf plugin add uv
-                    - asdf install uv latest
-                    - asdf global uv latest
-                    - uv sync
-                    - uv run sphinx-build -M html docs/source $READTHEDOCS_OUTPUT
-            """
-        )
-    )
     logger.info("ReadTheDocs file written.")
