@@ -9,6 +9,7 @@ dependencies = [
     "cyclopts>=2.9.9",
     "pygithub>=2.5.0",
     "keyring>=25.5.0",
+    "pyyaml>=6.0.2",
 ]
 
 [project.scripts]

@@ -264,6 +264,7 @@ dependencies = [
     { name = "cyclopts" },
     { name = "keyring" },
     { name = "pygithub" },
+    { name = "pyyaml" },
     { name = "rich" },
 ]
 
@@ -285,6 +286,7 @@ requires-dist = [
     { name = "cyclopts", specifier = ">=2.9.9" },
     { name = "keyring", specifier = ">=25.5.0" },
     { name = "pygithub", specifier = ">=2.5.0" },
+    { name = "pyyaml", specifier = ">=6.0.2" },
     { name = "rich", specifier = ">=13.9.4" },
 ]
 
