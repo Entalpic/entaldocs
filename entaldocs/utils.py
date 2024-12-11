@@ -10,7 +10,7 @@ from filecmp import cmp as compare_files
 from os.path import expandvars, relpath
 from pathlib import Path
 from shutil import copy2, copytree
-from subprocess import run
+from subprocess import CalledProcessError, run
 from tempfile import TemporaryDirectory
 
 from github import Github, UnknownObjectException
@@ -18,11 +18,72 @@ from github.Auth import Token
 from github.Repository import Repository
 from keyring import get_password
 from rich import print
+from ruamel.yaml import YAML
 
 from entaldocs.logger import Logger
 
 logger = Logger("entaldocs")
 """A logger to log messages to the console."""
+
+
+def safe_dump(data, file, **kwargs):
+    """Uses ``ruamel.yaml`` to dump data to a file.
+
+    Parameters
+    ----------
+    data : dict
+        The data to dump to the file.
+    file : str | Path | IO
+        The file to dump the data to.
+    """
+    handle = file
+    if isinstance(file, str):
+        handle = open(file, "w")
+    else:
+        handle = file
+
+    yaml = YAML(typ="rt", pure=True)
+    yaml.default_flow_style = False
+    yaml.dump(data, handle, **kwargs)
+    if isinstance(file, str):
+        handle.close()
+
+
+def safe_load(file):
+    """Uses ``ruamel.yaml`` to load data from a file.
+
+    Parameters
+    ----------
+    file : str | Path | IO
+        The file to load the data from.
+    """
+    handle = file
+    if isinstance(file, str):
+        handle = open(file, "r")
+    yaml = YAML(typ="safe", pure=True)
+    return yaml.load(handle)
+
+
+def run_command(cmd: list[str], check: bool = True) -> str | bool:
+    """Run a command in the shell.
+
+    Parameters
+    ----------
+    cmd : list[str]
+        The command to run.
+    check : bool, optional
+        Whether to raise an error if the command fails, by default ``True``.
+
+    Returns
+    -------
+    str | bool
+        The result of the command.
+    """
+    try:
+        return run(cmd, check=check, capture_output=True, text=True, encoding="utf-8")
+    except CalledProcessError as e:
+        logger.error(e.stderr)
+        return False
 
 
 def get_user_pat():
@@ -34,6 +95,25 @@ def get_user_pat():
         The GitHub Personal Access Token (PAT).
     """
     return get_password("entaldocs", "github_pat")
+
+
+def get_pyver():
+    """Get the Python version from the user.
+
+    Returns
+    -------
+    str
+        The Python version.
+    """
+    python_version_file = Path(".python-version")
+    if python_version_file.exists():
+        return python_version_file.read_text().strip()
+    if run_command(["which", "uv"]):
+        # e.g. "Python 3.12.1"
+        full_version = run_command(["uv", "run", "python", "--version"]).stdout.strip()
+        version = full_version.split()[1]
+        major, minor, _ = version.split(".")
+        return f"{major}.{minor}"
 
 
 def resolve_path(path: str | Path) -> Path:
@@ -227,10 +307,11 @@ def install_dependencies(uv: bool, dev: bool):
     cmd = ["uv", "add"] if uv else ["python", "-m", "pip", "install"]
     if dev:
         cmd.append("--dev")
-    cmd.extend(load_deps())
-    output = run(cmd, check=True)
-    if output.stdout:
-        print(output.stdout)
+    cmd.extend(load_deps()["docs"])
+    # capture error and output
+    output = run_command(cmd)
+    if output is not False:
+        print(output.stdout.strip())
 
 
 def make_empty_folders(dest: Path):
@@ -326,10 +407,8 @@ def get_repo_url(with_defaults: bool) -> str:
     """
     url = ""
     try:
-        ssh_url = run(
-            ["git", "config", "--get", "remote.origin.url"],
-            capture_output=True,
-            text=True,
+        ssh_url = run_command(
+            ["git", "config", "--get", "remote.origin.url"]
         ).stdout.strip()
         html_url = "https://github.com/" + ssh_url.split(":")[-1].replace(".git", "")
         url = (
@@ -491,3 +570,68 @@ def fetch_github_files(
         path = Path(base_dir) / name
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(content)
+
+
+def write_or_update_pre_commit_file() -> None:
+    """Write the pre-commit file to the current directory."""
+    pre_commit = Path(".pre-commit-config.yaml")
+    ref = Path(__file__).parent / "precommits.yaml"
+    if pre_commit.exists():
+        # Load existing config
+        with open(pre_commit, "r") as f:
+            current = safe_load(f)
+
+        # Load reference config
+        with open(ref, "r") as f:
+            reference = safe_load(f)
+
+        # Update existing config with reference repos
+        if not isinstance(current, dict):
+            current = {}
+        if not isinstance(reference, dict):
+            reference = {}
+        if "repos" not in current:
+            current["repos"] = []
+        if "repos" not in reference:
+            reference["repos"] = []
+        current_repos = {repo["repo"]: repo for repo in current["repos"]}
+        for repo in reference["repos"]:
+            current_repos[repo["repo"]] = repo
+
+        current["repos"] = list(current_repos.values())
+
+        # Write updated config
+        safe_dump(current, pre_commit)
+        logger.info("pre-commit file updated.")
+        return
+
+    # Copy reference file if no existing config
+    copy2(ref, pre_commit)
+    logger.info("pre-commit file written.")
+    return
+
+
+def write_rtd_config() -> None:
+    """Write the ReadTheDocs configuration file to the current directory."""
+    rtd = Path(".readthedocs.yml")
+    if rtd.exists():
+        logger.warning("ReadTheDocs file already exists. Skipping.")
+        return
+    pyver = get_pyver()
+    config = {
+        "version": 2,
+        "build": {
+            "os": "ubuntu-22.04",
+            "tools": {"python": pyver},
+            "commands": [
+                "asdf plugin add uv",
+                "asdf install uv latest",
+                "asdf global uv latest",
+                "uv sync",
+                "uv run sphinx-build -M html docs/source $READTHEDOCS_OUTPUT",
+            ],
+        },
+    }
+
+    safe_dump(config, rtd)
+    logger.info("ReadTheDocs file written.")
