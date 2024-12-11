@@ -9,7 +9,7 @@ dependencies = [
     "cyclopts>=2.9.9",
     "pygithub>=2.5.0",
     "keyring>=25.5.0",
-    "pyyaml>=6.0.2",
+    "ruamel-yaml>=0.18.6",
 ]
 
 [project.scripts]
@@ -18,6 +18,7 @@ entaldocs = "entaldocs.cli:app"
 [tool.uv]
 dev-dependencies = [
     "ipython>=8.28.0",
+    "pre-commit>=4.0.1",
     "shibuya>=2024.10.15",
     "sphinx-autoapi>=3.3.2",
     "sphinx-autodoc-typehints>=2.5.0",
