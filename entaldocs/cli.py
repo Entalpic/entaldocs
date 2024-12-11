@@ -280,6 +280,11 @@ def update(path: str = "./docs", branch: str = "main", contents: str = "boilerpl
         logger.success("[r]conf.py[/r] updated.")
     if logger.confirm("Would you like to update the pre-commit hooks?"):
         write_or_update_pre_commit_file()
+        has_uv = Path("uv.lock").exists()
+        if has_uv:
+            run_command(["uv", "run", "pre-commit", "install"])
+        else:
+            run_command(["pre-commit", "install"])
         logger.success("Pre-commit hooks updated.")
     logger.success("Done.")
 
