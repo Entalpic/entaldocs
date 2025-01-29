@@ -7,7 +7,8 @@ Learn how to use with:
 
     $ entaldocs --help
     $ entaldocs set-github-pat --help
-    $ entaldocs init --help
+    $ entaldocs quickstart-project --help
+    $ entaldocs init-docs --help
     $ entaldocs show-deps --help
     $ entaldocs update --help
 
@@ -15,11 +16,12 @@ You can also refer to the :ref:`entaldocs-cli-tutorial` for more information.
 """
 
 import sys
+from pathlib import Path
 from shutil import rmtree
 from subprocess import run
 from typing import Optional
 
-from cyclopts import App, Parameter
+from cyclopts import App
 from rich import print
 
 from entaldocs.utils import (
@@ -31,12 +33,14 @@ from entaldocs.utils import (
     make_empty_folders,
     overwrite_docs_files,
     resolve_path,
+    run_command,
     update_conf_py,
+    write_or_update_pre_commit_file,
+    write_rtd_config,
 )
 
 _app = App(
     help="A CLI tool to initialize a Sphinx documentation project with standard Entalpic config.",
-    default_parameter=Parameter(negative=()),
 )
 """:py:class:`cyclopts.App`: The main CLI application."""
 
@@ -51,7 +55,7 @@ def app():
 
 
 @_app.command
-def init(
+def init_docs(
     path: str = "./docs",
     as_main: bool = None,
     overwrite: bool = False,
@@ -61,13 +65,14 @@ def init(
     branch: str = "main",
     contents: str = "boilerplate",
 ):
-    """Initialize a Sphinx documentation project with Entalpic's standard configuration.
+    """Initialize a Sphinx documentation project with Entalpic's standard configuration (also called within `entaldocs quickstart-project`).
 
     In particular:
 
     - Initializes a new Sphinx project at the specified path.
 
-    - Optionally installs recommended dependencies (run `entaldocs show-deps` to see them).
+    - Optionally installs recommended dependencies (run `entaldocs show-deps` to see
+      them).
 
     - Uses the split source / build folder structure.
 
@@ -75,16 +80,18 @@ def init(
 
     .. warning::
 
-        If you don't install the dependencies here, you will need to install them manually.
+        If you don't install the dependencies here, you will need to install them
+        manually.
 
     .. important::
 
-        Update the placeholders (``$FILL_HERE``) in the generated files with the appropriate values before you
-        build the documentation.
+        Update the placeholders (``$FILL_HERE``) in the generated files with the
+        appropriate values before you build the documentation.
 
     .. tip::
 
-        Build the local HTML docs by running ``$ make clean && make html`` from the documentation folder.
+        Build the local HTML docs by running ``$ make clean && make html`` from the
+        documentation folder.
 
     Parameters
     ----------
@@ -208,7 +215,7 @@ def init(
 
 @_app.command
 def show_deps(as_pip: bool = False):
-    """Show the recommended dependencies for the documentation that would be installed with `entaldocs init`.
+    """Show the recommended dependencies for the documentation that would be installed with `entaldocs init-docs`.
 
     Parameters
     ----------
@@ -217,11 +224,11 @@ def show_deps(as_pip: bool = False):
     """
     deps = load_deps()
     if as_pip:
-        print(" ".join(deps))
+        print(" ".join([d for k in deps for d in deps[k]]))
     else:
         print("Dependencies:")
-        for dep_and_ver in deps:
-            print("  • " + dep_and_ver)
+        for scope in deps:
+            print("  • " + scope + ": " + " ".join(deps[scope]))
 
 
 @_app.command
@@ -234,13 +241,14 @@ def update(path: str = "./docs", branch: str = "main", contents: str = "boilerpl
 
     .. important::
 
-        ``$ entaldocs update`` requires a GitHub Personal Access Token (PAT) to fetch the latest
-        version of the documentation's static files etc. from the repository.
+        ``$ entaldocs update`` requires a GitHub Personal Access Token (PAT) to fetch
+        the latest version of the documentation's static files etc. from the repository.
         Run ``$ entaldocs set-github-pat`` to do so.
 
     .. note::
 
-        Existing files will be backed up to ``{filename}.bak`` before new files are copied.
+        Existing files will be backed up to ``{filename}.bak`` before new files are
+        copied.
 
     Parameters
     ----------
@@ -255,7 +263,7 @@ def update(path: str = "./docs", branch: str = "main", contents: str = "boilerpl
     path = resolve_path(path)
     if not path.exists():
         logger.abort(f"Path not found: {path}", exit=1)
-    if logger.confirm("This will overwrite the static files. Continue?"):
+    if logger.confirm("Overwrite the documentation's HTML static files. Continue?"):
         static = path / "source" / "_static"
         if not static.exists():
             logger.abort(f"Static folder not found: {static}", exit=1)
@@ -270,6 +278,15 @@ def update(path: str = "./docs", branch: str = "main", contents: str = "boilerpl
     if logger.confirm("Would you like to update the conf.py file?"):
         update_conf_py(path, branch=branch)
         logger.success("[r]conf.py[/r] updated.")
+    if logger.confirm("Would you like to update the pre-commit hooks?"):
+        write_or_update_pre_commit_file()
+        has_uv = Path("uv.lock").exists()
+        if has_uv:
+            run_command(["uv", "add", "--dev", "pre-commit"])
+            run_command(["uv", "run", "pre-commit", "install"])
+        else:
+            run_command(["pre-commit", "install"])
+        logger.success("Pre-commit hooks updated.")
     logger.success("Done.")
 
 
@@ -278,15 +295,16 @@ def set_github_pat(pat: Optional[str] = ""):
     """
     Store a GitHub Personal Access Token (PAT) in your keyring.
 
-    A Github PAT is required to fetch the latest version of the
-    documentation's static files etc. from the repository.
+    A Github PAT is required to fetch the latest version of the documentation's static
+    files etc. from the repository.
 
     `About GitHub PAT <https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#about-personal-access-tokens>`_
 
     `Creating Github a PAT <https://github.com/settings/tokens>`_
 
 
-    1. Go to ``Settings > Developer settings > Personal access tokens (fine-grained) > Generate new token``.
+    1. Go to ``Settings > Developer settings > Personal access tokens (fine-grained) >
+       Generate new token``.
     2. Name it ``entaldocs``.
     3. Set ``Entalpic`` as resource owner
     4. Expire it in 1 year.
@@ -314,3 +332,153 @@ def set_github_pat(pat: Optional[str] = ""):
     set_password("entaldocs", "github_pat", pat)
     logger.success("GitHub PAT set.")
     logger.success("GitHub PAT set.")
+
+
+@_app.command
+def quickstart_project(
+    as_app: bool = False,
+    precommit: bool | None = None,
+    docs: bool | None = None,
+    deps: bool | None = None,
+    docs_path: str = "./docs",
+    as_main: bool | None = None,
+    overwrite: bool = False,
+    with_defaults: bool = False,
+    branch: str = "main",
+    contents: str = "boilerplate",
+):
+    """Start a ``uv``-based Python project from scratch, with initial project structure and docs.
+
+    Overall:
+
+    * Initializes a new ``uv`` project with ``$ uv init``.
+    * Installs recommended dependencies with ``$ uv add --dev [...]``.
+    * Initializes a new Sphinx project at the specified path as per ``$ entaldocs
+      init-docs``.
+    * Initializes pre-commit hooks with ``$ uv run pre-commit install``.
+
+    .. note::
+
+        The default behavior is to initialize the project as a library (with a package
+        structure within a ``src/`` folder). Use the ``--as-app`` flag to initialize the
+        project as an app (just a script file to start with).
+
+    .. important::
+
+        Using ``--with-defaults`` will trust the defaults and skip all prompts:
+
+        - Install recommended dependencies.
+        - Initialize pre-commit hooks.
+        - Initialize the docs.
+
+    .. important::
+
+        If you generate the docs, (with ``--docs`` or ``--with-defaults``) parameters
+        like ``--deps`` and ``--as_main`` will passed to the ``entaldocs init-docs``
+        command so it may be worth checking ``$ entaldocs init-docs --help``.
+
+    Parameters
+    ----------
+    as_app : bool, optional
+        Whether to initialize the project as an app (just a script file to start with)
+        or a library (with a package structure within a ``src/`` folder).
+    precommit : bool, optional
+        Whether to install pre-commit hooks, by default ``None`` (i.e. prompt the user).
+    docs : bool, optional
+        Whether to initialize the docs, by default ``None`` (i.e. prompt the user).
+    deps : bool, optional
+        Whether to install dependencies, by default ``None`` (i.e. prompt the user).
+    docs_path : str, optional
+        Where to build the docs.
+    as_main : bool, optional
+        Whether to include docs dependencies in the main dependencies, by default
+        ``None`` (i.e. prompt the user).
+    overwrite : bool, optional
+        Whether to overwrite existing files (if any). Will be passed to ``entaldocs
+        init-docs``.
+    with_defaults : bool, optional
+        Whether to trust the defaults and skip all prompts.
+    branch : str, optional
+        The branch to fetch the static files from.
+    contents : str, optional
+        The path to the static files in the repository.
+    """
+    has_uv = bool(run_command(["uv", "--version"]))
+    if not has_uv:
+        logger.abort(
+            "uv not found. Please install it first -> https://docs.astral.sh/uv/getting-started/installation/"
+        )
+
+    if with_defaults:
+        if precommit is not None:
+            logger.warning("Ignoring precommit argument because of --with-defaults.")
+        precommit = True
+        if docs is not None:
+            logger.warning("Ignoring docs argument because of --with-defaults.")
+        docs = True
+        if deps is not None:
+            logger.warning("Ignoring deps argument because of --with-defaults.")
+        deps = True
+        if as_main is not None:
+            logger.warning("Ignoring as_main argument because of --with-defaults.")
+        as_main = False
+
+    has_uv_lock = Path("uv.lock").exists()
+    if not has_uv_lock:
+        initialized = run_command(["uv", "init"] + ([] if as_app else ["--lib"]))
+        if initialized is False:
+            logger.abort("Failed to initialize the project.")
+        logger.success("Project initialized with uv.")
+    else:
+        logger.info("Project already initialized with uv.")
+
+    if deps is None:
+        deps = logger.confirm("Would you like to install recommended dependencies?")
+    if deps:
+        dev_deps = load_deps()["dev"]
+        # Check which dependencies are already installed
+        missing_deps = []
+        for dep in dev_deps:
+            try:
+                __import__(dep.split("[")[0])  # Handle cases like package[extra]
+            except ImportError:
+                missing_deps.append(dep)
+
+        if missing_deps:
+            installed = run_command(["uv", "add", "--dev"] + missing_deps)
+            if installed is False:
+                logger.abort("Failed to install the dev dependencies.")
+            logger.success("Dev dependencies installed.")
+        else:
+            logger.info("All dev dependencies already installed.")
+
+    if precommit is None:
+        precommit = logger.confirm(
+            "Would you like to update & install pre-commit hooks?"
+        )
+    if precommit:
+        write_or_update_pre_commit_file()
+        pre_commit_installed = run_command(["uv", "run", "pre-commit", "install"])
+        if pre_commit_installed is False:
+            logger.abort("Failed to install pre-commit hooks.")
+        logger.success("Pre-commit hooks installed.")
+
+    has_rtd = Path(".readthedocs.yml").exists()
+    if docs is None and not has_rtd:
+        docs = logger.confirm("Would you like to initialize the docs?")
+    if docs:
+        if not has_rtd:
+            write_rtd_config()
+            logger.success("ReadTheDocs config written.")
+        else:
+            logger.info("ReadTheDocs config already exists.")
+        init_docs(
+            path=docs_path,
+            as_main=as_main,
+            overwrite=overwrite,
+            deps=deps,
+            with_defaults=with_defaults,
+            branch=branch,
+            contents=contents,
+        )
+    logger.success("Done.")
