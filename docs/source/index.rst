@@ -14,16 +14,16 @@ Home
    self
    guide/index
 
-This is your base documentation file. You can edit this file to add more context to your documentation. 
-For example, you can add a brief description of your project, installation instructions, a quickstart guide, and more.
+Welcome to the Entaldocs 🥳
 
-You can also add more pages to your documentation by creating new ``.rst`` files in the ``source`` directory and listing them in the ``toctree`` directive above, 
-below the ``self`` entry. For example, if you create a new file called ``example.rst``, you can add it to the ``toctree`` directive like this:
+This repository serves as both a tutorial for Python project documentation (including docstrings) **AND** a CLI tool to initialize a Python project with standard Entalpic initial setup.
 
-.. code-block:: rst
+.. note::
 
-   .. toctree::
-      :maxdepth: 4
+    This repository is still under active development.
 
-      self
-      example
+➡️ To learn how to use the ``entaldocs`` CLI, please refer to the API reference page: :py:mod:`entaldocs`.
+
+➡️ For more information on how to write docstrings, documentation files like this one and good practices with Ruff, please refer to the :doc:`Contribution Guide </guide/index>`.
+
+

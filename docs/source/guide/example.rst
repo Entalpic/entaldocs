@@ -1,6 +1,10 @@
 .. Copyright 2025 Entalpic
-Examlple of a contributor's file
-================================
+Example documentation file
+==========================
+
+This is an example documentation file that illustrates how to use ``.rst`` syntax to write documentation, including **tutorials**.
+
+---
 
 Include code to illustrate how to use the package / module / class / method / function etc.
 
@@ -8,16 +12,9 @@ Remember, this works in docstrings *and* in stand-alone ``.rst`` files.
 
 .. code-block:: python
 
-    import gflownet
+    import entaldocs
 
-    # Create a new instance of the class
-    my_class = gflownet.MyClass()
-
-    # Call a method of the class
-    my_class.do_something()
-
-    # Get an attribute of the class
-    my_class.attribute
+    entaldocs.cli.app()
 
 .. note::
 
@@ -31,10 +28,10 @@ Cool features:
 
 Reference code docs of:
 
-- A class: :class:`gflownet.envs.grid.Grid` (long format)
-- Another class :class:`~gflownet.gflownet.GFlowNetAgent` (short format, by prepending ``~``)
-- A method :meth:`~gflownet.gflownet.GFlowNetAgent.trajectorybalance_loss`
-- Or even an external function :func:`torch.cuda.synchronize()`
+- A class: :class:`entaldocs.logger.BaseLogger` (long format)
+- Another class :class:`~entaldocs.logger.Logger` (short format, by prepending ``~``)
+- A method :meth:`~entaldocs.logger.Logger.prompt`
+- Or even an external library :class:`github.MainClass.Github`
 
 .. note
 
@@ -80,7 +77,7 @@ An actual tutorial on ``.rst``:
 
     You can also have images!
 
-    .. image:: https://source.unsplash.com/200x200/daily?cute+animals
+    .. image:: https://picsum.photos/300
         :alt: A cute animal
 
     And icons :octicon:`project` and badges :bdg-primary:`primary`, :bdg-primary-line:`primary-line`
