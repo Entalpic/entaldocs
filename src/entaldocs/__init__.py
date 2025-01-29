@@ -83,7 +83,7 @@ When running ``$ entaldocs init-docs`` the following happens:
    being asked)
 4. By default, ``entaldocs`` will install the docs dependencies in the ``dev``
    dependencies. Use ``--as-main`` to install them as main dependencies.
-5. ``entaldoc`` then prompts the user for the project name (defaut: current directory
+5. ``entaldoc`` then prompts the user for the project name (default: current directory
    name) and the project's URL (default: ``https`` version of the current ``git`` remote
    URL)
 
