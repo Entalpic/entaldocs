@@ -1,3 +1,4 @@
+# Copyright 2025 Entalpic
 """
 A module to log messages to the console.
 
@@ -28,7 +29,13 @@ from datetime import datetime
 from rich import print
 
 
-class Logger:
+class BaseLogger:
+    """A dummy class for documentation purposes"""
+
+    ...
+
+
+class Logger(BaseLogger):
     """A class to log messages to the console."""
 
     def __init__(self, name: str, with_time: bool = True):
@@ -170,4 +177,5 @@ class Logger:
         import shutil
 
         cols = shutil.get_terminal_size().columns
+        print(" " * cols, end="\r")
         print(" " * cols, end="\r")

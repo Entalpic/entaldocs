@@ -1,3 +1,4 @@
+# Copyright 2025 Entalpic
 # Configuration file for the Sphinx documentation builder.
 #
 # For the full list of built-in configuration values, see the documentation:
@@ -5,11 +6,12 @@
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
+import importlib
 
 project = "entaldocs"  # Project name
-copyright = "2024, Entalpic"
-author = "REPLACE in conf.py"  # Contributors to the package
-release = "REPLACE in conf.py"  # Current version of the package, can be retrieved programmatically too.
+copyright = "2025, Entalpic"
+author = "Victor Schmidt <victor.schmidt@entalpic.ai>"  # Contributors to the package
+release = importlib.metadata.version("entaldocs")
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -97,7 +99,7 @@ intersphinx_mapping = {
 # https://autoapi.readthedocs.io/
 autodoc_typehints = "signature"
 autoapi_type = "python"
-autoapi_dirs = ["../../entaldocs"]  # list of paths to the packages to document
+autoapi_dirs = ["../../src/entaldocs"]  # list of paths to the packages to document
 autoapi_ignore = ["*.venv/*", "*/tests/*", "*boilerplate/*"]
 autoapi_member_order = "bysource"
 autoapi_template_dir = "_templates/autoapi"
