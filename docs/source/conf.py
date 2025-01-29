@@ -147,6 +147,10 @@ hoverxref_mathjax = True
 # Open Graph
 
 ogp_site_url = "https://entalpic-entaldocs.readthedocs-hosted.com"
+ogp_social_cards = {
+    "enable": True,
+    "image": "./_static/img/entalpic-logo-rounded.png",
+}
 
 # :entaldocs: <update>
 # DO NOT change what is between <update> and </update>
