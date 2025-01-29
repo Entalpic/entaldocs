@@ -27,6 +27,7 @@ extensions = [
     "autoapi.extension",
     "sphinx_autodoc_typehints",
     "sphinx_copybutton",
+    "sphinxext.opengraph",
     "code_include.extension",
 ]
 
@@ -145,11 +146,7 @@ hoverxref_mathjax = True
 
 # Open Graph
 
-# ogp_site_url = "https://entalpic-dev-guide.readthedocs.io/en/latest/"
-# ogp_social_cards = {
-#     "enable": True,
-#     # "image": "./_static/images/logo.png",
-# }
+ogp_site_url = "https://entalpic-entaldocs.readthedocs-hosted.com"
 
 # :entaldocs: <update>
 # DO NOT change what is between <update> and </update>
