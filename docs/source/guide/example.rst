@@ -56,7 +56,7 @@ An actual tutorial on ``.rst``:
     .. code-block::
 
         .. note::
-        This is a note.
+        This is NOT a note.
 
     But this will
 
