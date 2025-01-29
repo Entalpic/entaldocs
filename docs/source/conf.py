@@ -6,11 +6,12 @@
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
+import importlib
 
 project = "entaldocs"  # Project name
-copyright = "2024, Entalpic"
-author = "REPLACE in conf.py"  # Contributors to the package
-release = "REPLACE in conf.py"  # Current version of the package, can be retrieved programmatically too.
+copyright = "2025, Entalpic"
+author = "Victor Schmidt <victor.schmidt@entalpic.ai>"  # Contributors to the package
+release = importlib.metadata.version("entaldocs")
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
