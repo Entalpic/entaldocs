@@ -1,3 +1,4 @@
+# Copyright 2025 Entalpic
 """
 A module to log messages to the console.
 

@@ -1,3 +1,4 @@
+.. Copyright 2025 Entalpic
 Examlple of a contributor's file
 ================================
 

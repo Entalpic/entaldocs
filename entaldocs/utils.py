@@ -1,3 +1,4 @@
+# Copyright 2025 Entalpic
 """
 A set of utilities to help with the ``entaldocs`` CLI and the
 initialization of Entalpic-style documentation projects.

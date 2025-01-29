@@ -1,3 +1,4 @@
+# Copyright 2025 Entalpic
 r"""
 .. _entaldocs-cli-tutorial:
 

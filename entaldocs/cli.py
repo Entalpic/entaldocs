@@ -1,3 +1,4 @@
+# Copyright 2025 Entalpic
 """
 Source code for the ``entaldocs`` Command-Line Interface (CLI).
 
