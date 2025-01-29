@@ -97,13 +97,24 @@ When running ``$ entaldocs init-docs`` the following happens:
 
     We won't need maths here, but if you wanted to, you could use ``$`` for
     inline-maths: $1 + e^{i\pi} = 0$ or ``$$`` for block-maths:
-    $$\\sum_{k=1}^{k=+\\infty} \\frac{1}{k^2} = \\frac{\\pi^2}{6} $$
+    $$
+    \sum_{k=1}^{k=+\infty} \frac{1}{k^2} = \frac{\pi^2}{6}
+    $$
 
-.. warning::
+.. important::
 
-    While you may use ``\`` (e.g. ``$\exp$``) for *inline* maths, you currently have to
-    use ``\\`` (e.g ``$$\\exp$$`` for block-maths. Fix welcome.
+    Remember to use **raw** strings when you use maths: ``r"$1 + e^{i\pi} = 0$"`` or
 
-    You can also still use the ``.. math::`` directive for block-maths.
+    .. code-block:: python
+
+        r'''
+        $$
+        1 + e^{i\pi} = 0
+        $$
+        '''
 
 """
+
+import importlib.metadata
+
+__version__ = importlib.metadata.version("entaldocs")

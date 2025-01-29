@@ -99,7 +99,7 @@ intersphinx_mapping = {
 # https://autoapi.readthedocs.io/
 autodoc_typehints = "signature"
 autoapi_type = "python"
-autoapi_dirs = ["../../entaldocs"]  # list of paths to the packages to document
+autoapi_dirs = ["../../src/entaldocs"]  # list of paths to the packages to document
 autoapi_ignore = ["*.venv/*", "*/tests/*", "*boilerplate/*"]
 autoapi_member_order = "bysource"
 autoapi_template_dir = "_templates/autoapi"
