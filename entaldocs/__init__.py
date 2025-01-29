@@ -31,7 +31,7 @@ What happens is the following:
 1. A new Python project is created in the current directory using ``uv``.
 2. Using ``uv add``, common development dependencies are added to the project.
 3. Pre-commit hooks to format and lint the code with ``ruff`` are added.
-4. The project is initialized with ``entaldocs init-docs`` to create a ``.docs/`` folder
+4. The project is initialized with ``entaldocs init-docs`` to create a ``docs/`` folder
    and install the necessary dependencies for documentation.
 
 
@@ -44,14 +44,15 @@ the ``entaldocs init-docs`` command.
 
     $ entaldocs init-docs --help # typically $ entaldocs init-docs --uv --with-defaults
 
-This creates a ``.docs/`` folder in your project and installing the necessary
-dependencies. Some of the contents of the ``.docs/`` folder are copied from the Entalpic
+This creates a ``docs/`` folder in your project and installing the necessary
+dependencies. Some of the contents of the ``docs/`` folder are copied from the Entalpic
 Github repository and therefore requires you to set a Github Personal Access Token (PAT)
 to access the files.
 
 .. code-block:: bash
 
-    $ entaldocs set-github-pat $ entaldocs init-docs --uv --with-defaults
+    $ entaldocs set-github-pat
+    $ entaldocs init-docs --uv --with-defaults
 
 Going further
 =============
@@ -74,7 +75,7 @@ Currently ``entaldocs`` has 5 main commands:
 
 When running ``$ entaldocs init-docs`` the following happens:
 
-1. Create a ``.docs/`` folder (change with ``--path``)
+1. Create a ``docs/`` folder (change with ``--path``)
 2. Optionally install dependencies based on an interactive user choice (use ``--deps``
    to prevent prompt and install dependencies automatically)
 3. Optionally use ``uv`` to install dependencies (use ``--uv`` to use ``uv`` without
