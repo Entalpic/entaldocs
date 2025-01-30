@@ -14,7 +14,7 @@ Overview
 
 There are two major types of documentation:
 
-1. **docstrings**: your code's docstrings will be automatically parsed by the documentation sofware `Sphinx <https://www.sphinx-doc.org>`_ (more in :ref:`about shpinx`).
+1. **docstrings**: your code's docstrings will be automatically parsed by the documentation software `Sphinx <https://www.sphinx-doc.org>`_ (more in :ref:`about shpinx`).
 2. **online documentation** such as this document. This can be for instance a detailed installation procedure, a tutorial, a FAQ, a contributor's guide etc. you name it!
 
 **Both** are written in `ReStructured Text <https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html>`_ (``.rst``) format.
@@ -23,7 +23,7 @@ In this tutorial, we'll go over the basics of ``.rst`` and Sphinx, and then we'l
 
 Some of the great features of using Sphinx is to be able to automatically generate documentation from your code's docstrings, and to be able to link to other parts of the documentation.
 
-For instance: :meth:`~gflownet.gflownet.GFlowNetAgent.trajectorybalance_loss` or to an external function :func:`torch.cuda.synchronize()`.
+For instance: :meth:`~entaldocs.logger.Logger._dummy` or to an external class :class:`github.Repository.Repository`.
 
 .. _learn by example:
 
@@ -74,9 +74,9 @@ FAQ
         - ``docs/{your_subfolder}/index.rst`` should contain a ``.. toctree::`` directive listing the files in the subfolder.
         - It should also be listed in the ``docs/index.rst`` under the ``.. toctree::`` directive to appear on the left handside of the documentation.
 
-    You can look at the |contributors|_ folder for an example.
+    You can look at the |guide|_ folder for an example.
 
-.. dropdown:: How do I document a sub-package like :py:mod:`gflownet.proxy.crystals`?
+.. dropdown:: How do I document a sub-package like :mod:`entaldocs.logger`?
 
     Just add a docstring at the top of the ``__init__.py`` file of the sub-package:
 
@@ -87,7 +87,7 @@ FAQ
 
         It can contain any kind of ``.rst`` syntax.
 
-        And refer to its members: :meth:`~gflownet.proxy.crystals.crystal.Stage`
+        And refer to its members: :meth:`~entaldocs.logger.Logger.prompt`
 
         .. note::
 
@@ -199,5 +199,5 @@ And finally open the generated ``docs/_build/html/index.html`` file in your brow
 
     LINKS SECTION ⬇️
 
-.. |contributors| replace::  ``docs/contributors/``
-.. _contributors: https://github.com/alexhernandezgarcia/gflownet/tree/master/docs/contributors
+.. |guide| replace::  ``docs/guide``
+.. _guide: https://github.com/entalpic/entaldocs/tree/main/docs/guide

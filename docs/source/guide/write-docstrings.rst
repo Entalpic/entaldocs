@@ -22,13 +22,13 @@ In the :doc:`previous section </guide/write-documentation>`, we learned about th
 
     There are two main conventions for writing docstrings: `Numpy <https://www.sphinx-doc.org/en/master/usage/extensions/example_numpy.html#example-numpy>`_ and `Google <https://www.sphinx-doc.org/en/master/usage/extensions/example_google.html#example-google>`_. The latter (Google) is more popular in the Python community, but the former (Numpy) is more popular in the scientific Python community.
 
-We use the |numpy-docs|_ **convention** for the ``gflownet`` project.
+We use the |numpy-docs|_ **convention** for all Entalpic projects.
 
 First, start with a one-line summary that gives an overview of the functionality, in Numpy docstring style:
 
 .. caution::
 
-     *Unlike* Markdown, code rendering like ``this`` in docstrics uses **two** backticks ``````, not one `````.
+     *Unlike* Markdown, code rendering like ``this`` in docstrings uses **two** backticks ``````, not one `````.
 
 .. code-block:: python
 
@@ -288,8 +288,8 @@ There's an easy way to check: use a tool called `pydocstyle <https://www.pydocst
 
 .. code-block:: bash
 
-    $ pydocstyle --convention=numpy --add-ignore=D212 gflownet/my_module.py
-    $ pydocstyle --convention=numpy --add-ignore=D212 gflownet/
+    $ pydocstyle --convention=numpy --add-ignore=D212 src/entaldocs/cli.py
+    $ pydocstyle --convention=numpy --add-ignore=D212 src/
 
 ..
     This is a comment.
