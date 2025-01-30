@@ -201,12 +201,6 @@ The following code renders as: :meth:`entaldocs.logger.Logger.dummy`.
 
             \int_0^1 x^2 dx = \frac{1}{3}
 
-        Or with $$:
-
-        $$
-        \sum_{i=1}^{+\infty} \frac{1}{i^2} = \frac{\pi^2}{6}
-        $$
-
         .. important::
 
             A docstring with **math** MUST be a raw Python string (a string prepended with
@@ -246,7 +240,9 @@ The following code renders as: :meth:`entaldocs.logger.Logger.dummy`.
 
         Or ``$$ ... $$`` for block math instead of the ``.. math:`` directive above.
 
-        $$\int_0^1 x^2 dx = \frac{1}{3}$$
+        $$
+        \sum_{i=1}^{+\infty} \frac{1}{i^2} = \frac{\pi^2}{6}
+        $$
 
 
         Parameters
