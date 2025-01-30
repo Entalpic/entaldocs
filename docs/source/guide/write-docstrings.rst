@@ -173,11 +173,11 @@ Importantly, if you need maths in your docstrings, you can use LaTeX to write eq
 Full Example
 ------------
 
-The following code renders as: :meth:`entaldocs.logger.Logger._dummy`.
+The following code renders as: :meth:`entaldocs.logger.Logger.dummy`.
 
 .. code-block:: python
 
-    def _dummy(self, arg1, arg2):
+    def dummy(self, arg1, arg2):
         r"""
         Summary line: this function is not used anywhere, it's just an example.
 

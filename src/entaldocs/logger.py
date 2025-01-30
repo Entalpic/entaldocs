@@ -32,7 +32,7 @@ from rich import print
 class BaseLogger:
     """A **dummy** class for documentation purposes"""
 
-    def _dummy(self, arg1, arg2):
+    def dummy(self, arg1, arg2):
         r"""
         Summary line: this function is not used anywhere, it's just an example.
 

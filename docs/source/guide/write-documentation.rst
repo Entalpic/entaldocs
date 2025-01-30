@@ -23,7 +23,7 @@ In this tutorial, we'll go over the basics of ``.rst`` and Sphinx, and then we'l
 
 Some of the great features of using Sphinx is to be able to automatically generate documentation from your code's docstrings, and to be able to link to other parts of the documentation.
 
-For instance: :meth:`~entaldocs.logger.Logger._dummy` or to an external class :class:`github.Repository.Repository`.
+For instance: :meth:`~entaldocs.logger.Logger.dummy` or to an external class :class:`github.Repository.Repository`.
 
 .. _learn by example:
 
