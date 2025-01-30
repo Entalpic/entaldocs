@@ -30,9 +30,101 @@ from rich import print
 
 
 class BaseLogger:
-    """A dummy class for documentation purposes"""
+    """A **dummy** class for documentation purposes"""
 
-    ...
+    def _dummy(self, arg1, arg2):
+        r"""
+        Summary line: this function is not used anywhere, it's just an example.
+
+        Extended description of function from the docstrings tutorial :ref:`write
+        docstrings-extended`.
+
+        Refer to:
+
+        * functions with :func:`entaldocs.utils.safe_dump`
+        * classes with :class:`entaldocs.logger.Logger`
+        * methods with :meth:`entaldocs.logger.Logger.prompt`
+        * constants with :const:`entaldocs.cli._app`
+
+        Prepend with ``~`` to refer to the name of the object only instead of the full
+        path -> :func:`~entaldocs.utils.safe_dump` will display as ``safe_dump``
+        instead of the full path ``entaldocs.utils.safe_dump``.
+
+        Great maths:
+
+        .. math::
+
+            \int_0^1 x^2 dx = \frac{1}{3}
+
+        Or with $$:
+
+        $$
+        \sum_{i=1}^{+\infty} \frac{1}{i^2} = \frac{\pi^2}{6}
+        $$
+
+        .. important::
+
+            A docstring with **math** MUST be a raw Python string (a string prepended with
+            an ``r``: ``r"raw"``) to avoid backslashes being treated as escape characters.
+
+            Alternatively, you can use double backslashes.
+
+        .. warning::
+
+            Display a warning. See :ref:`learn by example`. (<-- this is a cross reference,
+            learn about it `here
+            <https://www.sphinx-doc.org/en/master/usage/referencing.html#ref-rolel>`_)
+
+
+        Examples
+        --------
+        >>> function(1, "a")
+        True
+        >>> function(1, 2)
+        True
+
+        >>> function(1, 1)
+        Traceback (most recent call last):
+            ...
+
+        Or
+
+        .. code-block:: python
+
+            function(1, "a")
+            function(1, 2)
+            print("Done.")
+
+        Notes
+        -----
+        This block uses ``$ ... $`` for inline maths -> $e^{\frac{x}{2}}$.
+
+        Or ``$$ ... $$`` for block math instead of the ``.. math:`` directive above.
+
+        $$\int_0^1 x^2 dx = \frac{1}{3}$$
+
+
+        Parameters
+        ----------
+        arg1 : int
+            Description of arg1
+        arg2 : str
+            Description of arg2
+
+        Returns
+        -------
+        bool
+            Description of return value
+
+        Raises
+        ------
+        ValueError
+            If arg1 is equal to arg2.
+        """
+
+        if arg1 == arg2:
+            raise ValueError("arg1 must not be equal to arg2")
+        return True
 
 
 class Logger(BaseLogger):

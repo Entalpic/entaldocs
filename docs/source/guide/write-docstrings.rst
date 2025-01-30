@@ -173,32 +173,39 @@ Importantly, if you need maths in your docstrings, you can use LaTeX to write eq
 Full Example
 ------------
 
-The following code renders as: :py:func:`gflownet.utils.common.example_documented_function`.
+The following code renders as: :meth:`entaldocs.logger.Logger._dummy`.
 
 .. code-block:: python
 
-    def example_documented_function(arg1, arg2):
-        r"""Summary line: this function is not used anywhere, it's just an example.
+    def _dummy(self, arg1, arg2):
+        r"""
+        Summary line: this function is not used anywhere, it's just an example.
 
         Extended description of function from the docstrings tutorial :ref:`write
         docstrings-extended`.
 
-        Refer to
+        Refer to:
 
-        * functions with :py:func:`gflownet.utils.common.set_device`
-        * classes with :py:class:`gflownet.gflownet.GFlowNetAgent`
-        * methods with :py:meth:`gflownet.envs.base.GFlowNetEnv.get_action_space`
-        * constants with :py:const:`gflownet.envs.base.CMAP`
+        * functions with :func:`entaldocs.utils.safe_dump`
+        * classes with :class:`entaldocs.logger.Logger`
+        * methods with :meth:`entaldocs.logger.Logger.prompt`
+        * constants with :const:`entaldocs.cli._app`
 
-        Prepenend with ``~`` to refer to the name of the object only instead of the full
-        path -> :py:func:`~gflownet.utils.common.set_device` will display as ``set_device``
-        instead of the full path.
+        Prepend with ``~`` to refer to the name of the object only instead of the full
+        path -> :func:`~entaldocs.utils.safe_dump` will display as ``safe_dump``
+        instead of the full path ``entaldocs.utils.safe_dump``.
 
         Great maths:
 
         .. math::
 
             \int_0^1 x^2 dx = \frac{1}{3}
+
+        Or with $$:
+
+        $$
+        \sum_{i=1}^{+\infty} \frac{1}{i^2} = \frac{\pi^2}{6}
+        $$
 
         .. important::
 
@@ -216,7 +223,7 @@ The following code renders as: :py:func:`gflownet.utils.common.example_documente
 
         Examples
         --------
-        >>> function(1, 'a')
+        >>> function(1, "a")
         True
         >>> function(1, 2)
         True
@@ -224,6 +231,14 @@ The following code renders as: :py:func:`gflownet.utils.common.example_documente
         >>> function(1, 1)
         Traceback (most recent call last):
             ...
+
+        Or
+
+        .. code-block:: python
+
+            function(1, "a")
+            function(1, 2)
+            print("Done.")
 
         Notes
         -----
@@ -245,10 +260,17 @@ The following code renders as: :py:func:`gflownet.utils.common.example_documente
         -------
         bool
             Description of return value
+
+        Raises
+        ------
+        ValueError
+            If arg1 is equal to arg2.
         """
+
         if arg1 == arg2:
             raise ValueError("arg1 must not be equal to arg2")
         return True
+
 
 
 So many rules, how can I check?
