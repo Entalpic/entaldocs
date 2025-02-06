@@ -173,7 +173,7 @@ Importantly, if you need maths in your docstrings, you can use LaTeX to write eq
 Full Example
 ------------
 
-The following code renders as: :meth:`entaldocs.logger.Logger.dummy`.
+The following code renders as: :meth:`entaldocs.logger.BaseLogger.dummy`.
 
 .. code-block:: python
 
