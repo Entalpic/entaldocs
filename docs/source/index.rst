@@ -18,12 +18,13 @@ Welcome to the Entaldocs 🥳
 
 This repository serves as both a tutorial for Python project documentation (including docstrings) **AND** a CLI tool to initialize a Python project with standard Entalpic initial setup.
 
+.. important::
+
+   ➡️ To learn how to use the ``entaldocs`` CLI, please refer to the API reference page: :py:mod:`entaldocs`.
+
+   ➡️ For more information on how to write docstrings, documentation files like this one and good practices with Ruff, please refer to the :doc:`Contribution Guide </guide/index>`.
+
 .. note::
 
     This repository is still under active development.
-
-➡️ To learn how to use the ``entaldocs`` CLI, please refer to the API reference page: :py:mod:`entaldocs`.
-
-➡️ For more information on how to write docstrings, documentation files like this one and good practices with Ruff, please refer to the :doc:`Contribution Guide </guide/index>`.
-
 
