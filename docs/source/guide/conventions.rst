@@ -11,7 +11,7 @@ Python tools
 TL;DR
 ~~~~~
 
-Use `Ruff <https://docs.astral.sh/ruff/>`_ and associated `Ruff VSCode Extension <https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff>`_ to:
+Use `Ruff <https://docs.astral.sh/ruff/>`_ and associated `Ruff IDE Extension (for VSCode, Cursor, PyCharm, (Neo)Vim, etc.) <https://docs.astral.sh/ruff/editors/setup/>`_ to:
 
 - Format your code (Black-compatible)
 - Sort your imports (isort-compatible)
@@ -31,17 +31,21 @@ Use `Ruff <https://docs.astral.sh/ruff/>`_ and associated `Ruff VSCode Extension
 
     `Set your default formatter <https://code.visualstudio.com/docs/python/formatting#_set-a-default-formatter>`_ to ``Ruff`` then enable `Format on save <https://stackoverflow.com/a/54665086/3867406>`_ in VSCode not to think about it.
 
+    You can easily find ways to do the same thing on other IDEs by asking Google 👻
+
 In the following section we'll describe how popular formatters / linters / sorters work, keeping in mind this is all bundled (and extended) in **Ruff**.
 
-Formatting with Black
-~~~~~~~~~~~~~~~~~~~~~
+Formatting with Ruff (or Black)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. note::
 
-    Understanding ``black`` is important because it is an industry standard. 
-    It is also the `foundation for Ruff <https://astral.sh/blog/the-ruff-formatter#2-black-compatible>`_
+    ``black`` is very similar to ``ruff`` as it is also a code formatter and the `foundation for Ruff <https://astral.sh/blog/the-ruff-formatter#2-black-compatible>`_
+    While Ruff is gaining more and more traction, Black is still the most popular code formatter and industry standard.
 
-Black is a code formatter. It ensures we all write code in the same style.
+    In the following sections what we write about Ruff will also apply to Black.
+
+Ruff is a code formatter. It ensures we all write code in the same style. Importantly, it will **change your code** if needed, to enforce conventions.
 
 For instance, this is valid Python code:
 
@@ -52,7 +56,7 @@ For instance, this is valid Python code:
     'a': 1, "b":2,}
     function (a=1,b = [1,2,3],c=3,)
 
-Black will reformat it to:
+But Ruff will reformat it to:
 
 .. code-block:: python
 
@@ -60,29 +64,60 @@ Black will reformat it to:
     b = {"a": 1, "b": 2}
     function(a=1, b=[1, 2, 3], c=3)
 
-Some choices are optimized for readability (for instance single quotes are replaced by double quotes). Others are just a matter of subjective taste (for instance the number of spaces around the equal sign).
+Some choices are optimized for readability (for instance single quotes ``'`` are replaced by double quotes ``"``). Others are just a matter of subjective taste (for instance the number of spaces around the equal sign ``=``).
 
-That being said, what matters is the consistency. Black is a tool that ensures we all write code in the same style. This will also make PRs clearer, easier to review, and less prone to conflicts. Plus, it will save you time: you don't have to think about formatting anymore, Black does it for you.
+That being said, what matters is the consistency. Ruff is a tool that ensures **we all write code in the same style**. This will also make PRs clearer, easier to review, and less prone to conflicts. Plus, it will save you time: you don't have to think about formatting anymore, Ruff does it for you.
 
-There are a number of ways to work with Black. It can be an extension in your IDE (PyCharm, VSCode, etc.), a pre-commit hook, or a command line tool. The latter is the simplest to set up and use:
+There are a number of ways to work with Ruff. It can be an extension in your IDE (PyCharm, VSCode, etc.), a pre-commit hook, or a command line tool. The latter is the simplest to set up and use:
 
 .. code-block:: bash
 
-    pip install black
-    black path/to/file.py
+    uv add --dev ruff
+    # or
+    pip install ruff
+    # then:
+    ruff format path/to/file.py
+    ruff format path/to/folder/
 
-Black will reformat the file in place. If you want to see the changes before applying them, use the ``--diff`` flag.
+.. tip::
+
+    Ruff can also format your *in-docstring* Python examples!
+    Add the following to your ``pyproject.toml``:
+
+    .. code-block:: toml
+
+        [tool.ruff.format]
+        docstring-code-format = true
+
+Ruff will reformat the file in place. If you want to see the changes before applying them, use the ``--diff`` flag:
+
+.. code-block:: bash
+
+    ❯ uv run ruff format --diff
+    --- docs/source/conf.py
+    +++ docs/source/conf.py
+    @@ -112,7 +112,7 @@
+        "show-module-summary",
+        "imported-members",
+    ]
+    -autoapi_keep_files=False
+    +autoapi_keep_files = False
+    
+    # sphinx_math_dollar
+    # Note: CHTML is the only output format that works with \mathcal{}
+
+    1 file would be reformatted, 5 files already formatted
 
 .. caution::
 
-    Your file needs to be valid Python for ``black`` to run. If you have a Syntax Error in your code, ``black`` will fail and it may look like your IDE extension "is not working". It is trying to, but it cannot. Fix the Syntax Error first, then run ``black`` again.
+    Your file needs to be valid Python for ``ruff`` to run. If you have a Syntax Error in your code, ``ruff`` will fail and it may look like your IDE extension "is not working". It is trying to, but it cannot. Fix the Syntax Error first, then run ``ruff`` again.
 
-Check out the `Black documentation <https://black.readthedocs.io/en/stable/>`_ for more information.
+Check out the `Ruff (formatter) documentation <https://docs.astral.sh/ruff/formatter/>`_ for more information.
 
-Flake8
-~~~~~~
+Linting with Ruff (or Flake8)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Flake8 is a code linter. It will help you, just like ``black``, with writing good, consistent code. 
+Ruff is also a code linter. It will help you, just like ``ruff format``, with writing good, consistent code. 
 It will also help you avoid common pitfalls and mistakes like undefined variables, unused imports, etc.
 Linters are most commonly used in one of two ways:
 
@@ -91,7 +126,7 @@ Linters are most commonly used in one of two ways:
 
 .. note::
 
-    Understanding ``flake8`` is important because it is also an industry standard. 
+    Understanding ``flake8`` is important because it is also an industry standard.
     Ruff goes a step further by extending Flake8 with additional rules and being more consistent.
     `Goodbye to Flake8 and PyLint: faster linting with Ruff <https://pythonspeed.com/articles/pylint-flake8-ruff/>`_
 
@@ -106,43 +141,58 @@ E.g.:
 
 .. code-block:: bash
 
-    flake8 example1.py
-    example1.py:2:12: F821 undefined name 'myva'
+    ❯ ruff check        
 
-Flake8 is a command line tool. It can be installed with:
+    example.py:2:12: F821 Undefined name `myva`
+      |
+    1 | def f(myvar):
+    2 |     return myva * 2
+      |            ^^^^ F821
+      |
 
-.. code-block:: bash
+    Found 1 error.
 
-    pip install flake8
-    flake8 --max-line-length=88 --ignore=E203 path/to/file.py
+.. hint::
 
+    Some errors are more severe than others. Some errors are actually safe to fix automatically. This is why Ruff has a ``--fix`` flag. For instance:
 
-.. note::
+    .. code-block:: python
 
-        For ``flake8`` to play nicely with ``black``, you need to use a couple extra flags:
+        f"Hello, world!"
+        # ❯ ruff check --fix
+        "Hello, world!"
 
-        .. code-block:: bash
+        "Hello, {name}".format(greeting="Hello", name="World")
+        # ❯ ruff check --fix
+        "Hello, {name}".format(name="World")
 
-            flake8 --max-line-length=88 --ignore=E203 path/to/file.py
+See `Rules <https://docs.astral.sh/ruff/rules/>`_ for more information (look for the 🛠️ symbol).
 
-        ``--max-line-length=88`` is to match ``black``'s default line length.
+Most IDEs will also let you use Ruff as an extension to have feedback as you code. Ask Google about your particular IDE, you're very likely not the first one.
 
-        ``--ignore=E203`` is to avoid conflicts between ``black`` and ``flake8``. ``black`` will add a space before ``:`` in slices, ``flake8`` will complain about it. This flag tells ``flake8`` to ignore this particular error.
+Check out the `Ruff (linter) documentation <https://docs.astral.sh/ruff/linter/>`_ for more information.
 
-.. important::
+.. tip::
 
-    This is important in case you work on a project that isn't Entalpic-lead and does not use Ruff as formatter+linter.
-    Hoever, in Entalpic projects, you should use Ruff, which lints and formats in a consistent way and you don't have to
-    worry about such flags to make the linter and formatter play nicely together.
+    You can `disable specific rules locally <https://docs.astral.sh/ruff/linter/#error-suppression>`_.
 
-Most IDEs will also let you use Flake8 as an extension to have feedback as you code. Ask Google about your particular IDE, you're very likely not the first one.
+    .. code-block:: python
 
-Check out the `Flake8 documentation <https://flake8.pycqa.org/en/latest/>`_ for more information.
+        # Ignore F841.
+        x = 1  # noqa: F841
 
-Isort
-~~~~~
+        # Ignore E741 and F841.
+        i = 1  # noqa: E741, F841
 
-Isort is a tool that sorts your imports. It will make sure that:
+        # Ignore _all_ violations.
+        x = 1  # noqa
+
+Sorting imports with Ruff (or isort)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sorting imports is a common task in Python projects. It is a good practice to sort your imports to make your code more readable and easier to maintain.
+
+Ruff can do this for you. It will sort your imports to make sure that:
 
 -   standard library imports are on top
 -   third-party imports are in the middle
@@ -152,12 +202,14 @@ It will also sort the imports alphabetically, and group them by package.
 
 .. note::
 
-    Once again, understanding ``isort`` is important because it is yet another industry standard.
-    But Ruff does it well, so you don't have to worry about it if you use Ruff in your project.
+    ``isort`` is another tool that can do this, and is a popular tool in the Python community.
+    Basically, Ruff is a more modern and opinionated version of the ``black`` + ``flake8`` + ``isort`` trio.
+
 
 .. code-block:: python
 
-    from os.path import expandvars, relpath
+    from os.path import expandvars
+    from os.path import relpath
     from entaldocs.logger import Logger
     from pathlib import Path
     import json
@@ -179,72 +231,16 @@ Becomes:
 
     from entaldocs.logger import Logger
 
-Isort can be installed with:
+This will be done automatically when using IDE extensions (if not, ask Google about your particular IDE and case). 
+
+If you want to do it manually, you can use Ruff from the command line:
 
 .. code-block:: bash
 
-    pip install isort
-    isort path/to/file.py
+    ruff check --select I --fix
 
-Again, this is all configurable. You can read more about it in the `isort documentation <https://pycqa.github.io/isort/>`_.
 
-Python advice
-=============
+.. note::
 
-The Zen of Python
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: python
-
-    import this
-
-Prints the following (pay attention to the \*-marked lines, by the Entalpic team):
-
-.. code-block:: text
-
-    The Zen of Python, by Tim Peters
-
-    Beautiful is better than ugly.
-    Explicit is better than implicit. (*)
-    Simple is better than complex. (*)
-    Complex is better than complicated.
-    Flat is better than nested.
-    Sparse is better than dense.
-    Readability counts. (*)
-    Special cases aren't special enough to break the rules.
-    Although practicality beats purity.
-    Errors should never pass silently.
-    Unless explicitly silenced.
-    In the face of ambiguity, refuse the temptation to guess. (*)
-    There should be one-- and preferably only one --obvious way to do it.
-    Although that way may not be obvious at first unless you're Dutch.
-    Now is better than never.
-    Although never is often better than *right* now.
-    If the implementation is hard to explain, it's a bad idea. (*)
-    If the implementation is easy to explain, it may be a good idea.
-    Namespaces are one honking great idea -- let's do more of those!
-
-What the Fuck Python??
-~~~~~~~~~~~~~~~~~~~~~~
-
-We cannot emphasize enough you have a regular look at this repo: `What the f*ck Python! 😱 <https://github.com/satwikkansal/wtfpython>`_.
-
-Typically, you should be able to explain:
-
-.. code-block:: python
-
-    assert False == False in [False] # this is True. Why?
-
-Or
-
-.. code-block:: python
-
-    some_string = "wtf"
-    some_dict = {}
-    for i, some_dict[i] in enumerate(some_string):
-        i = 10
-    else:
-        some_dict[i] = "!"
-
-    assert some_dict == {0: "w", 1: "t", 2: "f", 10: "!"}
+    Yes, it should be more of a ``format`` action than a ``check`` action, `but that's the way it is <https://github.com/astral-sh/ruff/issues/8926>`_.
 
