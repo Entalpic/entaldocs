@@ -1,15 +1,13 @@
 .. Copyright 2025 Entalpic
 .. _coding conventions:
 
-##################
-Coding conventions
-##################
+########
+Ruff 101
+########
 
-Python tools
-------------
 
 TL;DR
-~~~~~
+-----
 
 Use `Ruff <https://docs.astral.sh/ruff/>`_ and associated `Ruff IDE Extension (for VSCode, Cursor, PyCharm, (Neo)Vim, etc.) <https://docs.astral.sh/ruff/editors/setup/>`_ to:
 
@@ -36,7 +34,7 @@ Use `Ruff <https://docs.astral.sh/ruff/>`_ and associated `Ruff IDE Extension (f
 In the following section we'll describe how popular formatters / linters / sorters work, keeping in mind this is all bundled (and extended) in **Ruff**.
 
 Formatting with Ruff (or Black)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
 
 .. note::
 
@@ -115,7 +113,7 @@ Ruff will reformat the file in place. If you want to see the changes before appl
 Check out the `Ruff (formatter) documentation <https://docs.astral.sh/ruff/formatter/>`_ for more information.
 
 Linting with Ruff (or Flake8)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 Ruff is also a code linter. It will help you, just like ``ruff format``, with writing good, consistent code. 
 It will also help you avoid common pitfalls and mistakes like undefined variables, unused imports, etc.
@@ -188,7 +186,7 @@ Check out the `Ruff (linter) documentation <https://docs.astral.sh/ruff/linter/>
         x = 1  # noqa
 
 Sorting imports with Ruff (or isort)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------
 
 Sorting imports is a common task in Python projects. It is a good practice to sort your imports to make your code more readable and easier to maintain.
 

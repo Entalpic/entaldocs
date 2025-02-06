@@ -16,8 +16,9 @@ Contribution Guide
 .. toctree::
     :maxdepth: 1
 
-    /guide/conventions
+    /guide/ruff
     /guide/write-documentation
     /guide/write-docstrings
-    /guide/github
     /guide/example
+
+    .. /guide/github
