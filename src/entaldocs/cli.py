@@ -301,7 +301,7 @@ def set_github_pat(pat: Optional[str] = ""):
 
     `About GitHub PAT <https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#about-personal-access-tokens>`_
 
-    `Creating Github a PAT <https://github.com/settings/tokens>`_
+    `Creating Github a PAT <https://github.com/settings/personal-access-tokens>`_
 
 
     1. Go to ``Settings > Developer settings > Personal access tokens (fine-grained) >
