@@ -22,13 +22,13 @@ In the :doc:`previous section </guide/write-documentation>`, we learned about th
 
     There are two main conventions for writing docstrings: `Numpy <https://www.sphinx-doc.org/en/master/usage/extensions/example_numpy.html#example-numpy>`_ and `Google <https://www.sphinx-doc.org/en/master/usage/extensions/example_google.html#example-google>`_. The latter (Google) is more popular in the Python community, but the former (Numpy) is more popular in the scientific Python community.
 
-We use the |numpy-docs|_ **convention** for the ``gflownet`` project.
+We use the |numpy-docs|_ **convention** for all Entalpic projects.
 
 First, start with a one-line summary that gives an overview of the functionality, in Numpy docstring style:
 
 .. caution::
 
-     *Unlike* Markdown, code rendering like ``this`` in docstrics uses **two** backticks ``````, not one `````.
+     *Unlike* Markdown, code rendering like ``this`` in docstrings uses **two** backticks ``````, not one `````.
 
 .. code-block:: python
 
@@ -150,7 +150,7 @@ Importantly, if you need maths in your docstrings, you can use LaTeX to write eq
         $$
 
         ...
-        """"
+        """
 
     Or
 
@@ -173,26 +173,27 @@ Importantly, if you need maths in your docstrings, you can use LaTeX to write eq
 Full Example
 ------------
 
-The following code renders as: :py:func:`gflownet.utils.common.example_documented_function`.
+The following code renders as: :meth:`entaldocs.logger.BaseLogger.dummy`.
 
 .. code-block:: python
 
-    def example_documented_function(arg1, arg2):
-        r"""Summary line: this function is not used anywhere, it's just an example.
+    def dummy(self, arg1, arg2):
+        r"""
+        Summary line: this function is not used anywhere, it's just an example.
 
         Extended description of function from the docstrings tutorial :ref:`write
         docstrings-extended`.
 
-        Refer to
+        Refer to:
 
-        * functions with :py:func:`gflownet.utils.common.set_device`
-        * classes with :py:class:`gflownet.gflownet.GFlowNetAgent`
-        * methods with :py:meth:`gflownet.envs.base.GFlowNetEnv.get_action_space`
-        * constants with :py:const:`gflownet.envs.base.CMAP`
+        * functions with :func:`entaldocs.utils.safe_dump`
+        * classes with :class:`entaldocs.logger.Logger`
+        * methods with :meth:`entaldocs.logger.Logger.prompt`
+        * constants with :const:`entaldocs.cli._app`
 
-        Prepenend with ``~`` to refer to the name of the object only instead of the full
-        path -> :py:func:`~gflownet.utils.common.set_device` will display as ``set_device``
-        instead of the full path.
+        Prepend with ``~`` to refer to the name of the object only instead of the full
+        path -> :func:`~entaldocs.utils.safe_dump` will display as ``safe_dump``
+        instead of the full path ``entaldocs.utils.safe_dump``.
 
         Great maths:
 
@@ -216,7 +217,7 @@ The following code renders as: :py:func:`gflownet.utils.common.example_documente
 
         Examples
         --------
-        >>> function(1, 'a')
+        >>> function(1, "a")
         True
         >>> function(1, 2)
         True
@@ -225,13 +226,23 @@ The following code renders as: :py:func:`gflownet.utils.common.example_documente
         Traceback (most recent call last):
             ...
 
+        Or
+
+        .. code-block:: python
+
+            function(1, "a")
+            function(1, 2)
+            print("Done.")
+
         Notes
         -----
         This block uses ``$ ... $`` for inline maths -> $e^{\frac{x}{2}}$.
 
         Or ``$$ ... $$`` for block math instead of the ``.. math:`` directive above.
 
-        $$\int_0^1 x^2 dx = \frac{1}{3}$$
+        $$
+        \sum_{i=1}^{+\infty} \frac{1}{i^2} = \frac{\pi^2}{6}
+        $$
 
 
         Parameters
@@ -245,10 +256,17 @@ The following code renders as: :py:func:`gflownet.utils.common.example_documente
         -------
         bool
             Description of return value
+
+        Raises
+        ------
+        ValueError
+            If arg1 is equal to arg2.
         """
+
         if arg1 == arg2:
             raise ValueError("arg1 must not be equal to arg2")
         return True
+
 
 
 So many rules, how can I check?
@@ -266,8 +284,8 @@ There's an easy way to check: use a tool called `pydocstyle <https://www.pydocst
 
 .. code-block:: bash
 
-    $ pydocstyle --convention=numpy --add-ignore=D212 gflownet/my_module.py
-    $ pydocstyle --convention=numpy --add-ignore=D212 gflownet/
+    $ pydocstyle --convention=numpy --add-ignore=D212 src/entaldocs/cli.py
+    $ pydocstyle --convention=numpy --add-ignore=D212 src/
 
 ..
     This is a comment.

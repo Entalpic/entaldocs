@@ -45,7 +45,7 @@ An actual tutorial on ``.rst``:
 
     Check out this documentation for more on the specific so-called *admonitions* like
     the "note", "warning", "important", etc. coloured boxes in this document:
-    `Furo theme documentation <https://pradyunsg.me/furo/reference/admonitions/#supported-types>`_
+    `Shibuya theme documentation <https://shibuya.lepture.com/writing/admonition/>`_
 
 .. attention::
 
@@ -71,7 +71,7 @@ An actual tutorial on ``.rst``:
 
 .. todo::
 
-    Improving the documentation: `Recommendations for Sphinx plugins <https://pradyunsg.me/furo/recommendations/>`_.
+    Improving the documentation: `Recommendations for Sphinx plugins <https://shibuya.lepture.com/extensions/sphinx-copybutton/>`_.
 
 .. dropdown::  :octicon:`megaphone` Want to learn more?
 
@@ -93,4 +93,4 @@ An actual tutorial on ``.rst``:
         :read-time: 5 min read
         :class-container: sd-p-2 sd-outline-muted sd-rounded-1
 
-    This is all documented in `Sphinx-Design <https://sphinx-design.readthedocs.io/en/furo-theme/>`_.
+    This is all documented in `Sphinx-Design <https://shibuya.lepture.com/extensions/sphinx-design/>`_.
