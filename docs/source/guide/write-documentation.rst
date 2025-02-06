@@ -32,7 +32,7 @@ Learn by example
 
 The next section will introduce many of the cool features of ``.rst`` + Sphinx + plugins.
 
-Click on "*Code for the example*" to look at the ``.rst`` code that generated what you are reading.
+Click on "*Code for the example*" to look at the ``.rst`` code that generated what you are reading. This file is located in the ``docs/source/guide/example.rst`` file, rendered :doc:`here </guide/example>`_.
 
 .. tab-set::
 
@@ -44,6 +44,8 @@ Click on "*Code for the example*" to look at the ``.rst`` code that generated wh
 
         .. literalinclude:: example.rst
             :language: rst
+
+🚧 **End of example** 🚧
 
 .. note::
 
