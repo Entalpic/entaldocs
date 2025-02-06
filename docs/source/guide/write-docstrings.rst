@@ -150,7 +150,7 @@ Importantly, if you need maths in your docstrings, you can use LaTeX to write eq
         $$
 
         ...
-        """"
+        """
 
     Or
 
