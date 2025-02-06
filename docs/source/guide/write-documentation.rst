@@ -14,7 +14,7 @@ Overview
 
 There are two major types of documentation:
 
-1. **docstrings**: your code's docstrings will be automatically parsed by the documentation software `Sphinx <https://www.sphinx-doc.org>`_ (more in :ref:`about shpinx`).
+1. **docstrings**: your code's docstrings will be automatically parsed by the documentation software `Sphinx <https://www.sphinx-doc.org>`_ (more in :ref:`about sphinx`).
 2. **online documentation** such as this document. This can be for instance a detailed installation procedure, a tutorial, a FAQ, a contributor's guide etc. you name it!
 
 **Both** are written in `ReStructured Text <https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html>`_ (``.rst``) format.
@@ -139,8 +139,8 @@ FAQ
 
 .. dropdown:: Where is the documentation for those advanced features? (tabs, dropdowns etc.)
 
-    - `Sphinx-Design <https://sphinx-design.readthedocs.io/en/furo-theme/>`_ contains many components you can re-use
-    - We use the `Furo <https://pradyunsg.me/furo/reference/admonitions/>`_ theme, you'll find the list of available *admonitions* there
+    - `Sphinx-Design <https://shibuya.lepture.com/extensions/sphinx-design/>`_ contains many components you can re-use
+    - We use the `Shibuya <https://shibuya.lepture.com/>`_ theme, you'll find the list of available *admonitions* there
 
 .. dropdown:: What plugins are used to make the documentation?
 
@@ -153,7 +153,7 @@ FAQ
     - `Hover X Ref <https://sphinx-hoverxref.readthedocs.io/en/latest/index.html>`_ Enables tooltips to display contents on the hover of links
     - `Napoleon <https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html>`_ enables the parsing of Google-style docstrings
 
-.. _about shpinx:
+.. _about sphinx:
 
 About Sphinx
 ------------
