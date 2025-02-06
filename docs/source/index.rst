@@ -22,7 +22,7 @@ This repository serves as both a tutorial for Python project documentation (incl
 
    ➡️ To learn how to use the ``entaldocs`` CLI, please refer to the API reference page: :py:mod:`entaldocs`.
 
-   ➡️ For more information on how to write docstrings, documentation files like this one and good practices with Ruff, please refer to the :doc:`Contribution Guide </guide/index>`.
+   ➡️ For more information on how to write docstrings and documentation files like this one please refer to the :doc:`Docs Guide </guide/index>`.
 
 .. note::
 

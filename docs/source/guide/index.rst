@@ -1,6 +1,6 @@
 .. Copyright 2025 Entalpic
-Contribution Guide
-==================
+Docs Guide
+==========
 
 
 .. tip::
@@ -16,9 +16,9 @@ Contribution Guide
 .. toctree::
     :maxdepth: 1
 
-    /guide/ruff
     /guide/write-documentation
     /guide/write-docstrings
     /guide/example
 
     .. /guide/github
+    .. /guide/ruff
