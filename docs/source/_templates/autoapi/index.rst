@@ -15,4 +15,20 @@ You can see the source code on `Github <https://github.com/Entalpic/entaldocs>`_
    {{ page.include_path }}
    {% endfor %}
 
+Installation
+------------
+
+.. code-block:: bash
+
+   # 1️⃣ Clone the repository
+   git clone git@github.com:Entalpic/entaldocs.git
+   # or
+   gh repo clone Entalpic/entaldocs
+
+   # 2️⃣ Install the package
+   uv tool install -e ./entaldocs
+   # or
+   pip install -e ./entaldocs
+
+
 .. [#f1] Created with `sphinx-autoapi <https://github.com/readthedocs/sphinx-autoapi>`_
