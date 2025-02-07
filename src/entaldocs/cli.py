@@ -16,7 +16,6 @@ Learn how to use with:
 You can also refer to the :ref:`entaldocs-cli-tutorial` for more information.
 """
 
-import sys
 from pathlib import Path
 from shutil import rmtree
 from subprocess import run
@@ -52,7 +51,6 @@ def app():
         _app()
     except KeyboardInterrupt:
         logger.abort("\nAborted.", exit=1)
-    sys.exit(0)
 
 
 @_app.command
@@ -219,7 +217,6 @@ def init_docs(
         logger.info(
             "You can try to build the docs manually by running the above command."
         )
-    sys.exit(0)
 
 
 @_app.command
