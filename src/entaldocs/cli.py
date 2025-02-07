@@ -130,7 +130,7 @@ def init_docs(
 
     # where the docs will be stored, typically `$CWD/docs`
     pat = get_user_pat()
-    if not pat:
+    if not pat and not local:
         logger.warning(
             "You need to set a GitHub Personal Access Token"
             + " to fetch the latest static files."
