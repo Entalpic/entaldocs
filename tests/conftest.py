@@ -4,10 +4,32 @@ from contextlib import contextmanager
 from io import StringIO
 from pathlib import Path
 from subprocess import run
+from unittest.mock import patch
 
 import pytest
 
 os.environ["PYTHONBREAKPOINT"] = "ipdb.set_trace"
+
+
+@pytest.fixture(autouse=True)
+def mock_keyring():
+    """Mock keyring.get_password to return a fake GitHub PAT.
+
+    This fixture is automatically used in all tests.
+    """
+    with patch("keyring.get_password") as mock_get_password:
+        mock_get_password.return_value = ""
+        yield mock_get_password
+
+
+@pytest.fixture(autouse=True)
+def mock_keyring_set():
+    """Mock keyring.set_password to do nothing.
+
+    This fixture is automatically used in all tests.
+    """
+    with patch("keyring.set_password") as mock_set_password:
+        yield mock_set_password
 
 
 @pytest.fixture
