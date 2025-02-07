@@ -11,25 +11,29 @@ import pytest
 os.environ["PYTHONBREAKPOINT"] = "ipdb.set_trace"
 
 
+class MockKeyring:
+    """Mock keyring that always returns a fake PAT."""
+
+    def get_password(self, service, username):
+        return "fake-github-pat-for-testing"
+
+    def set_password(self, service, username, password):
+        pass
+
+
 @pytest.fixture(autouse=True)
 def mock_keyring():
-    """Mock keyring.get_password to return a fake GitHub PAT.
+    """Mock the entire keyring system to use our fake implementation.
 
     This fixture is automatically used in all tests.
     """
-    with patch("keyring.get_password") as mock_get_password:
-        mock_get_password.return_value = ""
-        yield mock_get_password
-
-
-@pytest.fixture(autouse=True)
-def mock_keyring_set():
-    """Mock keyring.set_password to do nothing.
-
-    This fixture is automatically used in all tests.
-    """
-    with patch("keyring.set_password") as mock_set_password:
-        yield mock_set_password
+    mock_kr = MockKeyring()
+    with (
+        patch("keyring.get_keyring", return_value=mock_kr),
+        patch("keyring.set_password", mock_kr.set_password),
+        patch("keyring.get_password", mock_kr.get_password),
+    ):
+        yield mock_kr
 
 
 @pytest.fixture
