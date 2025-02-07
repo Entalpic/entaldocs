@@ -29,6 +29,7 @@ jobs:
               run: |
                   uv sync
                   uv tool install -e .
+                  uv pip install keyrings.alt
 
             - name: Configure Git
               run: |
