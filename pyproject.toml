@@ -20,6 +20,7 @@ dev-dependencies = [
     "ipdb>=0.13.13",
     "ipython>=8.28.0",
     "pre-commit>=4.0.1",
+    "pytest-cov>=6.0.0",
     "pytest>=8.3.4",
     "ruff>=0.9.4",
     "shibuya>=2024.10.15",
