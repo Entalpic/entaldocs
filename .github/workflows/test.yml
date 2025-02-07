@@ -1,0 +1,40 @@
+name: Tests
+
+on:
+    pull_request: # This will now trigger on any PR
+    push:
+        branches: ["main"] # Keep running on pushes to main
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                python-version: ["3.10", "3.11", "3.12"]
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Set up Python ${{ matrix.python-version }}
+              uses: actions/setup-python@v5
+              with:
+                  python-version: ${{ matrix.python-version }}
+
+            - name: Install uv
+              run: |
+                  curl -LsSf https://astral.sh/uv/install.sh | sh
+                  echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+            - name: Install dependencies
+              run: |
+                  uv sync
+                  uv tool install -e .
+
+            - name: Configure Git
+              run: |
+                  git config --global user.email "test@example.com"
+                  git config --global user.name "Test User"
+
+            - name: Run tests
+              run: |
+                  uv run pytest tests/ -v --cov=entaldocs --cov-report=term-missing
