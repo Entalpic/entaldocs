@@ -27,6 +27,7 @@ from rich import print
 from entaldocs.utils import (
     copy_boilerplate,
     get_user_pat,
+    has_python_files,
     install_dependencies,
     load_deps,
     logger,
@@ -120,6 +121,13 @@ def init_docs(
     sys.exit(1)
         If the path already exists and ``--overwrite`` is not provided.
     """
+    # Check for Python files before proceeding
+    if not has_python_files():
+        logger.abort(
+            "No Python files found in project. Documentation requires Python files to document.",
+            exit=1,
+        )
+
     # where the docs will be stored, typically `$CWD/docs`
     pat = get_user_pat()
     if not pat:

@@ -648,3 +648,25 @@ def write_rtd_config() -> None:
 
     safe_dump(config, rtd)
     logger.info("ReadTheDocs file written.")
+
+
+def has_python_files(path: Path = Path(".")) -> bool:
+    """Check if there are any Python files in the given path or its subdirectories.
+
+    Parameters
+    ----------
+    path : Path, optional
+        The path to check for Python files, by default current directory.
+
+    Returns
+    -------
+    bool
+        True if Python files are found, False otherwise.
+    """
+    # Look for .py files, excluding common test directories and virtual environments
+    exclude_dirs = {".venv", "venv", ".tox", ".eggs", "build", "dist"}
+    for p in path.rglob("*.py"):
+        # Check if any parent directory is in exclude_dirs
+        if not any(x in exclude_dirs for x in p.parts):
+            return True
+    return False
