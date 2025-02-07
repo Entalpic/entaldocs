@@ -65,6 +65,7 @@ def init_docs(
     with_defaults: bool = False,
     branch: str = "main",
     contents: str = "boilerplate",
+    local: bool = False,
 ):
     """Initialize a Sphinx documentation project with Entalpic's standard configuration (also called within `entaldocs quickstart-project`).
 
@@ -112,6 +113,9 @@ def init_docs(
         The branch to fetch the static files from.
     contents : str, optional
         The path to the static files in the repository.
+    local : bool, optional
+        Use local boilerplate docs assets instead of fetching from the repository.
+        May update to outdated contents so avoid using this option.
 
     Raises
     ------
@@ -184,7 +188,9 @@ def init_docs(
         print("Skipping dependency installation.")
 
     # download and copy entaldocs pre-filled folder structure to the target directory
-    copy_boilerplate(path, branch=branch, content_path=contents, overwrite=True)
+    copy_boilerplate(
+        path, branch=branch, content_path=contents, overwrite=True, local=local
+    )
     # make empty dirs (_build and _static) in target directory
     make_empty_folders(path)
     # update defaults from user config
@@ -235,7 +241,12 @@ def show_deps(as_pip: bool = False):
 
 
 @_app.command
-def update(path: str = "./docs", branch: str = "main", contents: str = "boilerplate"):
+def update(
+    path: str = "./docs",
+    branch: str = "main",
+    contents: str = "boilerplate",
+    local: bool = False,
+):
     """
     Update the static files in the docs folder like CSS, JS and images.
 
@@ -261,6 +272,9 @@ def update(path: str = "./docs", branch: str = "main", contents: str = "boilerpl
         The branch to fetch the static files from.
     contents : str, optional
         The path to the static files in the repository.
+    local : bool, optional
+        Use local boilerplate docs assets instead of fetching from the repository.
+        May update to outdated contents so avoid using this option.
     """
 
     path = resolve_path(path)
@@ -276,6 +290,7 @@ def update(path: str = "./docs", branch: str = "main", contents: str = "boilerpl
             content_path=contents,
             overwrite=False,
             include_files_regex="_static",
+            local=local,
         )
         logger.success("Static files updated.")
     if logger.confirm("Would you like to update the conf.py file?"):
@@ -349,6 +364,7 @@ def quickstart_project(
     with_defaults: bool = False,
     branch: str = "main",
     contents: str = "boilerplate",
+    local: bool = False,
 ):
     """Start a ``uv``-based Python project from scratch, with initial project structure and docs.
 
@@ -405,6 +421,9 @@ def quickstart_project(
         The branch to fetch the static files from.
     contents : str, optional
         The path to the static files in the repository.
+    local : bool, optional
+        Use local boilerplate docs assets instead of fetching from the repository.
+        May update to outdated contents so avoid using this option.
     """
     has_uv = bool(run_command(["uv", "--version"]))
     if not has_uv:
@@ -483,5 +502,6 @@ def quickstart_project(
             with_defaults=with_defaults,
             branch=branch,
             contents=contents,
+            local=local,
         )
     logger.success("Done.")

@@ -204,6 +204,7 @@ def copy_boilerplate(
     branch: str = "main",
     content_path: str = "boilerplate",
     include_files_regex: str = ".*",
+    local: bool = False,
 ):
     """Copy the target files to the specified path.
 
@@ -229,7 +230,16 @@ def copy_boilerplate(
         A regex pattern to include only files that match the pattern with :func:`re.findall`.
     """
     with TemporaryDirectory() as tmpdir:
-        fetch_github_files(branch=branch, content_path=content_path, dir=tmpdir)
+        if local:
+            # use local boilerplate:
+            # copy the boilerplate folder to the tmpdir
+            copytree(
+                resolve_path(__file__).parent.parent.parent / content_path,
+                Path(tmpdir),
+                dirs_exist_ok=True,
+            )
+        else:
+            fetch_github_files(branch=branch, content_path=content_path, dir=tmpdir)
         tmpdir = Path(tmpdir)
         if include_files_regex:
             for f in tmpdir.rglob("*"):
@@ -454,7 +464,7 @@ def overwrite_docs_files(dest: Path, with_defaults: bool):
     assert index_rst.exists(), f"autoapi/index.rst not found: {dest}"
     index_text = index_rst.read_text()
     index_text = index_text.replace("$PROJECT_NAME", project)
-    index_text = index_text.replace("$PROJECT_URL", url)
+    index_text = index_text.replace("$PROJECT_URL", url or " URL TO BE SET ")
     index_rst.write_text(index_text)
 
 
