@@ -58,7 +58,7 @@ def app():
 @_app.command
 def init_docs(
     path: str = "./docs",
-    as_main: bool = None,
+    as_main_deps: bool = None,
     overwrite: bool = False,
     deps: bool = None,
     uv: bool = None,
@@ -98,7 +98,7 @@ def init_docs(
     ----------
     path : str, optional
         Where to store the docs.
-    as_main : bool, optional
+    as_main_deps : bool, optional
         Whether docs dependencies should be included in the main or dev dependencies.
     overwrite : bool, optional
         Whether to overwrite existing docs (if any).
@@ -150,9 +150,11 @@ def init_docs(
         if deps is not None:
             print("Ignoring deps argument because you are using --with-defaults.")
         deps = True
-        if as_main is not None:
-            print("Ignoring as_main argument because you are using --with-defaults.")
-        as_main = False
+        if as_main_deps is not None:
+            print(
+                "Ignoring as_main_deps argument because you are using --with-defaults."
+            )
+        as_main_deps = False
 
     # whether to install dependencies
     should_install = deps is not None or logger.confirm(
@@ -176,7 +178,7 @@ def init_docs(
                 )
         print(f"Installing dependencies{' with uv.' if with_uv else '.'}..")
         # execute the command to install dependencies
-        install_dependencies(with_uv, with_uv and not as_main)
+        install_dependencies(with_uv, with_uv and not as_main_deps)
         print("[green]Dependencies installed.[green]")
     else:
         print("Skipping dependency installation.")
@@ -342,7 +344,7 @@ def quickstart_project(
     docs: bool | None = None,
     deps: bool | None = None,
     docs_path: str = "./docs",
-    as_main: bool | None = None,
+    as_main_deps: bool | None = None,
     overwrite: bool = False,
     with_defaults: bool = False,
     branch: str = "main",
@@ -375,23 +377,23 @@ def quickstart_project(
     .. important::
 
         If you generate the docs, (with ``--docs`` or ``--with-defaults``) parameters
-        like ``--deps`` and ``--as_main`` will passed to the ``entaldocs init-docs``
+        like ``--deps`` and ``--as_main_deps`` will passed to the ``entaldocs init-docs``
         command so it may be worth checking ``$ entaldocs init-docs --help``.
 
     Parameters
     ----------
     as_app : bool, optional
         Whether to initialize the project as an app (just a script file to start with)
-        or a library (with a package structure within a ``src/`` folder).
+        or a library (with a package structure within a ``src/`` folder) which is the default.
     precommit : bool, optional
         Whether to install pre-commit hooks, by default ``None`` (i.e. prompt the user).
     docs : bool, optional
         Whether to initialize the docs, by default ``None`` (i.e. prompt the user).
     deps : bool, optional
-        Whether to install dependencies, by default ``None`` (i.e. prompt the user).
+        Whether to install dependencies (dev &? docs), by default ``None`` (i.e. prompt the user).
     docs_path : str, optional
-        Where to build the docs.
-    as_main : bool, optional
+        Where to build the docs, by default ``./docs``.
+    as_main_deps : bool, optional
         Whether to include docs dependencies in the main dependencies, by default
         ``None`` (i.e. prompt the user).
     overwrite : bool, optional
@@ -420,9 +422,9 @@ def quickstart_project(
         if deps is not None:
             logger.warning("Ignoring deps argument because of --with-defaults.")
         deps = True
-        if as_main is not None:
-            logger.warning("Ignoring as_main argument because of --with-defaults.")
-        as_main = False
+        if as_main_deps is not None:
+            logger.warning("Ignoring as_main_deps argument because of --with-defaults.")
+        as_main_deps = False
 
     has_uv_lock = Path("uv.lock").exists()
     if not has_uv_lock:
@@ -475,7 +477,7 @@ def quickstart_project(
             logger.info("ReadTheDocs config already exists.")
         init_docs(
             path=docs_path,
-            as_main=as_main,
+            as_main_deps=as_main_deps,
             overwrite=overwrite,
             deps=deps,
             with_defaults=with_defaults,
