@@ -2,7 +2,6 @@ import os
 import sys
 from contextlib import contextmanager
 from io import StringIO
-from pathlib import Path
 from subprocess import run
 from unittest.mock import patch
 
@@ -65,41 +64,6 @@ def capture_output():
             sys.stdout = old_stdout
 
     return c
-
-
-def tree() -> str:
-    """Print a recursive directory tree, ignoring .venv directory.
-
-    Mostly to debug tests.
-
-    Returns
-    -------
-    str
-        A string representation of the directory tree.
-    """
-
-    def _tree(path: Path, prefix: str = "", is_last: bool = True) -> str:
-        if path.name == ".venv":
-            return ""
-
-        # Prepare the current line
-        result = prefix + ("└── " if is_last else "├── ") + path.name + "\n"
-
-        if path.is_dir():
-            # Get all visible items (no hidden files)
-            items = sorted([x for x in path.iterdir() if not x.name.startswith(".")])
-            # Filter out .venv
-            items = [x for x in items if x.name != ".venv"]
-
-            # Handle children
-            for i, item in enumerate(items):
-                is_last_item = i == len(items) - 1
-                new_prefix = prefix + ("    " if is_last else "│   ")
-                result += _tree(item, new_prefix, is_last_item)
-
-        return result
-
-    return _tree(Path.cwd())
 
 
 @pytest.fixture
