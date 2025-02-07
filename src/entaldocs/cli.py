@@ -360,6 +360,7 @@ def set_github_pat(pat: Optional[str] = ""):
 @_app.command
 def quickstart_project(
     as_app: bool = False,
+    as_pkg: bool = False,
     precommit: bool | None = None,
     docs: bool | None = None,
     deps: bool | None = None,
@@ -385,7 +386,8 @@ def quickstart_project(
 
         The default behavior is to initialize the project as a library (with a package
         structure within a ``src/`` folder). Use the ``--as-app`` flag to initialize the
-        project as an app (just a script file to start with).
+        project as an app (just a script file to start with) or ``--as-pkg`` to initialize
+        as a package (with a package structure in the root directory).
 
     .. important::
 
@@ -404,8 +406,9 @@ def quickstart_project(
     Parameters
     ----------
     as_app : bool, optional
-        Whether to initialize the project as an app (just a script file to start with)
-        or a library (with a package structure within a ``src/`` folder) which is the default.
+        Whether to initialize the project as an app (just a script file to start with).
+    as_pkg : bool, optional
+        Whether to initialize the project as a package (with a package structure in the root directory).
     precommit : bool, optional
         Whether to install pre-commit hooks, by default ``None`` (i.e. prompt the user).
     docs : bool, optional
@@ -430,6 +433,9 @@ def quickstart_project(
         Use local boilerplate docs assets instead of fetching from the repository.
         May update to outdated contents so avoid using this option.
     """
+    if as_app and as_pkg:
+        logger.abort("Cannot use both --as-app and --as-pkg flags.")
+
     has_uv = bool(run_command(["uv", "--version"]))
     if not has_uv:
         logger.abort(
@@ -452,7 +458,18 @@ def quickstart_project(
 
     has_uv_lock = Path("uv.lock").exists()
     if not has_uv_lock:
-        initialized = run_command(["uv", "init"] + ([] if as_app else ["--lib"]))
+        cmd = ["uv", "init"]
+        if as_app:
+            # Initialize as app (no src/ directory)
+            pass
+        elif as_pkg:
+            # Initialize as package (package structure in root directory)
+            cmd.append("--package")
+        else:
+            # Initialize as library (package structure in src/ directory)
+            cmd.append("--lib")
+
+        initialized = run_command(cmd)
         if initialized is False:
             logger.abort("Failed to initialize the project.")
         logger.success("Project initialized with uv.")
