@@ -391,6 +391,8 @@ def discover_packages(dest: Path, with_defaults: str) -> str:
             "No packages found. Enter relative package paths separated by commas"
         )
         packages = [resolve_path(p.strip()) for p in user_packages.split(",")]
+    if not packages:
+        packages = [Path(".")]
     for p in packages:
         if not p.exists():
             logger.abort(f"Package not found: {p}", exit=1)
