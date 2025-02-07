@@ -16,7 +16,6 @@ Learn how to use with:
 You can also refer to the :ref:`entaldocs-cli-tutorial` for more information.
 """
 
-import sys
 from pathlib import Path
 from shutil import rmtree
 from subprocess import run
@@ -28,6 +27,7 @@ from rich import print
 from entaldocs.utils import (
     copy_boilerplate,
     get_user_pat,
+    has_python_files,
     install_dependencies,
     load_deps,
     logger,
@@ -52,7 +52,6 @@ def app():
         _app()
     except KeyboardInterrupt:
         logger.abort("\nAborted.", exit=1)
-    sys.exit(0)
 
 
 @_app.command
@@ -65,6 +64,7 @@ def init_docs(
     with_defaults: bool = False,
     branch: str = "main",
     contents: str = "boilerplate",
+    local: bool = False,
 ):
     """Initialize a Sphinx documentation project with Entalpic's standard configuration (also called within `entaldocs quickstart-project`).
 
@@ -112,15 +112,25 @@ def init_docs(
         The branch to fetch the static files from.
     contents : str, optional
         The path to the static files in the repository.
+    local : bool, optional
+        Use local boilerplate docs assets instead of fetching from the repository.
+        May update to outdated contents so avoid using this option.
 
     Raises
     ------
     sys.exit(1)
         If the path already exists and ``--overwrite`` is not provided.
     """
+    # Check for Python files before proceeding
+    if not has_python_files():
+        logger.abort(
+            "No Python files found in project. Documentation requires Python files to document.",
+            exit=1,
+        )
+
     # where the docs will be stored, typically `$CWD/docs`
     pat = get_user_pat()
-    if not pat:
+    if not pat and not local:
         logger.warning(
             "You need to set a GitHub Personal Access Token"
             + " to fetch the latest static files."
@@ -184,7 +194,9 @@ def init_docs(
         print("Skipping dependency installation.")
 
     # download and copy entaldocs pre-filled folder structure to the target directory
-    copy_boilerplate(path, branch=branch, content_path=contents, overwrite=True)
+    copy_boilerplate(
+        path, branch=branch, content_path=contents, overwrite=True, local=local
+    )
     # make empty dirs (_build and _static) in target directory
     make_empty_folders(path)
     # update defaults from user config
@@ -213,7 +225,6 @@ def init_docs(
         logger.info(
             "You can try to build the docs manually by running the above command."
         )
-    sys.exit(0)
 
 
 @_app.command
@@ -235,7 +246,12 @@ def show_deps(as_pip: bool = False):
 
 
 @_app.command
-def update(path: str = "./docs", branch: str = "main", contents: str = "boilerplate"):
+def update(
+    path: str = "./docs",
+    branch: str = "main",
+    contents: str = "boilerplate",
+    local: bool = False,
+):
     """
     Update the static files in the docs folder like CSS, JS and images.
 
@@ -261,6 +277,9 @@ def update(path: str = "./docs", branch: str = "main", contents: str = "boilerpl
         The branch to fetch the static files from.
     contents : str, optional
         The path to the static files in the repository.
+    local : bool, optional
+        Use local boilerplate docs assets instead of fetching from the repository.
+        May update to outdated contents so avoid using this option.
     """
 
     path = resolve_path(path)
@@ -276,6 +295,7 @@ def update(path: str = "./docs", branch: str = "main", contents: str = "boilerpl
             content_path=contents,
             overwrite=False,
             include_files_regex="_static",
+            local=local,
         )
         logger.success("Static files updated.")
     if logger.confirm("Would you like to update the conf.py file?"):
@@ -340,6 +360,7 @@ def set_github_pat(pat: Optional[str] = ""):
 @_app.command
 def quickstart_project(
     as_app: bool = False,
+    as_pkg: bool = False,
     precommit: bool | None = None,
     docs: bool | None = None,
     deps: bool | None = None,
@@ -349,6 +370,7 @@ def quickstart_project(
     with_defaults: bool = False,
     branch: str = "main",
     contents: str = "boilerplate",
+    local: bool = False,
 ):
     """Start a ``uv``-based Python project from scratch, with initial project structure and docs.
 
@@ -364,7 +386,8 @@ def quickstart_project(
 
         The default behavior is to initialize the project as a library (with a package
         structure within a ``src/`` folder). Use the ``--as-app`` flag to initialize the
-        project as an app (just a script file to start with).
+        project as an app (just a script file to start with) or ``--as-pkg`` to initialize
+        as a package (with a package structure in the root directory).
 
     .. important::
 
@@ -383,8 +406,9 @@ def quickstart_project(
     Parameters
     ----------
     as_app : bool, optional
-        Whether to initialize the project as an app (just a script file to start with)
-        or a library (with a package structure within a ``src/`` folder) which is the default.
+        Whether to initialize the project as an app (just a script file to start with).
+    as_pkg : bool, optional
+        Whether to initialize the project as a package (with a package structure in the root directory).
     precommit : bool, optional
         Whether to install pre-commit hooks, by default ``None`` (i.e. prompt the user).
     docs : bool, optional
@@ -405,7 +429,13 @@ def quickstart_project(
         The branch to fetch the static files from.
     contents : str, optional
         The path to the static files in the repository.
+    local : bool, optional
+        Use local boilerplate docs assets instead of fetching from the repository.
+        May update to outdated contents so avoid using this option.
     """
+    if as_app and as_pkg:
+        logger.abort("Cannot use both --as-app and --as-pkg flags.")
+
     has_uv = bool(run_command(["uv", "--version"]))
     if not has_uv:
         logger.abort(
@@ -428,7 +458,18 @@ def quickstart_project(
 
     has_uv_lock = Path("uv.lock").exists()
     if not has_uv_lock:
-        initialized = run_command(["uv", "init"] + ([] if as_app else ["--lib"]))
+        cmd = ["uv", "init"]
+        if as_app:
+            # Initialize as app (no src/ directory)
+            pass
+        elif as_pkg:
+            # Initialize as package (package structure in root directory)
+            cmd.append("--package")
+        else:
+            # Initialize as library (package structure in src/ directory)
+            cmd.append("--lib")
+
+        initialized = run_command(cmd)
         if initialized is False:
             logger.abort("Failed to initialize the project.")
         logger.success("Project initialized with uv.")
@@ -483,5 +524,6 @@ def quickstart_project(
             with_defaults=with_defaults,
             branch=branch,
             contents=contents,
+            local=local,
         )
     logger.success("Done.")

@@ -204,6 +204,7 @@ def copy_boilerplate(
     branch: str = "main",
     content_path: str = "boilerplate",
     include_files_regex: str = ".*",
+    local: bool = False,
 ):
     """Copy the target files to the specified path.
 
@@ -229,7 +230,16 @@ def copy_boilerplate(
         A regex pattern to include only files that match the pattern with :func:`re.findall`.
     """
     with TemporaryDirectory() as tmpdir:
-        fetch_github_files(branch=branch, content_path=content_path, dir=tmpdir)
+        if local:
+            # use local boilerplate:
+            # copy the boilerplate folder to the tmpdir
+            copytree(
+                resolve_path(__file__).parent.parent.parent / content_path,
+                Path(tmpdir),
+                dirs_exist_ok=True,
+            )
+        else:
+            fetch_github_files(branch=branch, content_path=content_path, dir=tmpdir)
         tmpdir = Path(tmpdir)
         if include_files_regex:
             for f in tmpdir.rglob("*"):
@@ -381,6 +391,8 @@ def discover_packages(dest: Path, with_defaults: str) -> str:
             "No packages found. Enter relative package paths separated by commas"
         )
         packages = [resolve_path(p.strip()) for p in user_packages.split(",")]
+    if not packages:
+        packages = [Path(".")]
     for p in packages:
         if not p.exists():
             logger.abort(f"Package not found: {p}", exit=1)
@@ -454,7 +466,7 @@ def overwrite_docs_files(dest: Path, with_defaults: bool):
     assert index_rst.exists(), f"autoapi/index.rst not found: {dest}"
     index_text = index_rst.read_text()
     index_text = index_text.replace("$PROJECT_NAME", project)
-    index_text = index_text.replace("$PROJECT_URL", url)
+    index_text = index_text.replace("$PROJECT_URL", url or " URL TO BE SET ")
     index_rst.write_text(index_text)
 
 
@@ -636,3 +648,25 @@ def write_rtd_config() -> None:
 
     safe_dump(config, rtd)
     logger.info("ReadTheDocs file written.")
+
+
+def has_python_files(path: Path = Path(".")) -> bool:
+    """Check if there are any Python files in the given path or its subdirectories.
+
+    Parameters
+    ----------
+    path : Path, optional
+        The path to check for Python files, by default current directory.
+
+    Returns
+    -------
+    bool
+        True if Python files are found, False otherwise.
+    """
+    # Look for .py files, excluding common test directories and virtual environments
+    exclude_dirs = {".venv", "venv", ".tox", ".eggs", "build", "dist"}
+    for p in path.rglob("*.py"):
+        # Check if any parent directory is in exclude_dirs
+        if not any(x in exclude_dirs for x in p.parts):
+            return True
+    return False
