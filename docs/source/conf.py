@@ -104,7 +104,7 @@ autoapi_dirs = ["../../src/entaldocs"]  # list of paths to the packages to docum
 autoapi_ignore = ["*.venv/*", "*/tests/*", "*boilerplate/*"]
 autoapi_member_order = "bysource"
 autoapi_template_dir = "_templates/autoapi"
-autoapi_python_class_content = "init"
+autoapi_python_class_content = "class"
 autoapi_options = [
     "members",
     "undoc-members",
