@@ -527,3 +527,29 @@ def quickstart_project(
             local=local,
         )
     logger.success("Done.")
+
+
+@_app.command
+def build_docs(path: str = "./docs"):
+    """Build the docs."""
+    path = resolve_path(path)
+    if not path.exists():
+        logger.abort(f"Path not found: {path}", exit=1)
+    make = path / "Makefile"
+    if not make.exists():
+        logger.abort(f"Makefile not found in {path}.", exit=1)
+    commands = [
+        ["make", "clean"],
+        ["make", "html"],
+    ]
+    with_uv = Path("uv.lock").exists()
+    if with_uv:
+        commands = [["uv", "run"] + command for command in commands]
+    for command in commands:
+        with logger.loading(f"Running {' '.join(command)}..."):
+            result = run_command(command, cwd=str(path), check=False)
+        if result.returncode != 0:
+            logger.error(result.stderr)
+            logger.abort("Failed to build the docs.")
+        print(result.stdout)
+    logger.success(f"Local docs built in {path / 'build/html/index.html'}")
