@@ -27,6 +27,7 @@ import sys
 from datetime import datetime
 
 from rich import print
+from rich.console import Console
 
 
 class BaseLogger:
@@ -138,6 +139,7 @@ class Logger(BaseLogger):
         """
         self.name = name
         self.with_time = with_time
+        self.console = Console()
 
     def now(self):
         """Get the current time.
@@ -267,3 +269,13 @@ class Logger(BaseLogger):
         cols = shutil.get_terminal_size().columns
         print(" " * cols, end="\r")
         print(" " * cols, end="\r")
+
+    def loading(self, message: str):
+        """Print a loading message.
+
+        Parameters
+        ----------
+        message : str
+            The message to print.
+        """
+        return self.console.status(message)
