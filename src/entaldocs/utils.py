@@ -637,7 +637,7 @@ def write_or_update_pre_commit_file() -> None:
 
 def write_rtd_config() -> None:
     """Write the ReadTheDocs configuration file to the current directory."""
-    rtd = Path(".readthedocs.yml")
+    rtd = Path(".readthedocs.yaml")
     if rtd.exists():
         logger.warning("ReadTheDocs file already exists. Skipping.")
         return
