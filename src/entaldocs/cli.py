@@ -507,7 +507,7 @@ def quickstart_project(
             logger.abort("Failed to install pre-commit hooks.")
         logger.success("Pre-commit hooks installed.")
 
-    has_rtd = Path(".readthedocs.yml").exists()
+    has_rtd = Path(".readthedocs.yaml").exists()
     if docs is None and not has_rtd:
         docs = logger.confirm("Would you like to initialize the docs?")
     if docs:
