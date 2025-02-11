@@ -99,7 +99,7 @@ autoapi_dirs = []  # list of paths to the packages to document
 autoapi_ignore = ["*.venv/*", "*/tests/*", "*/boilerplate/*", "*/docs/*"]
 autoapi_member_order = "bysource"
 autoapi_template_dir = "_templates/autoapi"
-autoapi_python_class_content = "init"
+autoapi_python_class_content = "class"
 autoapi_options = [
     "members",
     "undoc-members",
