@@ -16,7 +16,7 @@ def test_quickstart_project(tmp_path, monkeypatch, capture_output):
     assert Path(tmp_path, "src").exists()
     assert Path(tmp_path, "docs").exists()
     assert Path(tmp_path, ".pre-commit-config.yaml").exists()
-    assert Path(tmp_path, ".readthedocs.yml").exists()
+    assert Path(tmp_path, ".readthedocs.yaml").exists()
     assert Path(tmp_path, "uv.lock").exists()
 
 

@@ -15,12 +15,47 @@ It also serves as a demo for how to write a Sphinx documentation project.
     This tutorial assumes you have already installed the ``entaldocs`` package using
     ``pip`` or, preferably, ``uv``.
 
+TL;DR
+------
+
+.. code-block:: bash
+
+    # Quickstart a project, fetch the docs boilerplate code from Github
+    # to use the most up-to-date files.
+    $ entaldocs set-github-pat
+    $ entaldocs quickstart-project
+
+.. code-block:: bash
+
+    # Quickstart a project with uv and use local files to render the docs.
+    $ entaldocs quickstart-project --with-defaults --local
+    # Build the docs locally after you have worked on your project.
+    $ entaldocs build-docs
+
+.. code-block:: bash
+
+    # Initialize the docs folder and install the necessary dependencies
+    # into the current project.
+    $ entaldocs init-docs # you get prompts
+    $ entaldocs init-docs --with-defaults # you don't get prompts
+
+.. code-block:: bash
+
+    # Build the docs locally to verify your changes.
+    $ entaldocs build-docs
+
+.. code-block:: bash
+
+    # Update the docs boilerplate files in your project from Github.
+    # Typically updating the brand assets and colors.
+    $ entaldocs update
+
+
 
 Getting Started
 ===============
 
-The goal is to create a Python project with `uv
-<https://docs.astral.sh/uv/getting-started/installation/>`_, install the necessary
+The goal is to create a Python project with `uv <https://docs.astral.sh/uv/getting-started/installation/>`_, install the necessary
 dependencies for documentation, and set up the project's documentation.
 
 .. code-block:: bash
@@ -58,21 +93,30 @@ to access the files.
 Going further
 =============
 
-Currently ``entaldocs`` has 5 main commands:
+Currently ``entaldocs`` has 6 main commands:
 
-- ``set-github-pat`` to set your Github Personal Access Token (PAT) to access remote
-  files **required** for the ``entaldocs init-docs`` and ``entaldocs update`` commands.
-- ``init`` to create a docs folder and get started with your current project's
-  documentation.
-- ``update`` to update the documentation boilerplate files in your project from Github.
-- ``show-deps`` to show the dependencies that will be added to your project to make
-  docs.
 - ``quickstart-project`` to create a new Python project with ``uv`` and set up
   documentation as per ``init``.
+- ``init-docs`` to create a docs folder and get started with your current project's
+  documentation.
+- ``build-docs`` to build the HTML documentation locally (equivalent to running
+  ``make clean && make html`` in the docs folder).
+- ``update`` to update the documentation boilerplate files in your project from Github. Typically updating the brand assets and colors.
+- ``set-github-pat`` to set your Github Personal Access Token (PAT) to access remote
+  files.
+- ``show-deps`` to show the dependencies that will be added to your project to make
+  docs.
 
 .. tip::
 
     Add ``-h`` / ``--help`` flags to the above commands to get their own help messages
+
+.. note::
+
+    ``init-docs`` and ``update`` require a Github Personal Access Token (PAT) to
+    access remote files. You can set it with ``$ entaldocs set-github-pat``. Alternatively,
+    you can use the ``--local`` flag to use local files instead of fetching from Github.
+    Note that it may therefore not use the most up-to-date files to render the docs.
 
 When running ``$ entaldocs init-docs`` the following happens:
 

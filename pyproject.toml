@@ -1,7 +1,7 @@
 [project]
 name = "entaldocs"
-version = "0.1.0"
-description = "Add your description here"
+version = "1.0.0-rc1"
+description = "Entalpic's Development Guidelines & Docs CLI"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

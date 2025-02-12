@@ -65,7 +65,9 @@ def safe_load(file):
     return yaml.load(handle)
 
 
-def run_command(cmd: list[str], check: bool = True) -> str | bool:
+def run_command(
+    cmd: list[str], check: bool = True, cwd: str | Path | None = None
+) -> str | bool:
     """Run a command in the shell.
 
     Parameters
@@ -74,6 +76,8 @@ def run_command(cmd: list[str], check: bool = True) -> str | bool:
         The command to run.
     check : bool, optional
         Whether to raise an error if the command fails, by default ``True``.
+    cwd : str | Path | None, optional
+        The working directory to run the command in, by default ``None``.
 
     Returns
     -------
@@ -81,7 +85,14 @@ def run_command(cmd: list[str], check: bool = True) -> str | bool:
         The result of the command.
     """
     try:
-        return run(cmd, check=check, capture_output=True, text=True, encoding="utf-8")
+        return run(
+            cmd,
+            check=check,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            cwd=cwd,
+        )
     except CalledProcessError as e:
         logger.error(e.stderr)
         return False
@@ -626,7 +637,7 @@ def write_or_update_pre_commit_file() -> None:
 
 def write_rtd_config() -> None:
     """Write the ReadTheDocs configuration file to the current directory."""
-    rtd = Path(".readthedocs.yml")
+    rtd = Path(".readthedocs.yaml")
     if rtd.exists():
         logger.warning("ReadTheDocs file already exists. Skipping.")
         return
