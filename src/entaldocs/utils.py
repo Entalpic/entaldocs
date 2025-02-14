@@ -4,6 +4,7 @@ A set of utilities to help with the ``entaldocs`` CLI and the
 initialization of Entalpic-style documentation projects.
 """
 
+import importlib
 import json
 import re
 import sys
@@ -25,6 +26,8 @@ from entaldocs.logger import Logger
 
 logger = Logger("entaldocs")
 """A logger to log messages to the console."""
+ROOT = importlib.resources.files("entaldocs")
+"""The root directory of the ``entaldocs`` package."""
 
 
 def safe_dump(data, file, **kwargs):
@@ -157,7 +160,7 @@ def load_deps() -> list[str]:
     .. _dependenciesjson: ../../../dependencies.json
     .. include 3x "../" because we need to reach /dependencies.json from /autoapi/entaldocs/utils/index.html
     """
-    path = resolve_path(__file__).parent / "dependencies.json"
+    path = ROOT / "dependencies.json"
     return json.loads(path.read_text())
 
 
@@ -245,7 +248,7 @@ def copy_boilerplate(
             # use local boilerplate:
             # copy the boilerplate folder to the tmpdir
             copytree(
-                resolve_path(__file__).parent.parent.parent / content_path,
+                ROOT / content_path,
                 Path(tmpdir),
                 dirs_exist_ok=True,
             )
@@ -603,7 +606,7 @@ def fetch_github_files(
 def write_or_update_pre_commit_file() -> None:
     """Write the pre-commit file to the current directory."""
     pre_commit = Path(".pre-commit-config.yaml")
-    ref = Path(__file__).parent / "precommits.yaml"
+    ref = ROOT / "precommits.yaml"
     if pre_commit.exists():
         # Load existing config
         with open(pre_commit, "r") as f:

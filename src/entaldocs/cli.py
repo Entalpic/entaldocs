@@ -25,6 +25,7 @@ from cyclopts import App
 from rich import print
 
 from entaldocs.utils import (
+    ROOT,
     copy_boilerplate,
     get_user_pat,
     has_python_files,
@@ -121,6 +122,7 @@ def init_docs(
     sys.exit(1)
         If the path already exists and ``--overwrite`` is not provided.
     """
+    print(ROOT)
     # Check for Python files before proceeding
     if not has_python_files():
         logger.abort(
