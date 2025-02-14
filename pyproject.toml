@@ -15,6 +15,9 @@ dependencies = [
 [project.scripts]
 entaldocs = "entaldocs.cli:app"
 
+[tool.hatch.build]
+include = ["src/boilerplate/*"]
+
 [tool.uv]
 dev-dependencies = [
     "ipdb>=0.13.13",
