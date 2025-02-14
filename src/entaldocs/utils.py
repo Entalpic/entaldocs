@@ -248,7 +248,7 @@ def copy_boilerplate(
             # use local boilerplate:
             # copy the boilerplate folder to the tmpdir
             copytree(
-                ROOT / content_path,
+                ROOT / content_path.replace("src/entaldocs/", ""),
                 Path(tmpdir),
                 dirs_exist_ok=True,
             )
