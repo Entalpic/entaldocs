@@ -506,13 +506,13 @@ def search_contents(
     if not isinstance(contents, list):
         contents = [contents]
 
-    # If we don't ajust the content path, fetching a folder will include the full content
+    # If we don't adjust the content path, fetching a folder will include the full content
     # path and the files will be copied to the wrong location:
     # eg: if we fetch boilerplate/ and the content is boilerplate/docs/source/conf.py
     #     the file will be copied to "boilerplate/docs/source/conf.py" instead of
     #     "docs/source/conf.py"
     # so we'll remove the hierarchy of the folder from the path
-    # trying to dowload a file
+    # trying to download a file
     extra_path = content_path
     if re.match(r".+\.\w+", extra_path.split("/")[-1]):
         # we'll just keep the file name
