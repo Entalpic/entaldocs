@@ -63,7 +63,7 @@ def init_docs(
     uv: bool = None,
     with_defaults: bool = False,
     branch: str = "main",
-    contents: str = "boilerplate",
+    contents: str = "src/entaldocs/boilerplate",
     local: bool = False,
 ):
     """Initialize a Sphinx documentation project with Entalpic's standard configuration (also called within `entaldocs quickstart-project`).
@@ -249,7 +249,7 @@ def show_deps(as_pip: bool = False):
 def update(
     path: str = "./docs",
     branch: str = "main",
-    contents: str = "boilerplate",
+    contents: str = "src/entaldocs/boilerplate",
     local: bool = False,
 ):
     """
@@ -369,7 +369,7 @@ def quickstart_project(
     overwrite: bool = False,
     with_defaults: bool = False,
     branch: str = "main",
-    contents: str = "boilerplate",
+    contents: str = "src/entaldocs/boilerplate",
     local: bool = False,
 ):
     """Start a ``uv``-based Python project from scratch, with initial project structure and docs.

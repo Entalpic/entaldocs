@@ -4,6 +4,7 @@ A set of utilities to help with the ``entaldocs`` CLI and the
 initialization of Entalpic-style documentation projects.
 """
 
+import importlib
 import json
 import re
 import sys
@@ -25,6 +26,8 @@ from entaldocs.logger import Logger
 
 logger = Logger("entaldocs")
 """A logger to log messages to the console."""
+ROOT = importlib.resources.files("entaldocs")
+"""The root directory of the ``entaldocs`` package."""
 
 
 def safe_dump(data, file, **kwargs):
@@ -157,7 +160,7 @@ def load_deps() -> list[str]:
     .. _dependenciesjson: ../../../dependencies.json
     .. include 3x "../" because we need to reach /dependencies.json from /autoapi/entaldocs/utils/index.html
     """
-    path = resolve_path(__file__).parent / "dependencies.json"
+    path = ROOT / "dependencies.json"
     return json.loads(path.read_text())
 
 
@@ -213,7 +216,7 @@ def copy_boilerplate(
     dest: Path,
     overwrite: bool,
     branch: str = "main",
-    content_path: str = "boilerplate",
+    content_path: str = "src/entaldocs/boilerplate",
     include_files_regex: str = ".*",
     local: bool = False,
 ):
@@ -245,7 +248,7 @@ def copy_boilerplate(
             # use local boilerplate:
             # copy the boilerplate folder to the tmpdir
             copytree(
-                resolve_path(__file__).parent.parent.parent / content_path,
+                ROOT / content_path.replace("src/entaldocs/", ""),
                 Path(tmpdir),
                 dirs_exist_ok=True,
             )
@@ -281,7 +284,9 @@ def update_conf_py(dest: Path, branch: str = "main"):
     """
     with TemporaryDirectory() as tmpdir:
         fetch_github_files(
-            branch=branch, content_path="boilerplate/source/conf.py", dir=tmpdir
+            branch=branch,
+            content_path="src/entaldocs/boilerplate/source/conf.py",
+            dir=tmpdir,
         )
         tmpdir = Path(tmpdir)
         src = tmpdir / "conf.py"
@@ -506,13 +511,13 @@ def search_contents(
     if not isinstance(contents, list):
         contents = [contents]
 
-    # If we don't ajust the content path, fetching a folder will include the full content
+    # If we don't adjust the content path, fetching a folder will include the full content
     # path and the files will be copied to the wrong location:
     # eg: if we fetch boilerplate/ and the content is boilerplate/docs/source/conf.py
     #     the file will be copied to "boilerplate/docs/source/conf.py" instead of
     #     "docs/source/conf.py"
     # so we'll remove the hierarchy of the folder from the path
-    # trying to dowload a file
+    # trying to download a file
     extra_path = content_path
     if re.match(r".+\.\w+", extra_path.split("/")[-1]):
         # we'll just keep the file name
@@ -547,7 +552,9 @@ def search_contents(
 
 
 def fetch_github_files(
-    branch: str = "main", content_path: str = "boilerplate", dir: str = "."
+    branch: str = "main",
+    content_path: str = "src/entaldocs/boilerplate",
+    dir: str = ".",
 ) -> Path:
     """Download a file or directory from a GitHub repository and write it to ``dir``.
 
@@ -599,7 +606,7 @@ def fetch_github_files(
 def write_or_update_pre_commit_file() -> None:
     """Write the pre-commit file to the current directory."""
     pre_commit = Path(".pre-commit-config.yaml")
-    ref = Path(__file__).parent / "precommits.yaml"
+    ref = ROOT / "precommits.yaml"
     if pre_commit.exists():
         # Load existing config
         with open(pre_commit, "r") as f:
