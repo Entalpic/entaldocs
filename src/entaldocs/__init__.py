@@ -18,39 +18,40 @@ It also serves as a demo for how to write a Sphinx documentation project.
 TL;DR
 ------
 
-.. code-block:: bash
-
-    # Quickstart a project, fetch the docs boilerplate code from Github
-    # to use the most up-to-date files.
-    $ entaldocs set-github-pat
-    $ entaldocs quickstart-project
+Quickstart a project with uv and use local files to render the docs.
 
 .. code-block:: bash
 
-    # Quickstart a project with uv and use local files to render the docs.
     $ entaldocs quickstart-project --with-defaults --local
     # Build the docs locally after you have worked on your project.
     $ entaldocs build-docs
 
+Quickstart a project, fetch the docs boilerplate code from Github to use the most up-to-date files.
+
 .. code-block:: bash
 
-    # Initialize the docs folder and install the necessary dependencies
-    # into the current project.
+    $ entaldocs set-github-pat
+    $ entaldocs quickstart-project
+
+
+Initialize the ``docs/`` folder in an existing project.
+
+.. code-block:: bash
+
     $ entaldocs init-docs # you get prompts
     $ entaldocs init-docs --with-defaults # you don't get prompts
 
+Build the docs locally to verify your changes.
+
 .. code-block:: bash
 
-    # Build the docs locally to verify your changes.
     $ entaldocs build-docs
 
+Update the docs boilerplate files in your project from Github. Typically updating the brand assets and colors.
+
 .. code-block:: bash
 
-    # Update the docs boilerplate files in your project from Github.
-    # Typically updating the brand assets and colors.
     $ entaldocs update
-
-
 
 Getting Started
 ===============
@@ -67,7 +68,7 @@ What happens is the following:
 1. A new Python project is created in the current directory using ``uv``.
 2. Using ``uv add``, common development dependencies are added to the project.
 3. Pre-commit hooks to format and lint the code with ``ruff`` are added.
-4. The project is initialized with ``entaldocs init-docs`` to create a ``docs/`` folder
+4. The Sphinx documentation to automatically render docstrings is initialized with ``entaldocs init-docs`` to create a ``docs/`` folder
    and install the necessary dependencies for documentation.
 
 

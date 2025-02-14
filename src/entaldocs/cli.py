@@ -531,7 +531,15 @@ def quickstart_project(
 
 @_app.command
 def build_docs(path: str = "./docs"):
-    """Build the docs."""
+    """Build your docs.
+
+    Equivalent to running ``$ cd docs && make clean && make html``.
+
+    Parameters
+    ----------
+    path : str, optional
+        The path to your documentation folder.
+    """
     path = resolve_path(path)
     if not path.exists():
         logger.abort(f"Path not found: {path}", exit=1)

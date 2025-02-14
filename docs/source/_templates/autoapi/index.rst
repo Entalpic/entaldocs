@@ -18,6 +18,31 @@ You can see the source code on `Github <https://github.com/Entalpic/entaldocs>`_
 Installation
 ------------
 
+Using Entaldocs:
+
+.. code-block:: bash
+
+   $ uv tool install git+ssh://git@github.com/entalpic/entaldocs.git
+   # then
+   $ uv tool upgrade entaldocs
+
+TL;DR
+-----
+
+.. code-block:: bash
+
+   # 1️⃣ Start new project
+   $ entaldocs quickstart-project --local
+   # 1️⃣ Initialize docs in existing project
+   $ entaldocs init-docs --local
+
+   # 2️⃣ Build docs
+   $ entaldocs build-docs
+
+
+Contributing
+------------
+
 .. code-block:: bash
 
    # 1️⃣ Clone the repository
