@@ -213,7 +213,7 @@ def copy_boilerplate(
     dest: Path,
     overwrite: bool,
     branch: str = "main",
-    content_path: str = "boilerplate",
+    content_path: str = "src/boilerplate",
     include_files_regex: str = ".*",
     local: bool = False,
 ):
@@ -281,7 +281,7 @@ def update_conf_py(dest: Path, branch: str = "main"):
     """
     with TemporaryDirectory() as tmpdir:
         fetch_github_files(
-            branch=branch, content_path="boilerplate/source/conf.py", dir=tmpdir
+            branch=branch, content_path="src/boilerplate/source/conf.py", dir=tmpdir
         )
         tmpdir = Path(tmpdir)
         src = tmpdir / "conf.py"
@@ -547,7 +547,7 @@ def search_contents(
 
 
 def fetch_github_files(
-    branch: str = "main", content_path: str = "boilerplate", dir: str = "."
+    branch: str = "main", content_path: str = "src/boilerplate", dir: str = "."
 ) -> Path:
     """Download a file or directory from a GitHub repository and write it to ``dir``.
 
