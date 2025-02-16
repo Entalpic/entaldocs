@@ -1,6 +1,6 @@
 import pytest
 
-from entaldocs.cli import _app as app
+from entaldocs.cli import app
 
 
 def test_init_docs_basic(temp_project_with_git_and_remote, monkeypatch):

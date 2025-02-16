@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.scripts]
-entaldocs = "entaldocs.cli:app"
+entaldocs = "entaldocs.cli:main"
 
 [tool.uv]
 dev-dependencies = [

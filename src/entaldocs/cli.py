@@ -43,21 +43,21 @@ from entaldocs.utils import (
     write_rtd_config,
 )
 
-_app = App(
+app = App(
     help="A CLI tool to initialize a Sphinx documentation project with standard Entalpic config.",
 )
 """:py:class:`cyclopts.App`: The main CLI application."""
 
 
-def app():
+def main():
     """Run the CLI."""
     try:
-        _app()
+        app()
     except KeyboardInterrupt:
         logger.abort("\nAborted.", exit=1)
 
 
-@_app.command
+@app.command
 def init_docs(
     path: str = "./docs",
     as_main_deps: bool = None,
@@ -230,7 +230,7 @@ def init_docs(
         )
 
 
-@_app.command
+@app.command
 def show_deps(as_pip: bool = False):
     """Show the recommended dependencies for the documentation that would be installed with `entaldocs init-docs`.
 
@@ -248,7 +248,7 @@ def show_deps(as_pip: bool = False):
             print("  • " + scope + ": " + " ".join(deps[scope]))
 
 
-@_app.command
+@app.command
 def update(
     path: str = "./docs",
     branch: str = "main",
@@ -316,7 +316,7 @@ def update(
     logger.success("Done.")
 
 
-@_app.command
+@app.command
 def set_github_pat(pat: Optional[str] = ""):
     """
     Store a GitHub Personal Access Token (PAT) in your keyring.
@@ -360,9 +360,9 @@ def set_github_pat(pat: Optional[str] = ""):
     logger.success("GitHub PAT set.")
 
 
-@_app.command
+@app.command
 def quickstart_project(
-    as_app: bool = False,
+    asapp: bool = False,
     as_pkg: bool = False,
     precommit: bool | None = None,
     docs: bool | None = None,
@@ -408,7 +408,7 @@ def quickstart_project(
 
     Parameters
     ----------
-    as_app : bool, optional
+    asapp : bool, optional
         Whether to initialize the project as an app (just a script file to start with).
     as_pkg : bool, optional
         Whether to initialize the project as a package (with a package structure in the root directory).
@@ -436,7 +436,7 @@ def quickstart_project(
         Use local boilerplate docs assets instead of fetching from the repository.
         May update to outdated contents so avoid using this option.
     """
-    if as_app and as_pkg:
+    if asapp and as_pkg:
         logger.abort("Cannot use both --as-app and --as-pkg flags.")
 
     has_uv = bool(run_command(["uv", "--version"]))
@@ -462,7 +462,7 @@ def quickstart_project(
     has_uv_lock = Path("uv.lock").exists()
     if not has_uv_lock:
         cmd = ["uv", "init"]
-        if as_app:
+        if asapp:
             # Initialize as app (no src/ directory)
             pass
         elif as_pkg:
@@ -532,7 +532,7 @@ def quickstart_project(
     logger.success("Done.")
 
 
-@_app.command
+@app.command
 def build_docs(path: str = "./docs"):
     """Build your docs.
 
@@ -566,7 +566,7 @@ def build_docs(path: str = "./docs"):
     logger.success(f"Local docs built in {path / 'build/html/index.html'}")
 
 
-@_app.command
+@app.command
 def watch_docs(path: str = "./docs", patterns: str = ".+/src/.+\.py;.+/source/.+\.rst"):
     """Automatically build the docs when source files matching the given patterns are changed.
 

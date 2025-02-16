@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from entaldocs.cli import _app as app
+from entaldocs.cli import app
 
 
 def a_in_b_str_no_space(a, b):
