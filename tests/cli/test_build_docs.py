@@ -19,19 +19,6 @@ def a_in_b_str_no_space(a, b):
     return a in b
 
 
-@pytest.fixture(scope="module")
-def module_test_path(tmp_path_factory):
-    """Create a shared test directory with quickstart project setup."""
-    tmp_path = tmp_path_factory.mktemp("shared-test-dir")
-    current_dir = Path.cwd()
-    try:
-        os.chdir(tmp_path)  # Change to temp directory
-        app(["quickstart-project", "--with-defaults", "--local", "--overwrite"])
-    finally:
-        os.chdir(current_dir)  # Always restore original directory
-    return tmp_path
-
-
 @pytest.fixture
 def module_test_path_no_docs(tmp_path_factory):
     """Create a shared test directory with quickstart project setup and docs."""
