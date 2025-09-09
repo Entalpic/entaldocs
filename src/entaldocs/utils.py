@@ -436,9 +436,11 @@ def get_repo_url(with_defaults: bool) -> str:
     """
     url = ""
     try:
-        ssh_url = run_command(
-            ["git", "config", "--get", "remote.origin.url"]
-        ).stdout.strip()
+        ssh_url = (
+            run_command(["git", "config", "--get", "remote.origin.url"])
+            .stdout.strip()
+            .replace("https://github.com/", "")
+        )
         html_url = "https://github.com/" + ssh_url.split(":")[-1].replace(".git", "")
         url = (
             html_url
