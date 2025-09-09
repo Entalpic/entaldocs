@@ -13,6 +13,9 @@ Home
 
    self
 
+Documentation
+=============
+
 This is your base documentation file. You can edit this file to add more context to your documentation. 
 For example, you can add a brief description of your project, installation instructions, a quickstart guide, and more.
 
@@ -26,3 +29,9 @@ below the ``self`` entry. For example, if you create a new file called ``example
 
       self
       example
+
+Readme 📖
+=========
+
+.. include:: ../../README.md
+   :parser: myst_parser.sphinx_
