@@ -28,3 +28,8 @@ This repository serves as both a tutorial for Python project documentation (incl
 
     This repository is still under active development.
 
+Readme 📖
+=========
+
+.. include:: ../../README.md
+   :parser: myst_parser.sphinx_

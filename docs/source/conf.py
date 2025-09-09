@@ -29,6 +29,7 @@ extensions = [
     "sphinx_copybutton",
     "sphinxext.opengraph",
     "code_include.extension",
+    "myst_parser",
 ]
 
 templates_path = ["_templates"]
@@ -56,6 +57,11 @@ html_theme_options = {
         {
             "title": "entaldocs",
             "url": "index",
+        },
+        {
+            "title": "GitHub Repository",
+            "url": "https://github.com/Entalpic/entaldocs",
+            "external": True,
         },
     ]
 }

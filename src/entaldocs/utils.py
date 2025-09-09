@@ -477,6 +477,7 @@ def overwrite_docs_files(dest: Path, with_defaults: bool):
     conf_text = conf_py.read_text()
     conf_text = conf_text.replace("$PROJECT_NAME", project)
     conf_text = conf_text.replace("autoapi_dirs = []", f"autoapi_dirs = {packages}")
+    conf_text = conf_text.replace("$PROJECT_URL", url or " URL TO BE SET ")
     conf_py.write_text(conf_text)
 
     # setup autoapi index.rst based on project name and repo URL
