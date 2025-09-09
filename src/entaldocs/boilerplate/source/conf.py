@@ -27,6 +27,7 @@ extensions = [
     "sphinx_autodoc_typehints",
     "sphinx_copybutton",
     "code_include.extension",
+    "myst_parser",
 ]
 
 templates_path = ["_templates"]
@@ -52,6 +53,11 @@ html_theme_options = {
         {
             "title": "$PROJECT_NAME",
             "url": "index",
+        },
+        {
+            "title": "GitHub Repository",
+            "url": "$PROJECT_URL",
+            "external": True,
         },
     ]
 }
