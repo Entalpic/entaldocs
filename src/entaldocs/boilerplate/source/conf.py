@@ -54,6 +54,11 @@ html_theme_options = {
             "title": "$PROJECT_NAME",
             "url": "index",
         },
+        {
+            "title": "GitHub Repository",
+            "url": "$PROJECT_URL",
+            "external": True,
+        },
     ]
 }
 
