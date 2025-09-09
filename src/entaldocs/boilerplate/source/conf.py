@@ -27,6 +27,7 @@ extensions = [
     "sphinx_autodoc_typehints",
     "sphinx_copybutton",
     "code_include.extension",
+    "myst_parser",
 ]
 
 templates_path = ["_templates"]
