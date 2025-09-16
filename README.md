@@ -36,7 +36,7 @@ Using `uv`:
     ```
 
 2. `$ uv sync`
-3. Build docs locally with `entaldocs build-docs`
+3. Build docs locally with `entaldocs docs build`
 4. Open `docs/build/html/index.html`
 
 That's it 🤓

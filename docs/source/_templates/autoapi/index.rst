@@ -32,12 +32,12 @@ TL;DR
 .. code-block:: bash
 
    # 1️⃣ Start new project
-   $ entaldocs quickstart-project --local
+   $ entaldocs project quickstart --local
    # 1️⃣ Initialize docs in existing project
-   $ entaldocs init-docs --local
+   $ entaldocs docs init --local
 
    # 2️⃣ Build docs
-   $ entaldocs build-docs
+   $ entaldocs docs build
 
 
 Contributing
