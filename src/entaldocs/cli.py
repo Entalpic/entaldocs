@@ -567,7 +567,9 @@ def build_docs(path: str = "./docs"):
 
 
 @app.command
-def watch_docs(path: str = "./docs", patterns: str = ".+/src/.+\.py;.+/source/.+\.rst"):
+def watch_docs(
+    path: str = "./docs", patterns: str = r".+/src/.+\.py;.+/source/.+\.rst"
+):
     """Automatically build the docs when source files matching the given patterns are changed.
 
     Files must be accessible down the directory you run the command from.
