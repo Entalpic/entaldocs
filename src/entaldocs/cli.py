@@ -366,8 +366,7 @@ def set_github_pat(pat: Optional[str] = ""):
         pat = logger.prompt("Enter your GitHub PAT")
     logger.confirm("Are you sure you want to set the GitHub PAT?")
     set_password("entaldocs", "github_pat", pat)
-    logger.success("GitHub PAT set.")
-    logger.success("GitHub PAT set.")
+    logger.success("GitHub PAT set. You can now use `entaldocs init-docs`.")
 
 
 @app.command
