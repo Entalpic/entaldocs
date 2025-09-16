@@ -1,5 +1,5 @@
-from entaldocs.cli import app
-from entaldocs.utils import load_deps
+from siesta.cli import app
+from siesta.utils import load_deps
 
 
 def test_show_deps(capture_output):

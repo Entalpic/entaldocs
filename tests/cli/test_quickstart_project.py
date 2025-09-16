@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from entaldocs.cli import app
+from siesta.cli import app
 
 
 def test_quickstart_project(tmp_path, monkeypatch, capture_output):

@@ -11,7 +11,7 @@ Example
 
 .. code-block:: python
 
-    from entaldocs.logger import Logger
+    from siesta.logger import Logger
 
     logger = Logger("MyLogger")
     logger.success("This is a success message.")
@@ -42,14 +42,14 @@ class BaseLogger:
 
         Refer to:
 
-        * functions with :func:`entaldocs.utils.safe_dump`
-        * classes with :class:`entaldocs.logger.Logger`
-        * methods with :meth:`entaldocs.logger.Logger.prompt`
-        * constants with :const:`entaldocs.cli.app`
+        * functions with :func:`siesta.utils.safe_dump`
+        * classes with :class:`siesta.logger.Logger`
+        * methods with :meth:`siesta.logger.Logger.prompt`
+        * constants with :const:`siesta.cli.app`
 
         Prepend with ``~`` to refer to the name of the object only instead of the full
-        path -> :func:`~entaldocs.utils.safe_dump` will display as ``safe_dump``
-        instead of the full path ``entaldocs.utils.safe_dump``.
+        path -> :func:`~siesta.utils.safe_dump` will display as ``safe_dump``
+        instead of the full path ``siesta.utils.safe_dump``.
 
         Great maths:
 

@@ -8,10 +8,10 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 import importlib
 
-project = "entaldocs"  # Project name
+project = "siesta"  # Project name
 copyright = "2025, Entalpic"
 author = "Victor Schmidt <victor.schmidt@entalpic.ai>"  # Contributors to the package
-release = importlib.metadata.version("entaldocs")
+release = importlib.metadata.version("siesta")
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -44,7 +44,7 @@ rst_prolog = """
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_title = (
-    "entaldocs"  # Title for the HTML output for the docs, typically the project's name
+    "siesta"  # Title for the HTML output for the docs, typically the project's name
 )
 html_theme = "shibuya"
 html_static_path = ["_static"]
@@ -55,19 +55,19 @@ html_favicon = "_static/img/entalpic-logo-rounded-96.png"
 html_theme_options = {
     "nav_links": [
         {
-            "title": "entaldocs",
+            "title": "siesta",
             "url": "index",
         },
         {
             "title": "GitHub Repository",
-            "url": "https://github.com/Entalpic/entaldocs",
+            "url": "https://github.com/Entalpic/siesta",
             "external": True,
         },
     ]
 }
 
 # html_baseurl = (
-#     "file:///Users/victor/Documents/Github/entalpic/entaldocs/docs/build/html"
+#     "file:///Users/victor/Documents/Github/entalpic/siesta/docs/build/html"
 # )
 
 
@@ -106,7 +106,7 @@ intersphinx_mapping = {
 # https://autoapi.readthedocs.io/
 autodoc_typehints = "signature"
 autoapi_type = "python"
-autoapi_dirs = ["../../src/entaldocs"]  # list of paths to the packages to document
+autoapi_dirs = ["../../src/siesta"]  # list of paths to the packages to document
 autoapi_ignore = ["*.venv/*", "*/tests/*", "*boilerplate/*"]
 autoapi_member_order = "bysource"
 autoapi_template_dir = "_templates/autoapi"
@@ -152,15 +152,15 @@ hoverxref_mathjax = True
 
 # Open Graph
 
-ogp_site_url = "https://entalpic-entaldocs.readthedocs-hosted.com"
+ogp_site_url = "https://entalpic-siesta.readthedocs-hosted.com"
 ogp_social_cards = {
     "enable": True,
     "image": "./_static/img/entalpic-logo-rounded.png",
 }
 
-# :entaldocs: <update>
+# :siesta: <update>
 # DO NOT change what is between <update> and </update>
-# it may be overwritten in subsequent `entaldocs update` calls
+# it may be overwritten in subsequent `siesta update` calls
 # ----------------------------X---------------------------------
 
 
@@ -206,4 +206,4 @@ def setup(sphinx):
 
 
 # ----------------------------X---------------------------------
-# :entaldocs: </update>
+# :siesta: </update>

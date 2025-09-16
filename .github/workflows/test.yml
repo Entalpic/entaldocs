@@ -38,4 +38,4 @@ jobs:
 
             # - name: Run tests
             #   run: |
-            #       uv run pytest tests/ -v --cov=entaldocs --cov-report=term-missing
+            #       uv run pytest tests/ -v --cov=siesta --cov-report=term-missing

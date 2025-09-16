@@ -4,8 +4,8 @@ from unittest.mock import Mock, patch
 import pytest
 from watchdog.observers import Observer
 
-from entaldocs.cli import app
-from entaldocs.utils import AutoBuild
+from siesta.cli import app
+from siesta.utils import AutoBuild
 
 
 def test_watch_docs_path_not_found(capture_output):
@@ -26,7 +26,7 @@ def test_watch_docs_observer_setup(module_test_path, monkeypatch, capture_output
     mock_observer_instance = mock_observer.return_value
 
     with (
-        patch("entaldocs.cli.Observer", mock_observer),
+        patch("siesta.cli.Observer", mock_observer),
         patch("time.sleep", side_effect=KeyboardInterrupt),
     ):
         with capture_output() as output:
@@ -85,7 +85,7 @@ def test_watch_docs_custom_patterns(module_test_path, monkeypatch, capture_outpu
     custom_patterns = "custom/*.py;other/*.rst"
 
     with (
-        patch("entaldocs.cli.Observer", mock_observer),
+        patch("siesta.cli.Observer", mock_observer),
         patch("time.sleep", side_effect=KeyboardInterrupt),
     ):
         with capture_output():
@@ -107,7 +107,7 @@ def test_watch_docs_keyboard_interrupt_handling(
     mock_observer = Mock(spec=Observer)
 
     with (
-        patch("entaldocs.cli.Observer", mock_observer),
+        patch("siesta.cli.Observer", mock_observer),
         patch("time.sleep", side_effect=KeyboardInterrupt),
     ):
         with capture_output() as output:

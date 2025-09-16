@@ -12,9 +12,9 @@ Remember, this works in docstrings *and* in stand-alone ``.rst`` files.
 
 .. code-block:: python
 
-    import entaldocs
+    import siesta
 
-    entaldocs.cli.app()
+    siesta.cli.app()
 
 .. note::
 
@@ -28,9 +28,9 @@ Cool features:
 
 Reference code docs of:
 
-- A class: :class:`entaldocs.logger.BaseLogger` (long format)
-- Another class :class:`~entaldocs.logger.Logger` (short format, by prepending ``~``)
-- A method :meth:`~entaldocs.logger.Logger.prompt`
+- A class: :class:`siesta.logger.BaseLogger` (long format)
+- Another class :class:`~siesta.logger.Logger` (short format, by prepending ``~``)
+- A method :meth:`~siesta.logger.Logger.prompt`
 - Or even an external library :class:`github.MainClass.Github`
 
 .. note

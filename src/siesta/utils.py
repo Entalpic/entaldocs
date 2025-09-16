@@ -1,6 +1,6 @@
 # Copyright 2025 Entalpic
 """
-A set of utilities to help with the ``entaldocs`` CLI and the
+A set of utilities to help with the ``siesta`` CLI and the
 initialization of Entalpic-style documentation projects.
 """
 
@@ -23,12 +23,12 @@ from rich import print
 from ruamel.yaml import YAML
 from watchdog.events import FileSystemEvent, RegexMatchingEventHandler
 
-from entaldocs.logger import Logger
+from siesta.logger import Logger
 
-logger = Logger("entaldocs")
+logger = Logger("siesta")
 """A logger to log messages to the console."""
-ROOT = importlib.resources.files("entaldocs")
-"""The root directory of the ``entaldocs`` package."""
+ROOT = importlib.resources.files("siesta")
+"""The root directory of the ``siesta`` package."""
 
 
 def safe_dump(data, file, **kwargs):
@@ -110,7 +110,7 @@ def get_user_pat():
     str
         The GitHub Personal Access Token (PAT).
     """
-    return get_password("entaldocs", "github_pat")
+    return get_password("siesta", "github_pat")
 
 
 def get_pyver():
@@ -159,7 +159,7 @@ def load_deps() -> list[str]:
 
     .. |dependenciesjson| replace:: ``dependencies.json``
     .. _dependenciesjson: ../../../dependencies.json
-    .. include 3x "../" because we need to reach /dependencies.json from /autoapi/entaldocs/utils/index.html
+    .. include 3x "../" because we need to reach /dependencies.json from /autoapi/siesta/utils/index.html
     """
     path = ROOT / "dependencies.json"
     return json.loads(path.read_text())
@@ -217,7 +217,7 @@ def copy_boilerplate(
     dest: Path,
     overwrite: bool,
     branch: str = "main",
-    content_path: str = "src/entaldocs/boilerplate",
+    content_path: str = "src/siesta/boilerplate",
     include_files_regex: str = ".*",
     local: bool = False,
 ):
@@ -249,7 +249,7 @@ def copy_boilerplate(
             # use local boilerplate:
             # copy the boilerplate folder to the tmpdir
             copytree(
-                ROOT / content_path.replace("src/entaldocs/", ""),
+                ROOT / content_path.replace("src/siesta/", ""),
                 Path(tmpdir),
                 dirs_exist_ok=True,
             )
@@ -286,15 +286,15 @@ def update_conf_py(dest: Path, branch: str = "main"):
     with TemporaryDirectory() as tmpdir:
         fetch_github_files(
             branch=branch,
-            content_path="src/entaldocs/boilerplate/source/conf.py",
+            content_path="src/siesta/boilerplate/source/conf.py",
             dir=tmpdir,
         )
         tmpdir = Path(tmpdir)
         src = tmpdir / "conf.py"
         dest = resolve_path(dest / "source/conf.py")
         assert dest.exists(), f"Destination file (conf.py) not found: {dest}"
-        start_pattern = "# :entaldocs: <update>"
-        end_pattern = "# :entaldocs: </update>"
+        start_pattern = "# :siesta: <update>"
+        end_pattern = "# :siesta: </update>"
 
         # load the source and destination files contents
         src_content = src.read_text()
@@ -557,7 +557,7 @@ def search_contents(
 
 def fetch_github_files(
     branch: str = "main",
-    content_path: str = "src/entaldocs/boilerplate",
+    content_path: str = "src/siesta/boilerplate",
     dir: str = ".",
 ) -> Path:
     """Download a file or directory from a GitHub repository and write it to ``dir``.
@@ -579,13 +579,13 @@ def fetch_github_files(
     pat = get_user_pat()
     if not pat:
         logger.abort(
-            "GitHub Personal Access Token (PAT) not found. Run 'entaldocs set-github-pat' to set it.",
+            "GitHub Personal Access Token (PAT) not found. Run 'siesta set-github-pat' to set it.",
             exit=1,
         )
         sys.exit(1)
     auth = Token(pat)
     g = Github(auth=auth)
-    repo = g.get_repo("entalpic/entaldocs")
+    repo = g.get_repo("entalpic/siesta")
     try:
         contents = search_contents(repo, branch=branch, content_path=content_path)
     except UnknownObjectException:

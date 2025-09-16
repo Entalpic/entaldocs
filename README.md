@@ -1,24 +1,26 @@
-# 𝚫 Entaldocs
+# 𝚫 Siesta
 
-Entalpic's Development Guidelines
+**Siesta Is Entalpic'S Terminal Assistant.**
+
+It is designed to help you with good practices in Python development at Entalpic, especially with boilerplate setup for projects and documentation.
 
 ## CL
 
-Use `entaldocs` to initialize a documentation infrastructure in your current codebase. Refer to the docs for usage [WIP].
+Use `siesta` to initialize a documentation infrastructure in your current codebase. Refer to the docs for usage[FIXME].
 
 ## Installation
 
 ```bash
-uv tool install git+ssh://git@github.com/entalpic/entaldocs.git
+uv tool install git+ssh://git@github.com/entalpic/siesta.git
 ```
 
 ## Upgrade
 
 ```bash
-uv tool upgrade entaldocs
+uv tool upgrade siesta
 ```
 
-See Usage instructions [in the online docs](https://entalpic-entaldocs.readthedocs-hosted.com/en/latest/autoapi/entaldocs/cli/index.html).
+See Usage instructions [in the online docs](https://entalpic-siesta.readthedocs-hosted.com/en/latest/autoapi/siesta/cli/index.html).
 
 ## Contributing
 
@@ -27,16 +29,16 @@ Using `uv`:
 1. Clone this repository
 
     ```bash
-    git clone git+ssh://git@github.com/entalpic/entaldocs.git
+    git clone git+ssh://git@github.com/entalpic/siesta.git
     # or
-    gh repo clone entalpic/entaldocs
+    gh repo clone entalpic/siesta
 
     # then
-    cd entaldocs
+    cd siesta
     ```
 
 2. `$ uv sync`
-3. Build docs locally with `entaldocs docs build`
+3. Build docs locally with `siesta docs build`
 4. Open `docs/build/html/index.html`
 
 That's it 🤓

@@ -1,6 +1,6 @@
-// Description: Custom JS for the EntalDocs theme
+// Description: Custom JS for the siesta theme
 /**
- * Custom JS for the EntalDocs theme
+ * Custom JS for the siesta theme
  */
 
 /**
