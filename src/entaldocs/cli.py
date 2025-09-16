@@ -371,7 +371,7 @@ def set_github_pat(pat: Optional[str] = ""):
 
 @app.command
 def quickstart_project(
-    asapp: bool = False,
+    as_app: bool = False,
     as_pkg: bool = False,
     precommit: bool | None = None,
     docs: bool | None = None,
@@ -417,7 +417,7 @@ def quickstart_project(
 
     Parameters
     ----------
-    asapp : bool, optional
+    as_app : bool, optional
         Whether to initialize the project as an app (just a script file to start with).
     as_pkg : bool, optional
         Whether to initialize the project as a package (with a package structure in the root directory).
@@ -445,7 +445,7 @@ def quickstart_project(
         Use local boilerplate docs assets instead of fetching from the repository.
         May update to outdated contents so avoid using this option.
     """
-    if asapp and as_pkg:
+    if as_app and as_pkg:
         logger.abort("Cannot use both --as-app and --as-pkg flags.")
 
     has_uv = bool(run_command(["uv", "--version"]))
@@ -471,7 +471,7 @@ def quickstart_project(
     has_uv_lock = Path("uv.lock").exists()
     if not has_uv_lock:
         cmd = ["uv", "init"]
-        if asapp:
+        if as_app:
             # Initialize as app (no src/ directory)
             pass
         elif as_pkg:
