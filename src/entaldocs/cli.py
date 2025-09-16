@@ -7,11 +7,13 @@ Learn how to use with:
 .. code-block:: bash
 
     $ entaldocs --help
+    $ entaldocs docs --help
+    $ entaldocs docs init --help
+    $ entaldocs docs update --help
+    $ entaldocs project --help
+    $ entaldocs project quickstart --help
     $ entaldocs set-github-pat --help
-    $ entaldocs quickstart-project --help
-    $ entaldocs init-docs --help
     $ entaldocs show-deps --help
-    $ entaldocs update --help
 
 You can also refer to the :ref:`entaldocs-cli-tutorial` for more information.
 """
@@ -47,16 +49,46 @@ from entaldocs.utils import (
 app = App(
     help=dedent(
         """
-        A CLI tool to initialize a Sphinx documentation project with standard Entalpic config.
+    A set of CLI tools to help you with good practices in Python development at Entalpic.
+
+    Upgrade with ``$ uv tool upgrade entaldocs``.
+
+    See Usage instructions in the online docs: https://entalpic-entaldocs.readthedocs-hosted.com/en/latest/autoapi/entaldocs/.
+    """.strip()
+    ),
+)
+""":py:class:`cyclopts.App`: The main CLI application."""
+
+docs_app = App(
+    name="docs",
+    help=dedent(
+        """
+        Initialize, build and watch a Sphinx documentation project with standard Entalpic config.
 
         Upgrade with ``$ uv tool upgrade entaldocs``.
 
-        See Usage instructions in the online docs: https://entalpic-entaldocs.readthedocs-hosted.com/en/latest/autoapi/entaldocs/.
+        See Usage instructions in the online docs: https://entalpic-entaldocs.readthedocs-hosted.com/en/latest/autoapi/entaldocs.
 
         """.strip(),
     ),
 )
-""":py:class:`cyclopts.App`: The main CLI application."""
+
+project_app = App(
+    name="project",
+    help=dedent(
+        """
+        Initialize a Python project with standard Entalpic config.
+
+        Upgrade with ``$ uv tool upgrade entaldocs``.
+
+        See Usage instructions in the online docs: https://entalpic-entaldocs.readthedocs-hosted.com/en/latest/autoapi/entaldocs.
+
+        """.strip(),
+    ),
+)
+
+app.command(docs_app)
+app.command(project_app)
 
 
 def main():
@@ -67,19 +99,19 @@ def main():
         logger.abort("\nAborted.", exit=1)
 
 
-@app.command
+@docs_app.command(name="init")
 def init_docs(
     path: str = "./docs",
     as_main_deps: bool = None,
     overwrite: bool = False,
     deps: bool = None,
     uv: bool = None,
-    with_defaults: bool = False,
+    with_defaults: bool = True,
     branch: str = "main",
     contents: str = "src/entaldocs/boilerplate",
     local: bool = False,
 ):
-    """Initialize a Sphinx documentation project with Entalpic's standard configuration (also called within `entaldocs quickstart-project`).
+    """Initialize a Sphinx documentation project with Entalpic's standard configuration (also called within ``entaldocs project quickstart``).
 
     In particular:
 
@@ -240,9 +272,9 @@ def init_docs(
         )
 
 
-@app.command
+@app.command(name="show-deps")
 def show_deps(as_pip: bool = False):
-    """Show the recommended dependencies for the documentation that would be installed with `entaldocs init-docs`.
+    """Show the recommended dependencies for the documentation that would be installed with `entaldocs docs init`.
 
     Parameters
     ----------
@@ -258,7 +290,7 @@ def show_deps(as_pip: bool = False):
             print("  • " + scope + ": " + " ".join(deps[scope]))
 
 
-@app.command
+@docs_app.command(name="update")
 def update(
     path: str = "./docs",
     branch: str = "main",
@@ -326,7 +358,7 @@ def update(
     logger.success("Done.")
 
 
-@app.command
+@app.command(name="set-github-pat")
 def set_github_pat(pat: Optional[str] = ""):
     """
     Store a GitHub Personal Access Token (PAT) in your keyring.
@@ -366,10 +398,10 @@ def set_github_pat(pat: Optional[str] = ""):
         pat = logger.prompt("Enter your GitHub PAT")
     logger.confirm("Are you sure you want to set the GitHub PAT?")
     set_password("entaldocs", "github_pat", pat)
-    logger.success("GitHub PAT set. You can now use `entaldocs init-docs`.")
+    logger.success("GitHub PAT set. You can now use `entaldocs docs init`.")
 
 
-@app.command
+@project_app.command(name="quickstart")
 def quickstart_project(
     as_app: bool = False,
     as_pkg: bool = False,
@@ -379,7 +411,7 @@ def quickstart_project(
     docs_path: str = "./docs",
     as_main_deps: bool | None = None,
     overwrite: bool = False,
-    with_defaults: bool = False,
+    with_defaults: bool = True,
     branch: str = "main",
     contents: str = "src/entaldocs/boilerplate",
     local: bool = False,
@@ -391,7 +423,7 @@ def quickstart_project(
     * Initializes a new ``uv`` project with ``$ uv init``.
     * Installs recommended dependencies with ``$ uv add --dev [...]``.
     * Initializes a new Sphinx project at the specified path as per ``$ entaldocs
-      init-docs``.
+      docs init``.
     * Initializes pre-commit hooks with ``$ uv run pre-commit install``.
 
     .. note::
@@ -412,8 +444,8 @@ def quickstart_project(
     .. important::
 
         If you generate the docs, (with ``--docs`` or ``--with-defaults``) parameters
-        like ``--deps`` and ``--as_main_deps`` will passed to the ``entaldocs init-docs``
-        command so it may be worth checking ``$ entaldocs init-docs --help``.
+        like ``--deps`` and ``--as_main_deps`` will passed to the ``entaldocs docs init``
+        command so it may be worth checking ``$ entaldocs docs init --help``.
 
     Parameters
     ----------
@@ -434,7 +466,7 @@ def quickstart_project(
         ``None`` (i.e. prompt the user).
     overwrite : bool, optional
         Whether to overwrite existing files (if any). Will be passed to ``entaldocs
-        init-docs``.
+        docs init``.
     with_defaults : bool, optional
         Whether to trust the defaults and skip all prompts.
     branch : str, optional
@@ -544,7 +576,7 @@ def quickstart_project(
     logger.success("Done.")
 
 
-@app.command
+@docs_app.command(name="build")
 def build_docs(path: str = "./docs"):
     """Build your docs.
 
@@ -581,7 +613,7 @@ def build_docs(path: str = "./docs"):
     logger.success(f"Local docs built in {path / 'build/html/index.html'}")
 
 
-@app.command
+@docs_app.command(name="watch")
 def watch_docs(
     path: str = "./docs", patterns: str = r".+/src/.+\.py;.+/source/.+\.rst"
 ):
