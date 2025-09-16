@@ -721,12 +721,11 @@ class AutoBuild(RegexMatchingEventHandler):
         """
         path = event.src_path
         suffix = Path(path).suffix
-        is_src_rst = "/source/" in path and suffix == ".rst"
         is_autoapi_rst = "/source/" in path and "/autoapi/" in path and suffix == ".rst"
-        is_autoapi_template = "_templates/autoapi/" in path and suffix == ".rst"
-        is_src_py = "src/" in path and suffix == ".py"
+        is_docs_py = str(self.path) in path and suffix == ".py"
 
-        run = (not is_autoapi_rst or is_autoapi_template) and (is_src_rst or is_src_py)
+        dont_run = is_autoapi_rst or is_docs_py
 
-        if run:
+        if not dont_run:
+            logger.info(f"Building docs because {path} was modified.")
             self.build_command(self.path)
