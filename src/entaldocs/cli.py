@@ -20,6 +20,7 @@ import time
 from pathlib import Path
 from shutil import rmtree
 from subprocess import run
+from textwrap import dedent
 from typing import Optional
 
 from cyclopts import App
@@ -44,7 +45,16 @@ from entaldocs.utils import (
 )
 
 app = App(
-    help="A CLI tool to initialize a Sphinx documentation project with standard Entalpic config.",
+    help=dedent(
+        """
+        A CLI tool to initialize a Sphinx documentation project with standard Entalpic config.
+
+        Upgrade with ``$ uv tool upgrade entaldocs``.
+
+        See Usage instructions in the online docs: https://entalpic-entaldocs.readthedocs-hosted.com/en/latest/autoapi/entaldocs/.
+
+        """.strip(),
+    ),
 )
 """:py:class:`cyclopts.App`: The main CLI application."""
 
