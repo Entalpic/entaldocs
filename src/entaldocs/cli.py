@@ -539,6 +539,9 @@ def quickstart_project(
             contents=contents,
             local=local,
         )
+    logger.info(
+        "Ask Victor if you want to automatically build and deploy the docs to ReadTheDocs."
+    )
     logger.success("Done.")
 
 
@@ -573,6 +576,9 @@ def build_docs(path: str = "./docs"):
             logger.error(result.stderr)
             logger.abort("Failed to build the docs.")
         print(result.stdout)
+    logger.info(
+        "Ask Victor if you want to automatically build and deploy the docs to ReadTheDocs."
+    )
     logger.success(f"Local docs built in {path / 'build/html/index.html'}")
 
 
