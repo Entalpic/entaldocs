@@ -10,10 +10,11 @@ dependencies = [
     "pygithub>=2.5.0",
     "keyring>=25.5.0",
     "ruamel-yaml>=0.18.6",
+    "watchdog>=6.0.0",
 ]
 
 [project.scripts]
-entaldocs = "entaldocs.cli:app"
+entaldocs = "entaldocs.cli:main"
 
 [tool.uv]
 dev-dependencies = [

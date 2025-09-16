@@ -1,4 +1,4 @@
-from entaldocs.cli import _app as app
+from entaldocs.cli import app
 from entaldocs.utils import load_deps
 
 

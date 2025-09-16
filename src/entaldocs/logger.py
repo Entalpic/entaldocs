@@ -45,7 +45,7 @@ class BaseLogger:
         * functions with :func:`entaldocs.utils.safe_dump`
         * classes with :class:`entaldocs.logger.Logger`
         * methods with :meth:`entaldocs.logger.Logger.prompt`
-        * constants with :const:`entaldocs.cli._app`
+        * constants with :const:`entaldocs.cli.app`
 
         Prepend with ``~`` to refer to the name of the object only instead of the full
         path -> :func:`~entaldocs.utils.safe_dump` will display as ``safe_dump``

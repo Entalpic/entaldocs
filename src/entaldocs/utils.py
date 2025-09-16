@@ -21,6 +21,7 @@ from github.Repository import Repository
 from keyring import get_password
 from rich import print
 from ruamel.yaml import YAML
+from watchdog.events import FileSystemEvent, RegexMatchingEventHandler
 
 from entaldocs.logger import Logger
 
@@ -691,3 +692,43 @@ def has_python_files(path: Path = Path(".")) -> bool:
         if not any(x in exclude_dirs for x in p.parts):
             return True
     return False
+
+
+class AutoBuild(RegexMatchingEventHandler):
+    """Automatically build the docs when they are changed.
+
+    Parameters
+    ----------
+    regexes : list[str]
+        The regexes to match against the file paths.
+    build_command : list[str]
+        The command to run to build the docs.
+    path : str
+        The path to the docs folder.
+    """
+
+    def __init__(self, regexes: list[str], build_command: list[str], path: str):
+        super().__init__(regexes=regexes)
+        self.build_command = build_command
+        self.path = path
+
+    def on_modified(self, event: FileSystemEvent):
+        """File modified event handler.
+
+        Runs the build command if the file is a source file that needs to be built.
+
+        Parameters
+        ----------
+        event : FileSystemEvent
+            The event to handle.
+        """
+        path = event.src_path
+        suffix = Path(path).suffix
+        is_autoapi_rst = "/source/" in path and "/autoapi/" in path and suffix == ".rst"
+        is_docs_py = str(self.path) in path and suffix == ".py"
+
+        dont_run = is_autoapi_rst or is_docs_py
+
+        if not dont_run:
+            logger.info(f"Building docs because {path} was modified.")
+            self.build_command(self.path)

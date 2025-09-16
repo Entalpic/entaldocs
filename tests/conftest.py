@@ -2,10 +2,13 @@ import os
 import sys
 from contextlib import contextmanager
 from io import StringIO
+from pathlib import Path
 from subprocess import run
 from unittest.mock import patch
 
 import pytest
+
+from entaldocs.cli import app as app
 
 os.environ["PYTHONBREAKPOINT"] = "ipdb.set_trace"
 
@@ -71,4 +74,17 @@ def temp_project_with_git_and_remote(tmp_path):
         cwd=str(tmp_path),
     )
 
+    return tmp_path
+
+
+@pytest.fixture(scope="module")
+def module_test_path(tmp_path_factory):
+    """Create a shared test directory with quickstart project setup."""
+    tmp_path = tmp_path_factory.mktemp("shared-test-dir")
+    current_dir = Path.cwd()
+    try:
+        os.chdir(tmp_path)  # Change to temp directory
+        app(["quickstart-project", "--with-defaults", "--local", "--overwrite"])
+    finally:
+        os.chdir(current_dir)  # Always restore original directory
     return tmp_path

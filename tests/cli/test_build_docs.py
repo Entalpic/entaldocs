@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from entaldocs.cli import _app as app
+from entaldocs.cli import app
 
 
 def a_in_b_str_no_space(a, b):
@@ -17,19 +17,6 @@ def a_in_b_str_no_space(a, b):
     a = a.replace(" ", "").replace("\n", "").replace("\t", "")
     b = b.replace(" ", "").replace("\n", "").replace("\t", "")
     return a in b
-
-
-@pytest.fixture(scope="module")
-def module_test_path(tmp_path_factory):
-    """Create a shared test directory with quickstart project setup."""
-    tmp_path = tmp_path_factory.mktemp("shared-test-dir")
-    current_dir = Path.cwd()
-    try:
-        os.chdir(tmp_path)  # Change to temp directory
-        app(["quickstart-project", "--with-defaults", "--local", "--overwrite"])
-    finally:
-        os.chdir(current_dir)  # Always restore original directory
-    return tmp_path
 
 
 @pytest.fixture

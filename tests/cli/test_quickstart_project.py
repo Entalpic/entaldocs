@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from entaldocs.cli import _app as app
+from entaldocs.cli import app
 
 
 def test_quickstart_project(tmp_path, monkeypatch, capture_output):
