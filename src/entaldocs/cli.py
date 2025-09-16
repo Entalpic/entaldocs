@@ -584,6 +584,7 @@ def watch_docs(
     patterns : str, optional
         The patterns to watch for changes, separated by ``;``.
     """
+    build_docs(path)
     patterns = [p.strip() for p in patterns.split(";")]
     ab = AutoBuild(patterns, build_docs, path=path)
     observer = Observer()
