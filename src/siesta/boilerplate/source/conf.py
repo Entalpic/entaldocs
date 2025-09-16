@@ -63,7 +63,7 @@ html_theme_options = {
 }
 
 # html_baseurl = (
-#     "file:///Users/victor/Documents/Github/entalpic/entaldocs/docs/build/html"
+#     "file:///Users/victor/Documents/Github/entalpic/siesta/docs/build/html"
 # )
 
 
@@ -153,9 +153,9 @@ hoverxref_mathjax = True
 #     # "image": "./_static/images/logo.png",
 # }
 
-# :entaldocs: <update>
+# :siesta: <update>
 # DO NOT change what is between <update> and </update>
-# it may be overwritten in subsequent `entaldocs update` calls
+# it may be overwritten in subsequent `siesta update` calls
 # ----------------------------X---------------------------------
 
 
@@ -201,4 +201,4 @@ def setup(sphinx):
 
 
 # ----------------------------X---------------------------------
-# :entaldocs: </update>
+# :siesta: </update>

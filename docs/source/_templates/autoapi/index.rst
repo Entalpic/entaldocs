@@ -2,11 +2,11 @@
 API Reference
 =============
 
-This page contains leads to the documentation of the ``entaldocs`` package.
+This page contains leads to the documentation of the ``siesta`` package.
 
 The API reference was auto-generated with ``autoapi`` [#f1]_.
 
-You can see the source code on `Github <https://github.com/Entalpic/entaldocs>`_ and explore the rendered documentation here ⬇️
+You can see the source code on `Github <https://github.com/Entalpic/siesta>`_ and explore the rendered documentation here ⬇️
 
 .. toctree::
    :titlesonly:
@@ -18,13 +18,13 @@ You can see the source code on `Github <https://github.com/Entalpic/entaldocs>`_
 Installation
 ------------
 
-Using Entaldocs:
+Using siesta:
 
 .. code-block:: bash
 
-   $ uv tool install git+ssh://git@github.com/entalpic/entaldocs.git
+   $ uv tool install git+ssh://git@github.com/entalpic/siesta.git
    # then
-   $ uv tool upgrade entaldocs
+   $ uv tool upgrade siesta
 
 TL;DR
 -----
@@ -32,12 +32,12 @@ TL;DR
 .. code-block:: bash
 
    # 1️⃣ Start new project
-   $ entaldocs quickstart-project --local
+   $ siesta project quickstart --local
    # 1️⃣ Initialize docs in existing project
-   $ entaldocs init-docs --local
+   $ siesta docs init --local
 
    # 2️⃣ Build docs
-   $ entaldocs build-docs
+   $ siesta docs build
 
 
 Contributing
@@ -46,14 +46,14 @@ Contributing
 .. code-block:: bash
 
    # 1️⃣ Clone the repository
-   git clone git@github.com:Entalpic/entaldocs.git
+   git clone git@github.com:Entalpic/siesta.git
    # or
-   gh repo clone Entalpic/entaldocs
+   gh repo clone Entalpic/siesta
 
    # 2️⃣ Install the package
-   uv tool install -e ./entaldocs
+   uv tool install -e ./siesta
    # or
-   pip install -e ./entaldocs
+   pip install -e ./siesta
 
 
 .. [#f1] Created with `sphinx-autoapi <https://github.com/readthedocs/sphinx-autoapi>`_

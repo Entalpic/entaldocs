@@ -1,6 +1,6 @@
 import pytest
 
-from entaldocs.cli import app
+from siesta.cli import app
 
 
 def test_init_docs_basic(temp_project_with_git_and_remote, monkeypatch):
@@ -9,7 +9,7 @@ def test_init_docs_basic(temp_project_with_git_and_remote, monkeypatch):
     monkeypatch.chdir(temp_project_with_git_and_remote)
 
     try:
-        app(["init-docs", "--with-defaults", "--local"])
+        app(["docs init", "--with-defaults", "--local"])
     except SystemExit as e:
         assert e.code == 0
 
@@ -27,7 +27,7 @@ def test_init_docs_basic(temp_project_with_git_and_remote, monkeypatch):
 def test_init_docs_no_overwrite(
     temp_project_with_git_and_remote, monkeypatch, capture_output
 ):
-    """Test that init-docs fails when docs exist and --overwrite is not used."""
+    """Test that docs init fails when docs exist and --overwrite is not used."""
     monkeypatch.chdir(temp_project_with_git_and_remote)
 
     # Create docs dir
@@ -36,7 +36,7 @@ def test_init_docs_no_overwrite(
 
     with pytest.raises(SystemExit) as exc_info:
         with capture_output() as output:
-            app(["init-docs", "--local"])
+            app(["docs init", "--local"])
         assert "Path already exists" in output.getvalue()
 
     assert exc_info.value.code == 1
@@ -45,7 +45,7 @@ def test_init_docs_no_overwrite(
 def test_init_docs_with_overwrite(
     temp_project_with_git_and_remote, monkeypatch, capture_output
 ):
-    """Test that init-docs succeeds when --overwrite is used on existing docs."""
+    """Test that docs init succeeds when --overwrite is used on existing docs."""
     monkeypatch.chdir(temp_project_with_git_and_remote)
 
     # Create docs dir with a marker file
@@ -54,7 +54,7 @@ def test_init_docs_with_overwrite(
     (docs_dir / "marker.txt").write_text("original content")
 
     with capture_output() as output:
-        app(["init-docs", "--overwrite", "--with-defaults", "--local"])
+        app(["docs init", "--overwrite", "--with-defaults", "--local"])
     assert "Failed to build the docs" not in output.getvalue()
 
     assert not (docs_dir / "marker.txt").exists()
@@ -64,11 +64,11 @@ def test_init_docs_with_overwrite(
 def test_init_docs_package_discovery(
     temp_project_with_git_and_remote, monkeypatch, capture_output
 ):
-    """Test that init-docs correctly discovers and configures packages."""
+    """Test that docs init correctly discovers and configures packages."""
     monkeypatch.chdir(temp_project_with_git_and_remote)
 
     with capture_output() as output:
-        app(["init-docs", "--with-defaults", "--local"])
+        app(["docs init", "--with-defaults", "--local"])
     assert "Failed to build the docs" not in output.getvalue()
 
     # Check conf.py contains discovered package
@@ -80,11 +80,11 @@ def test_init_docs_package_discovery(
 def test_init_docs_project_name(
     temp_project_with_git_and_remote, monkeypatch, capture_output
 ):
-    """Test that init-docs uses correct project name in generated files."""
+    """Test that docs init uses correct project name in generated files."""
     monkeypatch.chdir(temp_project_with_git_and_remote)
 
     with capture_output() as output:
-        app(["init-docs", "--with-defaults", "--local"])
+        app(["docs init", "--with-defaults", "--local"])
     assert "Failed to build the docs" not in output.getvalue()
 
     # Check project name in conf.py
@@ -107,7 +107,7 @@ def test_init_docs_project_name(
 
 
 def test_init_docs_no_python_files(tmp_path, monkeypatch, capture_output):
-    """Test that init-docs fails when no Python files are found."""
+    """Test that docs init fails when no Python files are found."""
     # Change to temp project directory
     monkeypatch.chdir(tmp_path)
 
@@ -115,7 +115,7 @@ def test_init_docs_no_python_files(tmp_path, monkeypatch, capture_output):
 
     with pytest.raises(SystemExit) as exc_info:
         with capture_output() as output:
-            app(["init-docs", "--local"])
+            app(["docs init", "--local"])
         assert "No Python files found in project" in output.getvalue()
 
     assert exc_info.value.code == 1

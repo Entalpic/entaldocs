@@ -1,22 +1,25 @@
 # Copyright 2025 Entalpic
 """
-Source code for the ``entaldocs`` Command-Line Interface (CLI).
+Source code for the ``siesta`` Command-Line Interface (CLI).
 
 Learn how to use with:
 
 .. code-block:: bash
 
-    $ entaldocs --help
-    $ entaldocs set-github-pat --help
-    $ entaldocs quickstart-project --help
-    $ entaldocs init-docs --help
-    $ entaldocs show-deps --help
-    $ entaldocs update --help
+    $ siesta --help
+    $ siesta docs --help
+    $ siesta docs init --help
+    $ siesta docs update --help
+    $ siesta project --help
+    $ siesta project quickstart --help
+    $ siesta set-github-pat --help
+    $ siesta show-deps --help
 
-You can also refer to the :ref:`entaldocs-cli-tutorial` for more information.
+You can also refer to the :ref:`siesta-cli-tutorial` for more information.
 """
 
 import time
+from importlib import metadata
 from pathlib import Path
 from shutil import rmtree
 from subprocess import run
@@ -27,7 +30,7 @@ from cyclopts import App
 from rich import print
 from watchdog.observers import Observer
 
-from entaldocs.utils import (
+from siesta.utils import (
     AutoBuild,
     copy_boilerplate,
     get_user_pat,
@@ -46,17 +49,49 @@ from entaldocs.utils import (
 
 app = App(
     help=dedent(
+        f"""
+    Siesta Is Entalpic'S Terminal Assistant ({metadata.version("siesta")})
+    
+    A set of CLI tools to help you with good practices in Python development at Entalpic.
+
+    Upgrade with ``$ uv tool upgrade siesta``.
+
+    See Usage instructions in the online docs: https://entalpic-siesta.readthedocs-hosted.com/en/latest/autoapi/siesta/.
+    """.strip()
+    ),
+)
+""":py:class:`cyclopts.App`: The main CLI application."""
+
+docs_app = App(
+    name="docs",
+    help=dedent(
         """
-        A CLI tool to initialize a Sphinx documentation project with standard Entalpic config.
+        Initialize, build and watch a Sphinx documentation project with standard Entalpic config.
 
-        Upgrade with ``$ uv tool upgrade entaldocs``.
+        Upgrade with ``$ uv tool upgrade siesta``.
 
-        See Usage instructions in the online docs: https://entalpic-entaldocs.readthedocs-hosted.com/en/latest/autoapi/entaldocs/.
+        See Usage instructions in the online docs: https://entalpic-siesta.readthedocs-hosted.com/en/latest/autoapi/siesta.
 
         """.strip(),
     ),
 )
-""":py:class:`cyclopts.App`: The main CLI application."""
+
+project_app = App(
+    name="project",
+    help=dedent(
+        """
+        Initialize a Python project with standard Entalpic config.
+
+        Upgrade with ``$ uv tool upgrade siesta``.
+
+        See Usage instructions in the online docs: https://entalpic-siesta.readthedocs-hosted.com/en/latest/autoapi/siesta.
+
+        """.strip(),
+    ),
+)
+
+app.command(docs_app)
+app.command(project_app)
 
 
 def main():
@@ -67,25 +102,25 @@ def main():
         logger.abort("\nAborted.", exit=1)
 
 
-@app.command
+@docs_app.command(name="init")
 def init_docs(
     path: str = "./docs",
     as_main_deps: bool = None,
     overwrite: bool = False,
     deps: bool = None,
     uv: bool = None,
-    with_defaults: bool = False,
+    with_defaults: bool = True,
     branch: str = "main",
-    contents: str = "src/entaldocs/boilerplate",
+    contents: str = "src/siesta/boilerplate",
     local: bool = False,
 ):
-    """Initialize a Sphinx documentation project with Entalpic's standard configuration (also called within `entaldocs quickstart-project`).
+    """Initialize a Sphinx documentation project with Entalpic's standard configuration (also called within ``siesta project quickstart``).
 
     In particular:
 
     - Initializes a new Sphinx project at the specified path.
 
-    - Optionally installs recommended dependencies (run `entaldocs show-deps` to see
+    - Optionally installs recommended dependencies (run `siesta show-deps` to see
       them).
 
     - Uses the split source / build folder structure.
@@ -148,7 +183,7 @@ def init_docs(
             "You need to set a GitHub Personal Access Token"
             + " to fetch the latest static files."
         )
-        logger.warning("Run [r]$ entaldocs set-github-pat --help[/r] to learn how to.")
+        logger.warning("Run [r]$ siesta set-github-pat --help[/r] to learn how to.")
         logger.abort("Aborting.", exit=1)
 
     path = resolve_path(path)
@@ -206,7 +241,7 @@ def init_docs(
     else:
         print("Skipping dependency installation.")
 
-    # download and copy entaldocs pre-filled folder structure to the target directory
+    # download and copy siesta pre-filled folder structure to the target directory
     copy_boilerplate(
         path, branch=branch, content_path=contents, overwrite=True, local=local
     )
@@ -240,9 +275,9 @@ def init_docs(
         )
 
 
-@app.command
+@app.command(name="show-deps")
 def show_deps(as_pip: bool = False):
-    """Show the recommended dependencies for the documentation that would be installed with `entaldocs init-docs`.
+    """Show the recommended dependencies for the documentation that would be installed with `siesta docs init`.
 
     Parameters
     ----------
@@ -258,11 +293,11 @@ def show_deps(as_pip: bool = False):
             print("  • " + scope + ": " + " ".join(deps[scope]))
 
 
-@app.command
+@docs_app.command(name="update")
 def update(
     path: str = "./docs",
     branch: str = "main",
-    contents: str = "src/entaldocs/boilerplate",
+    contents: str = "src/siesta/boilerplate",
     local: bool = False,
 ):
     """
@@ -273,9 +308,9 @@ def update(
 
     .. important::
 
-        ``$ entaldocs update`` requires a GitHub Personal Access Token (PAT) to fetch
+        ``$ siesta update`` requires a GitHub Personal Access Token (PAT) to fetch
         the latest version of the documentation's static files etc. from the repository.
-        Run ``$ entaldocs set-github-pat`` to do so.
+        Run ``$ siesta set-github-pat`` to do so.
 
     .. note::
 
@@ -326,7 +361,7 @@ def update(
     logger.success("Done.")
 
 
-@app.command
+@app.command(name="set-github-pat")
 def set_github_pat(pat: Optional[str] = ""):
     """
     Store a GitHub Personal Access Token (PAT) in your keyring.
@@ -341,10 +376,10 @@ def set_github_pat(pat: Optional[str] = ""):
 
     1. Go to ``Settings > Developer settings > Personal access tokens (fine-grained) >
        Generate new token``.
-    2. Name it ``entaldocs``.
+    2. Name it ``siesta``.
     3. Set ``Entalpic`` as resource owner
     4. Expire it in 1 year.
-    5. Only select the ``entaldocs`` repository
+    5. Only select the ``siesta`` repository
     6. Set *Repository Permissions* to *Contents: Read* and *Metadata: Read*.
     7. Click on *Generate token*.
 
@@ -359,17 +394,17 @@ def set_github_pat(pat: Optional[str] = ""):
     assert isinstance(pat, str), "PAT must be a string."
 
     logger.warning(
-        "Run [r]$ entaldocs set-github-pat --help[/r]"
+        "Run [r]$ siesta set-github-pat --help[/r]"
         + " if you're not sure how to generate a PAT."
     )
     if not pat:
         pat = logger.prompt("Enter your GitHub PAT")
     logger.confirm("Are you sure you want to set the GitHub PAT?")
-    set_password("entaldocs", "github_pat", pat)
-    logger.success("GitHub PAT set. You can now use `entaldocs init-docs`.")
+    set_password("siesta", "github_pat", pat)
+    logger.success("GitHub PAT set. You can now use `siesta docs init`.")
 
 
-@app.command
+@project_app.command(name="quickstart")
 def quickstart_project(
     as_app: bool = False,
     as_pkg: bool = False,
@@ -379,9 +414,9 @@ def quickstart_project(
     docs_path: str = "./docs",
     as_main_deps: bool | None = None,
     overwrite: bool = False,
-    with_defaults: bool = False,
+    with_defaults: bool = True,
     branch: str = "main",
-    contents: str = "src/entaldocs/boilerplate",
+    contents: str = "src/siesta/boilerplate",
     local: bool = False,
 ):
     """Start a ``uv``-based Python project from scratch, with initial project structure and docs.
@@ -390,8 +425,8 @@ def quickstart_project(
 
     * Initializes a new ``uv`` project with ``$ uv init``.
     * Installs recommended dependencies with ``$ uv add --dev [...]``.
-    * Initializes a new Sphinx project at the specified path as per ``$ entaldocs
-      init-docs``.
+    * Initializes a new Sphinx project at the specified path as per ``$ siesta
+      docs init``.
     * Initializes pre-commit hooks with ``$ uv run pre-commit install``.
 
     .. note::
@@ -412,8 +447,8 @@ def quickstart_project(
     .. important::
 
         If you generate the docs, (with ``--docs`` or ``--with-defaults``) parameters
-        like ``--deps`` and ``--as_main_deps`` will passed to the ``entaldocs init-docs``
-        command so it may be worth checking ``$ entaldocs init-docs --help``.
+        like ``--deps`` and ``--as_main_deps`` will passed to the ``siesta docs init``
+        command so it may be worth checking ``$ siesta docs init --help``.
 
     Parameters
     ----------
@@ -433,8 +468,8 @@ def quickstart_project(
         Whether to include docs dependencies in the main dependencies, by default
         ``None`` (i.e. prompt the user).
     overwrite : bool, optional
-        Whether to overwrite existing files (if any). Will be passed to ``entaldocs
-        init-docs``.
+        Whether to overwrite existing files (if any). Will be passed to ``siesta
+        docs init``.
     with_defaults : bool, optional
         Whether to trust the defaults and skip all prompts.
     branch : str, optional
@@ -544,7 +579,7 @@ def quickstart_project(
     logger.success("Done.")
 
 
-@app.command
+@docs_app.command(name="build")
 def build_docs(path: str = "./docs"):
     """Build your docs.
 
@@ -581,7 +616,7 @@ def build_docs(path: str = "./docs"):
     logger.success(f"Local docs built in {path / 'build/html/index.html'}")
 
 
-@app.command
+@docs_app.command(name="watch")
 def watch_docs(
     path: str = "./docs", patterns: str = r".+/src/.+\.py;.+/source/.+\.rst"
 ):

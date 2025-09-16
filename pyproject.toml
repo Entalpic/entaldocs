@@ -1,6 +1,6 @@
 [project]
-name = "entaldocs"
-version = "1.0.0-rc2"
+name = "siesta"
+version = "1.0.0-rc3"
 description = "Entalpic's Development Guidelines & Docs CLI"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.scripts]
-entaldocs = "entaldocs.cli:main"
+siesta = "siesta.cli:main"
 
 [tool.uv]
 dev-dependencies = [
@@ -42,7 +42,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/entaldocs"]
+packages = ["src/siesta"]
 
 [tool.hatch.build.targets.sdist]
 include = ["src/boilerplate/*"]

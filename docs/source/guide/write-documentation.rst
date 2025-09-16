@@ -23,7 +23,7 @@ In this tutorial, we'll go over the basics of ``.rst`` and Sphinx, and then we'l
 
 Some of the great features of using Sphinx is to be able to automatically generate documentation from your code's docstrings, and to be able to link to other parts of the documentation.
 
-For instance: :meth:`~entaldocs.logger.BaseLogger.dummy` or to an external class :class:`github.Repository.Repository`.
+For instance: :meth:`~siesta.logger.BaseLogger.dummy` or to an external class :class:`github.Repository.Repository`.
 
 .. _learn by example:
 
@@ -78,7 +78,7 @@ FAQ
 
     You can look at the |guide|_ folder for an example.
 
-.. dropdown:: How do I document a sub-package like :mod:`entaldocs.logger`?
+.. dropdown:: How do I document a sub-package like :mod:`siesta.logger`?
 
     Just add a docstring at the top of the ``__init__.py`` file of the sub-package:
 
@@ -89,7 +89,7 @@ FAQ
 
         It can contain any kind of ``.rst`` syntax.
 
-        And refer to its members: :meth:`~entaldocs.logger.Logger.prompt`
+        And refer to its members: :meth:`~siesta.logger.Logger.prompt`
 
         .. note::
 
@@ -202,4 +202,4 @@ And finally open the generated ``docs/_build/html/index.html`` file in your brow
     LINKS SECTION ⬇️
 
 .. |guide| replace::  ``docs/guide``
-.. _guide: https://github.com/entalpic/entaldocs/tree/main/docs/guide
+.. _guide: https://github.com/entalpic/siesta/tree/main/docs/guide

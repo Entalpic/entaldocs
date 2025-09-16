@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 import pytest
 
-from entaldocs.cli import app as app
+from siesta.cli import app as app
 
 os.environ["PYTHONBREAKPOINT"] = "ipdb.set_trace"
 
@@ -19,9 +19,7 @@ def mock_user_pat():
 
     This fixture is automatically used in all tests.
     """
-    with patch(
-        "entaldocs.utils.get_user_pat", return_value="fake-github-pat-for-testing"
-    ):
+    with patch("siesta.utils.get_user_pat", return_value="fake-github-pat-for-testing"):
         yield
 
 
@@ -84,7 +82,7 @@ def module_test_path(tmp_path_factory):
     current_dir = Path.cwd()
     try:
         os.chdir(tmp_path)  # Change to temp directory
-        app(["quickstart-project", "--with-defaults", "--local", "--overwrite"])
+        app(["project", "quickstart", "--with-defaults", "--local", "--overwrite"])
     finally:
         os.chdir(current_dir)  # Always restore original directory
     return tmp_path

@@ -208,7 +208,7 @@ It will also sort the imports alphabetically, and group them by package.
 
     from os.path import expandvars
     from os.path import relpath
-    from entaldocs.logger import Logger
+    from siesta.logger import Logger
     from pathlib import Path
     import json
     from rich import print
@@ -227,7 +227,7 @@ Becomes:
 
     from rich import print
 
-    from entaldocs.logger import Logger
+    from siesta.logger import Logger
 
 This will be done automatically when using IDE extensions (if not, ask Google about your particular IDE and case). 
 

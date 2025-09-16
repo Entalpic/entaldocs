@@ -173,7 +173,7 @@ Importantly, if you need maths in your docstrings, you can use LaTeX to write eq
 Full Example
 ------------
 
-The following code renders as: :meth:`entaldocs.logger.BaseLogger.dummy`.
+The following code renders as: :meth:`siesta.logger.BaseLogger.dummy`.
 
 .. code-block:: python
 
@@ -186,14 +186,14 @@ The following code renders as: :meth:`entaldocs.logger.BaseLogger.dummy`.
 
         Refer to:
 
-        * functions with :func:`entaldocs.utils.safe_dump`
-        * classes with :class:`entaldocs.logger.Logger`
-        * methods with :meth:`entaldocs.logger.Logger.prompt`
-        * constants with :const:`entaldocs.cli.app`
+        * functions with :func:`siesta.utils.safe_dump`
+        * classes with :class:`siesta.logger.Logger`
+        * methods with :meth:`siesta.logger.Logger.prompt`
+        * constants with :const:`siesta.cli.app`
 
         Prepend with ``~`` to refer to the name of the object only instead of the full
-        path -> :func:`~entaldocs.utils.safe_dump` will display as ``safe_dump``
-        instead of the full path ``entaldocs.utils.safe_dump``.
+        path -> :func:`~siesta.utils.safe_dump` will display as ``safe_dump``
+        instead of the full path ``siesta.utils.safe_dump``.
 
         Great maths:
 
@@ -284,7 +284,7 @@ There's an easy way to check: use a tool called `pydocstyle <https://www.pydocst
 
 .. code-block:: bash
 
-    $ pydocstyle --convention=numpy --add-ignore=D212 src/entaldocs/cli.py
+    $ pydocstyle --convention=numpy --add-ignore=D212 src/siesta/cli.py
     $ pydocstyle --convention=numpy --add-ignore=D212 src/
 
 ..
