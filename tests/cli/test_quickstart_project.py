@@ -4,11 +4,11 @@ from entaldocs.cli import app
 
 
 def test_quickstart_project(tmp_path, monkeypatch, capture_output):
-    """Test quickstart-project command creates expected project structure."""
+    """Test project quickstart command creates expected project structure."""
     monkeypatch.chdir(tmp_path)
 
     with capture_output() as output:
-        app(["quickstart-project", "--with-defaults", "--local"])
+        app(["project quickstart", "--with-defaults", "--local"])
 
     assert "Failed to build the docs" not in output.getvalue()
 
@@ -21,11 +21,11 @@ def test_quickstart_project(tmp_path, monkeypatch, capture_output):
 
 
 def test_quickstart_project_as_app(tmp_path, monkeypatch, capture_output):
-    """Test quickstart-project --as-app creates app structure instead of library."""
+    """Test project quickstart --as-app creates app structure instead of library."""
     monkeypatch.chdir(tmp_path)
 
     with capture_output() as output:
-        app(["quickstart-project", "--as-app", "--with-defaults", "--local"])
+        app(["project quickstart", "--as-app", "--with-defaults", "--local"])
 
     assert "Failed to build the docs" not in output.getvalue()
     # Should not have src directory for app
@@ -35,11 +35,11 @@ def test_quickstart_project_as_app(tmp_path, monkeypatch, capture_output):
 
 
 def test_quickstart_project_as_pkg(tmp_path, monkeypatch, capture_output):
-    """Test quickstart-project --as-pkg creates package structure in root directory."""
+    """Test project quickstart --as-pkg creates package structure in root directory."""
     monkeypatch.chdir(tmp_path)
 
     with capture_output() as output:
-        app(["quickstart-project", "--as-pkg", "--with-defaults", "--local"])
+        app(["project quickstart", "--as-pkg", "--with-defaults", "--local"])
 
     assert "Failed to build the docs" not in output.getvalue()
     assert (tmp_path / "src").exists()

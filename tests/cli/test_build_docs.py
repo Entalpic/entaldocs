@@ -26,7 +26,7 @@ def module_test_path_no_docs(tmp_path_factory):
     current_dir = Path.cwd()
     try:
         os.chdir(tmp_path)  # Change to temp directory
-        app(["quickstart-project", "--with-defaults", "--local", "--overwrite"])
+        app(["project quickstart", "--with-defaults", "--local", "--overwrite"])
         shutil.rmtree(tmp_path / "docs")
     finally:
         os.chdir(current_dir)  # Always restore original directory
@@ -37,7 +37,7 @@ def test_build_docs_path_not_found(capture_output):
     """Test build_docs fails when path doesn't exist."""
     with pytest.raises(SystemExit) as exc_info:
         with capture_output() as output:
-            app(["build-docs", "--path", "nonexistent/path"])
+            app(["docs build", "--path", "nonexistent/path"])
         assert a_in_b_str_no_space("Path not found", output.getvalue())
 
     assert exc_info.value.code == 1
@@ -51,7 +51,7 @@ def test_build_docs_no_makefile(tmp_path, monkeypatch, capture_output):
 
     with pytest.raises(SystemExit) as exc_info:
         with capture_output() as output:
-            app(["build-docs"])
+            app(["docs build"])
         assert a_in_b_str_no_space("Makefile not found", output.getvalue())
 
     assert exc_info.value.code == 1
@@ -62,7 +62,7 @@ def test_build_docs_successful(module_test_path, monkeypatch, capture_output):
     monkeypatch.chdir(module_test_path)
 
     with capture_output() as output:
-        app(["build-docs"])
+        app(["docs build"])
 
     # Verify success message
     assert a_in_b_str_no_space(
@@ -79,7 +79,7 @@ def test_build_docs_with_uv(module_test_path, monkeypatch, capture_output):
     Path("uv.lock").touch()
 
     with capture_output() as output:
-        app(["build-docs"])
+        app(["docs build"])
 
     # Verify success message
     assert a_in_b_str_no_space(
@@ -99,7 +99,7 @@ def test_build_docs_command_failure(
 
     with pytest.raises(SystemExit) as exc_info:
         with capture_output() as output:
-            app(["build-docs"])
+            app(["docs build"])
         assert a_in_b_str_no_space("Failed to build the docs", output.getvalue())
 
     assert exc_info.value.code == 1

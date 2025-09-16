@@ -12,7 +12,7 @@ def test_watch_docs_path_not_found(capture_output):
     """Test watch_docs fails when path doesn't exist."""
     with pytest.raises(SystemExit) as exc_info:
         with capture_output() as output:
-            app(["watch-docs", "--path", "nonexistent/path"])
+            app(["docs watch", "--path", "nonexistent/path"])
         assert "Path not found" in output.getvalue()
 
     assert exc_info.value.code == 1
@@ -30,7 +30,7 @@ def test_watch_docs_observer_setup(module_test_path, monkeypatch, capture_output
         patch("time.sleep", side_effect=KeyboardInterrupt),
     ):
         with capture_output() as output:
-            app(["watch-docs"])
+            app(["docs watch"])
 
     # Verify observer was started
     assert mock_observer_instance.start.called
@@ -89,7 +89,7 @@ def test_watch_docs_custom_patterns(module_test_path, monkeypatch, capture_outpu
         patch("time.sleep", side_effect=KeyboardInterrupt),
     ):
         with capture_output():
-            app(["watch-docs", "--patterns", custom_patterns])
+            app(["docs watch", "--patterns", custom_patterns])
 
     # Verify observer was scheduled with handler using custom patterns
     schedule_call = mock_observer.return_value.schedule.call_args[0]
@@ -111,7 +111,7 @@ def test_watch_docs_keyboard_interrupt_handling(
         patch("time.sleep", side_effect=KeyboardInterrupt),
     ):
         with capture_output() as output:
-            app(["watch-docs"])
+            app(["docs watch"])
 
     # Verify graceful shutdown messages
     assert "Watching stopped" in output.getvalue()
