@@ -157,3 +157,23 @@ def write_or_update_pre_commit_file() -> None:
     # Copy reference file if no existing config
     copy2(ref, pre_commit)
     logger.info("pre-commit file written.")
+
+
+def get_pyver():
+    """Get the Python version from the user.
+
+    Returns
+    -------
+    str
+        The Python version.
+    """
+    python_version_file = Path(".python-version")
+    if python_version_file.exists():
+        return python_version_file.read_text().strip()
+    if run_command(["which", "uv"]):
+        # e.g. "Python 3.12.1"
+        full_version = run_command(["uv", "run", "python", "--version"]).stdout.strip()
+        version = full_version.split()[1]
+        major, minor, _ = version.split(".")
+        return f"{major}.{minor}"
+    return "3.12"

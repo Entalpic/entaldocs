@@ -9,7 +9,7 @@ from github.Auth import Token
 from github.Repository import Repository
 from keyring import get_password
 
-from siesta.utils.all import logger, resolve_path
+from siesta.utils.common import logger, resolve_path
 
 
 def get_user_pat():
