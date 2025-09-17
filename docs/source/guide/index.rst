@@ -1,17 +1,37 @@
 .. Copyright 2025 Entalpic
-Docs Guide
-==========
+Entalpic's Documentation Guide
+==============================
 
+*Documentation* refers to the content that you produce to help others understand your code. 
 
-.. tip::
+It includes both the code's *docstrings* and the *manual documentation files* like the current one you are reading.
 
-    **Docstrings TL-DR**:
+.. admonition:: Docstrings TL-DR
+    :class: tip
 
     Use `Numpy-style <https://numpydoc.readthedocs.io/en/latest/format.html>`_ docstrings as illustrated in this :ref:`write docstrings-extended`.
 
-    :doc:`write-documentation` contains a guide on how to write documentation in general AND how to use reStructuredText (which is the text format used in the docstrings).
-
     :doc:`write-docstrings` contains a guide on how to write docstrings in particular (which requires basic understanding of reStructuredText).
+
+.. admonition:: Manual documentation files TL-DR
+    :class: hint
+    
+    Use `reStructuredText <https://shibuya.lepture.com/writing/>`_ to write your manual documentation files.
+        
+    :doc:`write-docstrings` contains a guide on how to write docstrings in particular (which requires basic understanding of reStructuredText).
+
+.. admonition:: ``siesta``
+    :class: hint
+    
+    Siesta is Entalpic'S Terminal Assistant. It is a CLI tool that helps you with good practices in Python development at Entalpic, especially with boilerplate setup for projects and documentation.
+
+    .. code-block:: bash
+
+        siesta project quickstart
+        # or
+        siesta docs init
+
+    See :ref:`siesta-cli-tutorial` for more information.
 
 .. toctree::
     :maxdepth: 1
