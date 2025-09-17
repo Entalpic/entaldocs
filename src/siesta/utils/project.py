@@ -80,7 +80,7 @@ def write_tests_infra(project_name: str):
         logger.warning("Tests directory already exists. Skipping.")
         return
     tests_dir.mkdir(parents=True, exist_ok=True)
-    test_example = dedent('''
+    test_example = dedent(f'''
     import pytest
     
     @pytest.fixture(autouse=True)
