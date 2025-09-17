@@ -1,3 +1,4 @@
+# Copyright 2025 Entalpic
 from siesta.cli import app
 from siesta.utils import load_deps
 

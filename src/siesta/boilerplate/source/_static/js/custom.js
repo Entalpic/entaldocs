@@ -1,3 +1,5 @@
+/* Copyright 2025 Entalpic */
+
 // Description: Custom JS for the siesta theme
 /**
  * Custom JS for the siesta theme

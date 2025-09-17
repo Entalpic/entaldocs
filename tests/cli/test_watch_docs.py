@@ -1,3 +1,4 @@
+# Copyright 2025 Entalpic
 from pathlib import Path
 from unittest.mock import Mock, patch
 

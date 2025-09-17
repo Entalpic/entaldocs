@@ -1,3 +1,4 @@
+# Copyright 2025 Entalpic
 import os
 import sys
 from contextlib import contextmanager
