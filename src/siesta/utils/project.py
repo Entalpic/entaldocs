@@ -99,3 +99,34 @@ def write_tests_infra(project_name: str):
     (tests_dir / "test_import.py").write_text(test_example)
 
     logger.info("Tests infra written.")
+
+
+def add_ipdb_as_debugger():
+    inits = list(Path("src/").glob("**/__init__.py"))
+    if not inits:
+        logger.warning("No __init__.py files found. Skipping ipdb debugger.")
+        return
+
+    first_init = sorted(
+        [(i, len(str(i).split("/"))) for i in inits], key=lambda x: x[1]
+    )[0][0]
+
+    first_init.write_text(
+        first_init.read_text()
+        + dedent(
+            """
+            try:
+                import os
+
+                import ipdb  # noqa: F401
+
+                # set ipdb as default debugger when calling `breakpoint()`
+                os.environ["PYTHONBREAKPOINT"] = "ipdb.set_trace"
+            except ImportError:
+                print(
+                    "ipdb not available. Consider adding it to your dev stack for a smoother debugging experience"
+                )
+            """
+        )
+    )
+    logger.info("ipdb added as debugger.")
