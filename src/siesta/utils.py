@@ -1,8 +1,5 @@
 # Copyright 2025 Entalpic
-"""
-A set of utilities to help with the ``siesta`` CLI and the
-initialization of Entalpic-style documentation projects.
-"""
+"""A set of utilities to help with the ``siesta`` CLI."""
 
 import importlib
 import json
@@ -32,7 +29,7 @@ ROOT = importlib.resources.files("siesta")
 
 
 def safe_dump(data, file, **kwargs):
-    """Uses ``ruamel.yaml`` to dump data to a file.
+    """Dump some data to a file using ``ruamel.yaml``.
 
     Parameters
     ----------
@@ -55,7 +52,7 @@ def safe_dump(data, file, **kwargs):
 
 
 def safe_load(file):
-    """Uses ``ruamel.yaml`` to load data from a file.
+    """Load data from a file using ``ruamel.yaml``.
 
     Parameters
     ----------
@@ -140,8 +137,8 @@ def resolve_path(path: str | Path) -> Path:
     path : str | Path
         The path to resolve.
 
-    Returns:
-    --------
+    Returns
+    -------
     Path
         The resolved path.
     """
@@ -150,7 +147,6 @@ def resolve_path(path: str | Path) -> Path:
 
 def load_deps() -> list[str]:
     """Load dependencies from the |dependenciesjson|_ file.
-
 
     Returns
     -------

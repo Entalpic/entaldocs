@@ -139,8 +139,7 @@ def init_docs(
 
     .. tip::
 
-        Build the local HTML docs by running ``$ make clean && make html`` from the
-        documentation folder.
+        Build the local HTML docs by running ``$ siesta docs build`` or ``$ siesta docs watch``.
 
     Parameters
     ----------
@@ -329,7 +328,6 @@ def update(
         Use local boilerplate docs assets instead of fetching from the repository.
         May update to outdated contents so avoid using this option.
     """
-
     path = resolve_path(path)
     if not path.exists():
         logger.abort(f"Path not found: {path}", exit=1)
