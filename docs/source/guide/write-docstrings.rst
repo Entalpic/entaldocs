@@ -168,6 +168,46 @@ Importantly, if you need maths in your docstrings, you can use LaTeX to write eq
 
     This is because the `r` before the triple quotes tells Python that the string is a raw string, which means that backslashes are treated as literal backslashes and not as escape characters.
 
+
+Link to other parts of the code
+-------------------------------
+
+Reference code docs of:
+
+- A class: :class:`siesta.logger.BaseLogger` (long format)
+- Another class :class:`~siesta.logger.Logger` (short format, by prepending ``~``)
+- A method :meth:`~siesta.logger.Logger.prompt`
+- Or even an external library :class:`github.MainClass.Github`
+
+.. important::
+
+    To reference an external library's documentation it needs to have a Sphinx-compatible documentation publicly available online and you *must* reference it in your ``conf.py`` file.
+
+    For instance:
+
+    .. code-block:: python
+
+        # docs/source/conf.py
+        intersphinx_mapping = {
+            "github": ("https://pygithub.readthedocs.io/en/stable/", None),
+            "torch": ("https://pytorch.org/docs/stable/", None),
+        }
+
+    Then you can reference the external library's documentation like this:
+
+    .. code-block:: text
+
+        :class:`github.MainClass.Github`
+
+    Or:
+
+    .. code-block:: text
+
+        :class:`~torch.nn.Module`
+
+    which respectively render as :class:`github.MainClass.Github` and :class:`~torch.nn.Module` (notice the ``~`` prefix removed the full path from the displayed link).
+
+
 .. _write docstrings-extended:
 
 Full Example

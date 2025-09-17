@@ -32,7 +32,7 @@ Learn by example
 
 The next section will introduce many of the cool features of ``.rst`` + Sphinx + plugins.
 
-Click on "*Code for the example*" to look at the ``.rst`` code that generated what you are reading. This file is located in the ``docs/source/guide/example.rst`` file, rendered :doc:`here </guide/example>`_.
+Click on "*Code for the example*" to look at the ``.rst`` code that generated what you are reading. This file is located in the ``docs/source/guide/example.rst`` file, rendered :doc:`here </guide/example>`.
 
 .. tab-set::
 
@@ -174,24 +174,24 @@ By default, the generated documentation will be put in the ``API Reference`` sec
 Generating the documentation
 ----------------------------
 
-The repository is currently setup to automatically build the documentation on every push to specific branches, including the ``main`` branch.
+The repository is currently setup to automatically build the current documentation you're reading on every push to specific branches, including the ``main`` branch.
 
-Ask Alex or Victor if you want your branch to be automatically built too.
+.. tip::
 
-If you want to write a manual documentation page or test new plugins or just visualize easily how your docstrings render, you can **build the documentation locally**, on your own computer, and open the generated HTML files in your browser.
+    Ask Victor if you want your repo and branches to be automatically built too.
+
+If you want to use this repo as testing ground to write a manual documentation page or test new plugins or just visualize easily how your docstrings render, 
+you can **build the documentation locally**, on your own computer, and open the generated HTML files in your browser.
 
 To do so, you need to install the dependencies for the documentation:
 
 .. code-block:: bash
 
-    pip install -r docs/requirements-docs.txt
+    git clone git@github.com:Entalpic/siesta.git
+    cd siesta
+    uv sync
+    siesta docs build
 
-Then, you can build the documentation by running:
-
-.. code-block:: bash
-
-    cd docs/
-    make html
 
 And finally open the generated ``docs/_build/html/index.html`` file in your browser (for instance by running ``open docs/_build/html/index.html``, depending on your local setup).
 

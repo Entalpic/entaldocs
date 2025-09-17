@@ -3,7 +3,7 @@ r"""
 .. _siesta-cli-tutorial:
 
 siesta CLI Tutorial
-----------------------
+-------------------
 
 **Siesta Is Entalpic'S Terminal Assistant.**
 
@@ -60,11 +60,14 @@ Getting Started
 The goal is to create a Python project with `uv <https://docs.astral.sh/uv/getting-started/installation/>`_, install the necessary
 dependencies for documentation, and set up the project's documentation.
 
-**For new projects, use the ``project`` command:**
+For brand new projects, use the ``project`` command:
 
 .. code-block:: bash
 
-    $ siesta project quickstart --help # typically $ siesta project quickstart --with-defaults
+    # Look at your options
+    $ siesta project quickstart --help
+    # Then you would typically use the --with-defaults flag
+    $ siesta project quickstart
 
 What happens is the following:
 
@@ -82,7 +85,9 @@ the ``docs`` command with the ``init`` subcommand.
 
 .. code-block:: bash
 
-    $ siesta docs init --help # typically $ siesta docs init --uv --with-defaults
+
+    $ siesta docs init --help
+    $ siesta docs init --with-defaults
 
 This creates a ``docs/`` folder in your project and installing the necessary
 dependencies. Some of the contents of the ``docs/`` folder are copied from the Entalpic
@@ -119,7 +124,7 @@ Currently ``siesta`` has 4 main entry points with subcommands:
 
 .. tip::
 
-    Add ``-h`` / ``--help`` flags to the above commands to get their own help messages
+    Add ``-h`` / ``--help`` flags to the any ``siesta`` command to get its help message
 
 .. note::
 

@@ -160,7 +160,7 @@ hoverxref_mathjax = True
 
 
 def skip_submodules(app, what, name, obj, skip, options):
-    """Function used by ``autoapi-skip-member`` event to skip submodules.
+    """Skips submodules that are not documented (used by ``autoapi-skip-member`` event).
 
     Parameters
     ----------
@@ -190,7 +190,7 @@ def skip_submodules(app, what, name, obj, skip, options):
 
 
 def setup(sphinx):
-    """Function to setup the Sphinx application.
+    """Set up the Sphinx application and adds a hook to skip un-documented attributes.
 
     Parameters
     ----------

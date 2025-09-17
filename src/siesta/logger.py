@@ -8,7 +8,6 @@ current line.
 
 Example
 -------
-
 .. code-block:: python
 
     from siesta.logger import Logger
@@ -31,7 +30,7 @@ from rich.console import Console
 
 
 class BaseLogger:
-    """A **dummy** class for documentation purposes"""
+    """A **dummy** class for documentation purposes."""
 
     def dummy(self, arg1, arg2):
         r"""
@@ -118,7 +117,6 @@ class BaseLogger:
         ValueError
             If arg1 is equal to arg2.
         """
-
         if arg1 == arg2:
             raise ValueError("arg1 must not be equal to arg2")
         return True
@@ -144,8 +142,8 @@ class Logger(BaseLogger):
     def now(self):
         """Get the current time.
 
-        Returns:
-        --------
+        Returns
+        -------
         str
             The current time.
         """
@@ -157,8 +155,8 @@ class Logger(BaseLogger):
 
         The prefix includes the name of the logger and the current time.
 
-        Returns:
-        --------
+        Returns
+        -------
         str
             The prefix.
         """
@@ -183,8 +181,8 @@ class Logger(BaseLogger):
         default : str, optional
             The default value, by default None.
 
-        Returns:
-        --------
+        Returns
+        -------
         str
             The value entered by the user.
         """
@@ -204,8 +202,8 @@ class Logger(BaseLogger):
         message : str
             The message to confirm.
 
-        Returns:
-        --------
+        Returns
+        -------
         bool
             Whether the user confirmed the message.
         """
