@@ -1,185 +1,26 @@
 # Copyright 2025 Entalpic
-"""A set of utilities to help with the ``siesta`` CLI."""
+"""Utility functions for the ``docs`` subcommand."""
 
-import importlib
 import json
 import re
-import sys
 from filecmp import cmp as compare_files
-from os.path import expandvars, relpath
+from os.path import relpath
 from pathlib import Path
 from shutil import copy2, copytree
-from subprocess import CalledProcessError, run
 from tempfile import TemporaryDirectory
 
-from github import Github, UnknownObjectException
-from github.Auth import Token
-from github.Repository import Repository
-from keyring import get_password
 from rich import print
-from ruamel.yaml import YAML
 from watchdog.events import FileSystemEvent, RegexMatchingEventHandler
 
-from siesta.logger import Logger
-
-logger = Logger("siesta")
-"""A logger to log messages to the console."""
-ROOT = importlib.resources.files("siesta")
-"""The root directory of the ``siesta`` package."""
-
-
-def safe_dump(data, file, **kwargs):
-    """Dump some data to a file using ``ruamel.yaml``.
-
-    Parameters
-    ----------
-    data : dict
-        The data to dump to the file.
-    file : str | Path | IO
-        The file to dump the data to.
-    """
-    handle = file
-    if isinstance(file, str):
-        handle = open(file, "w")
-    else:
-        handle = file
-
-    yaml = YAML(typ="rt", pure=True)
-    yaml.default_flow_style = False
-    yaml.dump(data, handle, **kwargs)
-    if isinstance(file, str):
-        handle.close()
-
-
-def safe_load(file):
-    """Load data from a file using ``ruamel.yaml``.
-
-    Parameters
-    ----------
-    file : str | Path | IO
-        The file to load the data from.
-    """
-    handle = file
-    if isinstance(file, str):
-        handle = open(file, "r")
-    yaml = YAML(typ="safe", pure=True)
-    return yaml.load(handle)
-
-
-def run_command(
-    cmd: list[str], check: bool = True, cwd: str | Path | None = None
-) -> str | bool:
-    """Run a command in the shell.
-
-    Parameters
-    ----------
-    cmd : list[str]
-        The command to run.
-    check : bool, optional
-        Whether to raise an error if the command fails, by default ``True``.
-    cwd : str | Path | None, optional
-        The working directory to run the command in, by default ``None``.
-
-    Returns
-    -------
-    str | bool
-        The result of the command.
-    """
-    try:
-        return run(
-            cmd,
-            check=check,
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            cwd=cwd,
-        )
-    except CalledProcessError as e:
-        logger.error(e.stderr)
-        return False
-
-
-def get_user_pat():
-    """Get the GitHub Personal Access Token (PAT) from the user.
-
-    Returns
-    -------
-    str
-        The GitHub Personal Access Token (PAT).
-    """
-    return get_password("siesta", "github_pat")
-
-
-def get_pyver():
-    """Get the Python version from the user.
-
-    Returns
-    -------
-    str
-        The Python version.
-    """
-    python_version_file = Path(".python-version")
-    if python_version_file.exists():
-        return python_version_file.read_text().strip()
-    if run_command(["which", "uv"]):
-        # e.g. "Python 3.12.1"
-        full_version = run_command(["uv", "run", "python", "--version"]).stdout.strip()
-        version = full_version.split()[1]
-        major, minor, _ = version.split(".")
-        return f"{major}.{minor}"
-
-
-def resolve_path(path: str | Path) -> Path:
-    """Resolve a path and expand environment variables.
-
-    Parameters
-    ----------
-    path : str | Path
-        The path to resolve.
-
-    Returns
-    -------
-    Path
-        The resolved path.
-    """
-    return Path(expandvars(path)).expanduser().resolve()
-
-
-def load_deps() -> list[str]:
-    """Load dependencies from the |dependenciesjson|_ file.
-
-    Returns
-    -------
-    list[str]
-        The dependencies to load.
-
-    .. |dependenciesjson| replace:: ``dependencies.json``
-    .. _dependenciesjson: ../../../dependencies.json
-    .. include 3x "../" because we need to reach /dependencies.json from /autoapi/siesta/utils/index.html
-    """
-    path = ROOT / "dependencies.json"
-    return json.loads(path.read_text())
-
-
-def _copy_not_overwrite(src: str | Path, dest: str | Path):
-    """Private function to copy a file, backing up the destination if it exists.
-
-    To be used by :func:`copy_defaults_folder` and :func:`~shutil.copytree` to update files recursively
-    without overwriting existing files.
-
-    Inspiration: `Stackoverflow <https://stackoverflow.com/a/78638812/3867406>`_
-
-    Parameters
-    ----------
-    src : str | Path
-        The path to the src file.
-    dest : str | Path
-        The path to copy the target file to.
-    """
-    if Path(dest).exists() and not compare_files(src, dest, shallow=False):
-        backed_up = backup(dest)
-        logger.warning(f"Backing up {dest} to {backed_up}")
-    copy2(src, dest)
+from siesta.utils.all import (
+    ROOT,
+    load_deps,
+    logger,
+    resolve_path,
+    run_command,
+    safe_dump,
+)
+from siesta.utils.github import fetch_github_files
 
 
 def backup(path: Path) -> Path:
@@ -207,6 +48,27 @@ def backup(path: Path) -> Path:
             b += 1
     copy2(src, dest)
     return dest
+
+
+def _copy_not_overwrite(src: str | Path, dest: str | Path):
+    """Private function to copy a file, backing up the destination if it exists.
+
+    To be used by :func:`copy_defaults_folder` and :func:`~shutil.copytree` to update files recursively
+    without overwriting existing files.
+
+    Inspiration: `Stackoverflow <https://stackoverflow.com/a/78638812/3867406>`_
+
+    Parameters
+    ----------
+    src : str | Path
+        The path to the src file.
+    dest : str | Path
+        The path to copy the target file to.
+    """
+    if Path(dest).exists() and not compare_files(src, dest, shallow=False):
+        backed_up = backup(dest)
+        logger.warning(f"Backing up {dest} to {backed_up}")
+    copy2(src, dest)
 
 
 def copy_boilerplate(
@@ -267,6 +129,52 @@ def copy_boilerplate(
             dirs_exist_ok=True,
             copy_function=copy2 if overwrite else _copy_not_overwrite,
         )
+
+
+def write_rtd_config() -> None:
+    """Write the ReadTheDocs configuration file to the current directory."""
+    rtd = Path(".readthedocs.yaml")
+    if rtd.exists():
+        logger.warning("ReadTheDocs file already exists. Skipping.")
+        return
+    pyver = get_pyver()
+    config = {
+        "version": 2,
+        "build": {
+            "os": "ubuntu-22.04",
+            "tools": {"python": pyver},
+            "commands": [
+                "asdf plugin add uv",
+                "asdf install uv latest",
+                "asdf global uv latest",
+                "uv sync",
+                "uv run sphinx-build -M html docs/source $READTHEDOCS_OUTPUT",
+            ],
+        },
+    }
+
+    safe_dump(config, rtd)
+    logger.info("ReadTheDocs file written.")
+
+
+def get_pyver():
+    """Get the Python version from the user.
+
+    Returns
+    -------
+    str
+        The Python version.
+    """
+    python_version_file = Path(".python-version")
+    if python_version_file.exists():
+        return python_version_file.read_text().strip()
+    if run_command(["which", "uv"]):
+        # e.g. "Python 3.12.1"
+        full_version = run_command(["uv", "run", "python", "--version"]).stdout.strip()
+        version = full_version.split()[1]
+        major, minor, _ = version.split(".")
+        return f"{major}.{minor}"
+    return "3.12"
 
 
 def update_conf_py(dest: Path, branch: str = "main"):
@@ -379,7 +287,7 @@ def discover_packages(dest: Path, with_defaults: str) -> str:
     """Discover packages in the current directory.
 
     Directories will be returned relatively to the conf.py file in the documentation
-    folder as a list of strings.
+    folder as a list of strings in order to document them with autoapi.
 
     Parameters
     ----------
@@ -484,188 +392,6 @@ def overwrite_docs_files(dest: Path, with_defaults: bool):
     index_text = index_text.replace("$PROJECT_NAME", project)
     index_text = index_text.replace("$PROJECT_URL", url or " URL TO BE SET ")
     index_rst.write_text(index_text)
-
-
-def search_contents(
-    repo: Repository, branch: str = "main", content_path: str = "boilerplate"
-) -> list[tuple[str, str]]:
-    """Get the (deep) contents of a directory.
-
-    Parameters
-    ----------
-    repo : Repository
-        The repository to get the contents from.
-    content_path : str
-        The path to the directory to get the contents of.
-    branch : str, optional
-        The branch to fetch the files from, by default ``"main"``.
-
-    Returns
-    -------
-    list[tuple[str, bytes]]
-        The list of tuples containing the file path and content as
-        ``(path, bytes content)``.
-
-    """
-    contents = repo.get_contents(content_path, ref=branch)
-    if not isinstance(contents, list):
-        contents = [contents]
-
-    # If we don't adjust the content path, fetching a folder will include the full content
-    # path and the files will be copied to the wrong location:
-    # eg: if we fetch boilerplate/ and the content is boilerplate/docs/source/conf.py
-    #     the file will be copied to "boilerplate/docs/source/conf.py" instead of
-    #     "docs/source/conf.py"
-    # so we'll remove the hierarchy of the folder from the path
-    # trying to download a file
-    extra_path = content_path
-    if re.match(r".+\.\w+", extra_path.split("/")[-1]):
-        # we'll just keep the file name
-        extra_path = "/".join(extra_path.split("/")[:-1])
-    else:
-        # trying to download a folder
-        if not extra_path.endswith("/"):
-            # we'll remove the hierarchy of the folder from the path
-            extra_path = extra_path + "/"
-
-    data = []
-    while contents:
-        file_content = contents.pop(0)
-        if file_content.type == "dir":
-            contents.extend(repo.get_contents(file_content.path, ref=branch))
-        else:
-            logger.clear_line()
-            print(f"Getting contents of '{file_content.path}'", end="\r")
-            # adjust file path
-            new_relative_path = file_content.path.replace(extra_path, "")
-            if new_relative_path.startswith("/"):
-                new_relative_path = new_relative_path[1:]
-            data.append(
-                (
-                    new_relative_path,
-                    file_content.decoded_content,
-                )
-            )
-    logger.clear_line()
-    logger.info(f"Downloaded contents of '{repo.html_url}/{content_path}'")
-    return data
-
-
-def fetch_github_files(
-    branch: str = "main",
-    content_path: str = "src/siesta/boilerplate",
-    dir: str = ".",
-) -> Path:
-    """Download a file or directory from a GitHub repository and write it to ``dir``.
-
-    Parameters
-    ----------
-    branch : str, optional
-        The branch to fetch the files from, by default ``"main"``.
-    content_path : str
-        The directory or file to fetch from the repository
-    dir : str, optional
-        The directory to save the files to, by default ``"."``.
-
-    Returns
-    -------
-    Path
-        The path to the temporary folder containing the files.
-    """
-    pat = get_user_pat()
-    if not pat:
-        logger.abort(
-            "GitHub Personal Access Token (PAT) not found. Run 'siesta set-github-pat' to set it.",
-            exit=1,
-        )
-        sys.exit(1)
-    auth = Token(pat)
-    g = Github(auth=auth)
-    repo = g.get_repo("entalpic/siesta")
-    try:
-        contents = search_contents(repo, branch=branch, content_path=content_path)
-    except UnknownObjectException:
-        branches = repo.get_branches()
-        has_branch = any(b.name == branch for b in branches)
-        if not has_branch:
-            logger.abort(f"Branch not found: {branch}", exit=1)
-        else:
-            logger.abort(
-                f"Could not find repository contents: {content_path} on branch {branch}",
-                exit=1,
-            )
-        return
-
-    base_dir = resolve_path(dir)
-    for name, content in contents:
-        path = Path(base_dir) / name
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes(content)
-
-
-def write_or_update_pre_commit_file() -> None:
-    """Write the pre-commit file to the current directory."""
-    pre_commit = Path(".pre-commit-config.yaml")
-    ref = ROOT / "precommits.yaml"
-    if pre_commit.exists():
-        # Load existing config
-        with open(pre_commit, "r") as f:
-            current = safe_load(f)
-
-        # Load reference config
-        with open(ref, "r") as f:
-            reference = safe_load(f)
-
-        # Update existing config with reference repos
-        if not isinstance(current, dict):
-            current = {}
-        if not isinstance(reference, dict):
-            reference = {}
-        if "repos" not in current:
-            current["repos"] = []
-        if "repos" not in reference:
-            reference["repos"] = []
-        current_repos = {repo["repo"]: repo for repo in current["repos"]}
-        for repo in reference["repos"]:
-            current_repos[repo["repo"]] = repo
-
-        current["repos"] = list(current_repos.values())
-
-        # Write updated config
-        safe_dump(current, pre_commit)
-        logger.info("pre-commit file updated.")
-        return
-
-    # Copy reference file if no existing config
-    copy2(ref, pre_commit)
-    logger.info("pre-commit file written.")
-    return
-
-
-def write_rtd_config() -> None:
-    """Write the ReadTheDocs configuration file to the current directory."""
-    rtd = Path(".readthedocs.yaml")
-    if rtd.exists():
-        logger.warning("ReadTheDocs file already exists. Skipping.")
-        return
-    pyver = get_pyver()
-    config = {
-        "version": 2,
-        "build": {
-            "os": "ubuntu-22.04",
-            "tools": {"python": pyver},
-            "commands": [
-                "asdf plugin add uv",
-                "asdf install uv latest",
-                "asdf global uv latest",
-                "uv sync",
-                "uv run sphinx-build -M html docs/source $READTHEDOCS_OUTPUT",
-            ],
-        },
-    }
-
-    safe_dump(config, rtd)
-    logger.info("ReadTheDocs file written.")
 
 
 def has_python_files(path: Path = Path(".")) -> bool:

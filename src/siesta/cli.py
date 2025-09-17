@@ -30,22 +30,24 @@ from cyclopts import App
 from rich import print
 from watchdog.observers import Observer
 
-from siesta.utils import (
-    AutoBuild,
-    copy_boilerplate,
-    get_user_pat,
-    has_python_files,
-    install_dependencies,
+from siesta.utils.all import (
     load_deps,
     logger,
-    make_empty_folders,
-    overwrite_docs_files,
     resolve_path,
     run_command,
-    update_conf_py,
     write_or_update_pre_commit_file,
+)
+from siesta.utils.docs import (
+    AutoBuild,
+    copy_boilerplate,
+    has_python_files,
+    install_dependencies,
+    make_empty_folders,
+    overwrite_docs_files,
+    update_conf_py,
     write_rtd_config,
 )
+from siesta.utils.github import get_user_pat
 
 app = App(
     help=dedent(
@@ -248,6 +250,13 @@ def init_docs(
     make_empty_folders(path)
     # update defaults from user config
     overwrite_docs_files(path, with_defaults)
+
+    has_rtd = Path(".readthedocs.yaml").exists()
+    if not has_rtd:
+        write_rtd_config()
+        logger.success("ReadTheDocs config written.")
+    else:
+        logger.info("ReadTheDocs config already exists.")
 
     logger.info(
         "Now go to your newly created docs folder and update placehodlers in"
@@ -552,15 +561,9 @@ def quickstart_project(
             logger.abort("Failed to install pre-commit hooks.")
         logger.success("Pre-commit hooks installed.")
 
-    has_rtd = Path(".readthedocs.yaml").exists()
-    if docs is None and not has_rtd:
+    if docs is None:
         docs = logger.confirm("Would you like to initialize the docs?")
     if docs:
-        if not has_rtd:
-            write_rtd_config()
-            logger.success("ReadTheDocs config written.")
-        else:
-            logger.info("ReadTheDocs config already exists.")
         init_docs(
             path=docs_path,
             as_main_deps=as_main_deps,
