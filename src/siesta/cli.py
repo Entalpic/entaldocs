@@ -18,6 +18,7 @@ Learn how to use with:
 You can also refer to the :ref:`siesta-cli-tutorial` for more information.
 """
 
+import getpass
 import time
 from importlib import metadata
 from pathlib import Path
@@ -405,8 +406,10 @@ def set_github_pat(pat: Optional[str] = ""):
         + " if you're not sure how to generate a PAT."
     )
     if not pat:
-        pat = logger.prompt("Enter your GitHub PAT")
-    logger.confirm("Are you sure you want to set the GitHub PAT?")
+        pat = getpass.getpass("Enter your GitHub PAT (hidden): ")
+    logger.confirm(
+        f"Are you sure you want to set the GitHub PAT to {pat[:5]}...{pat[-5:]}?"
+    )
     set_password("siesta", "github_pat", pat)
     logger.success("GitHub PAT set. You can now use `siesta docs init`.")
 
