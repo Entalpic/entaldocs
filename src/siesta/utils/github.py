@@ -33,7 +33,7 @@ def search_contents(
     repo : Repository
         The repository to get the contents from.
     content_path : str
-        The path to the directory to get the contents of.
+        The path to the directory to get the contents of (with respect to the repository root).
     branch : str, optional
         The branch to fetch the files from, by default ``"main"``.
 
