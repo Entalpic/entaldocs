@@ -14,6 +14,7 @@ from watchdog.events import FileSystemEvent, RegexMatchingEventHandler
 
 from siesta.utils.common import (
     ROOT,
+    get_project_name,
     get_pyver,
     load_deps,
     logger,
@@ -242,26 +243,6 @@ def make_empty_folders(dest: Path):
     (dest / "build").mkdir(parents=True, exist_ok=True)
     (dest / "source/_static").mkdir(parents=True, exist_ok=True)
     (dest / "source/_templates").mkdir(parents=True, exist_ok=True)
-
-
-def get_project_name(with_defaults) -> str:
-    """Get the current project's name from the user.
-
-    Prompts the user for the project name, with the default being the current
-    directory's name.
-
-    Parameters
-    ----------
-    with_defaults : bool
-        Whether to trust the defaults and skip all prompts.
-
-    Returns
-    -------
-    str
-        The project name.
-    """
-    default = resolve_path(".").name
-    return default if with_defaults else logger.prompt("Project name", default=default)
 
 
 def discover_packages(dest: Path, with_defaults: str) -> str:

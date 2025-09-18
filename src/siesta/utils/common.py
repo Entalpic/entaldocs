@@ -3,6 +3,7 @@
 
 import importlib
 import json
+import re
 from os.path import expandvars
 from pathlib import Path
 from shutil import copy2
@@ -156,7 +157,7 @@ def write_or_update_pre_commit_file() -> None:
 
     # Copy reference file if no existing config
     copy2(ref, pre_commit)
-    logger.info("pre-commit file written.")
+    logger.info("Pre-commit file written.")
 
 
 def get_pyver():
@@ -177,3 +178,33 @@ def get_pyver():
         major, minor, _ = version.split(".")
         return f"{major}.{minor}"
     return "3.12"
+
+
+def get_project_name(with_defaults: bool, snake_case: bool = False) -> str:
+    """Get the current project's name from the pyproject.toml or user.
+
+    Prompts the user for the project name, with the default being the name in the pyproject.toml
+    if it exists or the current directory's name.
+
+    Parameters
+    ----------
+    with_defaults : bool
+        Whether to trust the defaults and skip all prompts.
+    snake_case : bool, optional
+        Whether to convert the project name to snake case, by default ``False``.
+
+    Returns
+    -------
+    str
+        The project name.
+    """
+    pyproject_toml = Path("pyproject.toml")
+    pyproject_name = None
+    if pyproject_toml.exists():
+        txt = pyproject_toml.read_text()
+        pyproject_name = re.search(r"name\s*=\s*['\"](.*)['\"]", txt).group(1)
+    default = pyproject_name or resolve_path(".").name
+    name = default if with_defaults else logger.prompt("Project name", default=default)
+    if snake_case:
+        name = name.lower().replace(" ", "_")
+    return name
