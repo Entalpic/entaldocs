@@ -94,7 +94,7 @@ def write_tests_infra(project_name: str):
 
     def test_import():
         """Test the project's import."""
-        import {project_name}
+        import {project_name}  # noqa: F401
     ''')
     (tests_dir / "test_import.py").write_text(test_example)
 
