@@ -124,7 +124,8 @@ def add_ipdb_as_debugger():
                 os.environ["PYTHONBREAKPOINT"] = "ipdb.set_trace"
             except ImportError:
                 print(
-                    "ipdb not available. Consider adding it to your dev stack for a smoother debugging experience"
+                    "`ipdb` not available.",
+                    "Consider adding it to your dev stack for a smoother debugging experience.",
                 )
             """
         )
