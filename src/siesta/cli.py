@@ -39,7 +39,7 @@ from siesta.utils.common import (
     write_or_update_pre_commit_file,
 )
 from siesta.utils.docs import (
-    AutoBuild,
+    AutoBuildDocs,
     copy_boilerplate,
     has_python_files,
     install_dependencies,
@@ -640,9 +640,9 @@ def watch_docs(
     """
     build_docs(path)
     patterns = [p.strip() for p in patterns.split(";")]
-    ab = AutoBuild(patterns, build_docs, path=path)
+    abd = AutoBuildDocs(patterns, build_docs, path=path)
     observer = Observer()
-    observer.schedule(ab, path=".", recursive=True)
+    observer.schedule(abd, path=".", recursive=True)
     observer.start()
     here = Path().resolve()
     logger.info(f"Watching {here}. Press Ctrl+C to stop.")

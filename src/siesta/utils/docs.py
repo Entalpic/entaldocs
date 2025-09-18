@@ -378,7 +378,7 @@ def has_python_files(path: Path = Path(".")) -> bool:
     return False
 
 
-class AutoBuild(RegexMatchingEventHandler):
+class AutoBuildDocs(RegexMatchingEventHandler):
     """Automatically build the docs when they are changed.
 
     Parameters
