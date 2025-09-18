@@ -207,7 +207,7 @@ class Logger(BaseLogger):
         bool
             Whether the user confirmed the message.
         """
-        return self.prompt(f"{message} (y/N)", "N").lower() == "y"
+        return self.prompt(f"{message} (Y/n)", "y").lower() == "y"
 
     def abort(self, message: str, exit=1):
         """Abort the program with a message.
