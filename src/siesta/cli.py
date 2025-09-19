@@ -114,6 +114,69 @@ def main():
         logger.abort("\nAborted.", exit=1)
 
 
+@app.command(name="set-github-pat")
+def set_github_pat(pat: Optional[str] = ""):
+    """
+    Store a GitHub Personal Access Token (PAT) in your keyring.
+
+    A Github PAT is required to fetch the latest version of the documentation's static
+    files etc. from the repository.
+
+    `About GitHub PAT <https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#about-personal-access-tokens>`_
+
+    `Creating Github a PAT <https://github.com/settings/personal-access-tokens>`_
+
+
+    1. Go to ``Settings > Developer settings > Personal access tokens (fine-grained) >
+       Generate new token``.
+    2. Name it ``siesta``.
+    3. Set ``Entalpic`` as resource owner
+    4. Expire it in 1 year.
+    5. Only select the ``siesta`` repository
+    6. Set *Repository Permissions* to *Contents: Read* and *Metadata: Read*.
+    7. Click on *Generate token*.
+
+
+    Parameters
+    ----------
+    pat : str, optional
+        The GitHub Personal Access Token.
+    """
+    from keyring import set_password
+
+    assert isinstance(pat, str), "PAT must be a string."
+
+    logger.warning(
+        "Run [r]$ siesta set-github-pat --help[/r]"
+        + " if you're not sure how to generate a PAT."
+    )
+    if not pat:
+        pat = getpass.getpass("Enter your GitHub PAT (hidden): ")
+    logger.confirm(
+        f"Are you sure you want to set the GitHub PAT to {pat[:5]}...{pat[-5:]}?"
+    )
+    set_password("siesta", "github_pat", pat)
+    logger.success("GitHub PAT set. You can now use `siesta docs init`.")
+
+
+@app.command(name="show-deps")
+def show_deps(as_pip: bool = False):
+    """Show the recommended dependencies for the documentation that would be installed with `siesta docs init`.
+
+    Parameters
+    ----------
+    as_pip : bool, optional
+        Show as pip install command.
+    """
+    deps = load_deps()
+    if as_pip:
+        print(" ".join([d for k in deps for d in deps[k]]))
+    else:
+        print("Dependencies:")
+        for scope in deps:
+            print("  • " + scope + ": " + " ".join(deps[scope]))
+
+
 @docs_app.command(name="init")
 def init_docs(
     path: str = "./docs",
@@ -299,24 +362,6 @@ def init_docs(
         )
 
 
-@app.command(name="show-deps")
-def show_deps(as_pip: bool = False):
-    """Show the recommended dependencies for the documentation that would be installed with `siesta docs init`.
-
-    Parameters
-    ----------
-    as_pip : bool, optional
-        Show as pip install command.
-    """
-    deps = load_deps()
-    if as_pip:
-        print(" ".join([d for k in deps for d in deps[k]]))
-    else:
-        print("Dependencies:")
-        for scope in deps:
-            print("  • " + scope + ": " + " ".join(deps[scope]))
-
-
 @docs_app.command(name="update")
 def update(
     path: str = "./docs",
@@ -391,49 +436,82 @@ def update(
     logger.success("Done.")
 
 
-@app.command(name="set-github-pat")
-def set_github_pat(pat: Optional[str] = ""):
-    """
-    Store a GitHub Personal Access Token (PAT) in your keyring.
+@docs_app.command(name="build")
+def build_docs(path: str = "./docs"):
+    """Build your docs.
 
-    A Github PAT is required to fetch the latest version of the documentation's static
-    files etc. from the repository.
-
-    `About GitHub PAT <https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#about-personal-access-tokens>`_
-
-    `Creating Github a PAT <https://github.com/settings/personal-access-tokens>`_
-
-
-    1. Go to ``Settings > Developer settings > Personal access tokens (fine-grained) >
-       Generate new token``.
-    2. Name it ``siesta``.
-    3. Set ``Entalpic`` as resource owner
-    4. Expire it in 1 year.
-    5. Only select the ``siesta`` repository
-    6. Set *Repository Permissions* to *Contents: Read* and *Metadata: Read*.
-    7. Click on *Generate token*.
-
+    Equivalent to running ``$ cd docs && make clean && make html``.
 
     Parameters
     ----------
-    pat : str, optional
-        The GitHub Personal Access Token.
+    path : str, optional
+        The path to your documentation folder.
     """
-    from keyring import set_password
-
-    assert isinstance(pat, str), "PAT must be a string."
-
-    logger.warning(
-        "Run [r]$ siesta set-github-pat --help[/r]"
-        + " if you're not sure how to generate a PAT."
+    path = resolve_path(path)
+    if not path.exists():
+        logger.abort(f"Path not found: {path}", exit=1)
+    make = path / "Makefile"
+    if not make.exists():
+        logger.abort(f"Makefile not found in {path}.", exit=1)
+    commands = [
+        ["make", "clean"],
+        ["make", "html"],
+    ]
+    with_uv = Path("uv.lock").exists()
+    if with_uv:
+        commands = [["uv", "run"] + command for command in commands]
+    for command in commands:
+        with logger.loading(f"Running {' '.join(command)}..."):
+            result = run_command(command, cwd=str(path), check=False)
+        if result.returncode != 0:
+            logger.error(result.stderr)
+            logger.abort("Failed to build the docs.")
+        print(result.stdout)
+    logger.info(
+        "Ask Victor if you want to automatically build and deploy the docs to ReadTheDocs."
     )
-    if not pat:
-        pat = getpass.getpass("Enter your GitHub PAT (hidden): ")
-    logger.confirm(
-        f"Are you sure you want to set the GitHub PAT to {pat[:5]}...{pat[-5:]}?"
-    )
-    set_password("siesta", "github_pat", pat)
-    logger.success("GitHub PAT set. You can now use `siesta docs init`.")
+    logger.success(f"Local docs built in {path / 'build/html/index.html'}")
+
+
+@docs_app.command(name="watch")
+def watch_docs(
+    path: str = "./docs", patterns: str = r".+/src/.+\.py;.+/source/.+\.rst"
+):
+    """Automatically build the docs when source files matching the given patterns are changed.
+
+    Files must be accessible down the directory you run the command from.
+
+    Files in the ``/autoapi/`` folder are not watched so that the intermediate
+    files generated by AutoAPI do not trigger a continuous rebuild.
+
+    Parameters
+    ----------
+    path : str, optional
+        The path to your documentation folder.
+    patterns : str, optional
+        The patterns to watch for changes, separated by ``;``.
+    """
+    # Build the docs
+    build_docs(path)
+
+    # Patterns to watch
+    patterns = [p.strip() for p in patterns.split(";")]
+
+    # Watch for changes
+    abd = AutoBuildDocs(patterns, build_docs, path=path)
+    observer = Observer()
+    observer.schedule(abd, path=".", recursive=True)
+    observer.start()
+    here = Path().resolve()
+    logger.info(f"Watching {here}. Press Ctrl+C to stop.")
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        observer.stop()
+        observer.join()
+    print()
+    logger.warning("Watching stopped. Bye bye 👋")
 
 
 @project_app.command(name="quickstart")
@@ -629,81 +707,3 @@ def quickstart_project(
             local=local,
         )
     logger.success("🔥 Done, happy coding! 👋")
-
-
-@docs_app.command(name="build")
-def build_docs(path: str = "./docs"):
-    """Build your docs.
-
-    Equivalent to running ``$ cd docs && make clean && make html``.
-
-    Parameters
-    ----------
-    path : str, optional
-        The path to your documentation folder.
-    """
-    path = resolve_path(path)
-    if not path.exists():
-        logger.abort(f"Path not found: {path}", exit=1)
-    make = path / "Makefile"
-    if not make.exists():
-        logger.abort(f"Makefile not found in {path}.", exit=1)
-    commands = [
-        ["make", "clean"],
-        ["make", "html"],
-    ]
-    with_uv = Path("uv.lock").exists()
-    if with_uv:
-        commands = [["uv", "run"] + command for command in commands]
-    for command in commands:
-        with logger.loading(f"Running {' '.join(command)}..."):
-            result = run_command(command, cwd=str(path), check=False)
-        if result.returncode != 0:
-            logger.error(result.stderr)
-            logger.abort("Failed to build the docs.")
-        print(result.stdout)
-    logger.info(
-        "Ask Victor if you want to automatically build and deploy the docs to ReadTheDocs."
-    )
-    logger.success(f"Local docs built in {path / 'build/html/index.html'}")
-
-
-@docs_app.command(name="watch")
-def watch_docs(
-    path: str = "./docs", patterns: str = r".+/src/.+\.py;.+/source/.+\.rst"
-):
-    """Automatically build the docs when source files matching the given patterns are changed.
-
-    Files must be accessible down the directory you run the command from.
-
-    Files in the ``/autoapi/`` folder are not watched so that the intermediate
-    files generated by AutoAPI do not trigger a continuous rebuild.
-
-    Parameters
-    ----------
-    path : str, optional
-        The path to your documentation folder.
-    patterns : str, optional
-        The patterns to watch for changes, separated by ``;``.
-    """
-    # Build the docs
-    build_docs(path)
-
-    # Patterns to watch
-    patterns = [p.strip() for p in patterns.split(";")]
-
-    # Watch for changes
-    abd = AutoBuildDocs(patterns, build_docs, path=path)
-    observer = Observer()
-    observer.schedule(abd, path=".", recursive=True)
-    observer.start()
-    here = Path().resolve()
-    logger.info(f"Watching {here}. Press Ctrl+C to stop.")
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        observer.stop()
-        observer.join()
-    print()
-    logger.warning("Watching stopped. Bye bye 👋")
