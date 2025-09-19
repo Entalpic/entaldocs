@@ -5,6 +5,11 @@ from siesta.utils.common import get_pyver, logger, safe_dump
 
 
 def write_test_actions_config() -> None:
+    """
+    Write the test actions config to the ``.github/workflows/test.yml`` file.
+
+    Basically this will allow you to run tests automatically on Github on any PR or push to the main branch.
+    """
     github_dir = Path(".github")
     workflows_dir = github_dir / "workflows"
     if workflows_dir.exists():
@@ -75,6 +80,15 @@ def write_test_actions_config() -> None:
 
 
 def write_tests_infra(project_name: str):
+    """Write the tests infrastructure to the ``tests/`` directory.
+
+    This will create a ``test_import.py`` file that will test that the project can be imported.
+
+    Parameters
+    ----------
+    project_name : str
+        The name of the project.
+    """
     tests_dir = Path("tests")
     if tests_dir.exists():
         logger.warning("Tests directory already exists. Skipping.")
@@ -102,6 +116,11 @@ def write_tests_infra(project_name: str):
 
 
 def add_ipdb_as_debugger():
+    """Set ``ipdb`` as default debugger to the project.
+
+    This will set ``ipdb`` as default debugger when calling ``breakpoint()`` by setting the
+    ``PYTHONBREAKPOINT`` environment variable to ``ipdb.set_trace``.
+    """
     inits = list(Path("src/").glob("**/__init__.py"))
     if not inits:
         logger.warning("No __init__.py files found. Skipping ipdb debugger.")

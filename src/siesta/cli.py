@@ -56,6 +56,7 @@ from siesta.utils.project import (
     write_tests_infra,
 )
 
+# Main app
 app = App(
     help=dedent(
         f"""
@@ -84,6 +85,7 @@ docs_app = App(
         """.strip(),
     ),
 )
+""":py:class:`cyclopts.App`: The app for the ``siesta docs`` sub-command."""
 
 project_app = App(
     name="project",
@@ -98,13 +100,14 @@ project_app = App(
         """.strip(),
     ),
 )
+""":py:class:`cyclopts.App`: The app for the ``siesta project`` sub-command."""
 
 app.command(docs_app)
 app.command(project_app)
 
 
 def main():
-    """Run the CLI."""
+    """Run the CLI, gracefully handling ``KeyboardInterrupt``."""
     try:
         app()
     except KeyboardInterrupt:
@@ -186,7 +189,7 @@ def init_docs(
             exit=1,
         )
 
-    # where the docs will be stored, typically `$CWD/docs`
+    # Check for GitHub Personal Access Token
     pat = get_user_pat()
     if not pat and not local:
         logger.warning(
@@ -196,6 +199,7 @@ def init_docs(
         logger.warning("Run [r]$ siesta set-github-pat --help[/r] to learn how to.")
         logger.abort("Aborting.", exit=1)
 
+    # Where the docs will be stored, typically `$CWD/docs`
     path = resolve_path(path)
     print(f"[blue]Initializing docs at path:[/blue] {path}")
     if path.exists():
@@ -209,11 +213,11 @@ def init_docs(
         print("🚧 Overwriting path.")
         rmtree(path)
 
-    # create the docs folder
+    # Create the docs folder
     path.mkdir(parents=True)
     print("Initialized.")
 
-    # setting defaults
+    # Setting defaults
     if with_defaults:
         if deps is not None:
             print("Ignoring deps argument because you are using --with-defaults.")
@@ -224,13 +228,13 @@ def init_docs(
             )
         as_main_deps = False
 
-    # whether to install dependencies
+    # Whether to install dependencies
     should_install = deps is not None or logger.confirm(
         "Would you like to install recommended dependencies?"
     )
     with_uv = False
     if should_install:
-        # check if uv.lock exists in order to decide whether to use uv or not
+        # Check if uv.lock exists in order to decide whether to use uv or not
         if resolve_path("./uv.lock").exists():
             with_uv = (
                 uv
@@ -245,21 +249,22 @@ def init_docs(
                     "uv.lock not found. Skipping uv dependencies, installing with pip."
                 )
         print(f"Installing dependencies{' with uv.' if with_uv else '.'}..")
-        # execute the command to install dependencies
+        # Execute the command to install dependencies
         install_dependencies(with_uv, with_uv and not as_main_deps)
         print("[green]Dependencies installed.[green]")
     else:
         print("Skipping dependency installation.")
 
-    # download and copy siesta pre-filled folder structure to the target directory
+    # Download and copy siesta pre-filled folder structure to the target directory
     copy_boilerplate(
         path, branch=branch, content_path=contents, overwrite=True, local=local
     )
-    # make empty dirs (_build and _static) in target directory
+    # Make empty dirs (_build and _static) in target directory
     make_empty_folders(path)
-    # update defaults from user config
+    # Update defaults from user config
     overwrite_docs_files(path, with_defaults, project_name)
 
+    # Check if the ReadTheDocs YAML config exists
     has_rtd = Path(".readthedocs.yaml").exists()
     if not has_rtd:
         write_rtd_config()
@@ -271,6 +276,8 @@ def init_docs(
         "Now go to your newly created docs folder and update placehodlers in"
         + " [r] conf.py [/r] with the appropriate values.",
     )
+
+    # Build the docs
     try:
         command = ["make", "html"]
         if with_uv:
@@ -346,9 +353,12 @@ def update(
         Use local boilerplate docs assets instead of fetching from the repository.
         May update to outdated contents so avoid using this option.
     """
+    # Check if the path exists
     path = resolve_path(path)
     if not path.exists():
         logger.abort(f"Path not found: {path}", exit=1)
+
+    # Confirm to overwrite the documentation's HTML static files
     if logger.confirm("Overwrite the documentation's HTML static files. Continue?"):
         static = path / "source" / "_static"
         if not static.exists():
@@ -362,9 +372,13 @@ def update(
             local=local,
         )
         logger.success("Static files updated.")
+
+    # Update the conf.py file
     if logger.confirm("Would you like to update the conf.py file?"):
         update_conf_py(path, branch=branch)
         logger.success("[r]conf.py[/r] updated.")
+
+    # Update the pre-commit hooks
     if logger.confirm("Would you like to update the pre-commit hooks?"):
         write_or_update_pre_commit_file()
         has_uv = Path("uv.lock").exists()
@@ -510,14 +524,17 @@ def quickstart_project(
     if as_app and as_pkg:
         logger.abort("Cannot use both --as-app and --as-pkg flags.")
 
+    # uv is required
     has_uv = bool(run_command(["uv", "--version"]))
     if not has_uv:
         logger.abort(
             "uv not found. Please install it first -> https://docs.astral.sh/uv/getting-started/installation/"
         )
 
+    # Get the project name
     project_name = get_project_name(with_defaults)
 
+    # Setting defaults
     if with_defaults:
         if precommit is not None:
             logger.warning("Ignoring precommit argument because of --with-defaults.")
@@ -541,6 +558,7 @@ def quickstart_project(
             logger.warning("Ignoring actions argument because of --with-defaults.")
         actions = True
 
+    # Check if the project is already initialized
     has_uv_lock = Path("uv.lock").exists()
     if not has_uv_lock:
         cmd = ["uv", "init"]
@@ -562,6 +580,7 @@ def quickstart_project(
     else:
         logger.info("Project already initialized with uv.")
 
+    # Install dependencies
     if deps is None:
         deps = logger.confirm("Would you like to install recommended dependencies?")
     if deps:
@@ -571,6 +590,7 @@ def quickstart_project(
             logger.abort("Failed to install the dev dependencies.")
         logger.success("Dev dependencies installed.")
 
+    # Install pre-commit hooks
     if precommit is None:
         precommit = logger.confirm(
             "Would you like to update & install pre-commit hooks?"
@@ -666,8 +686,13 @@ def watch_docs(
     patterns : str, optional
         The patterns to watch for changes, separated by ``;``.
     """
+    # Build the docs
     build_docs(path)
+
+    # Patterns to watch
     patterns = [p.strip() for p in patterns.split(";")]
+
+    # Watch for changes
     abd = AutoBuildDocs(patterns, build_docs, path=path)
     observer = Observer()
     observer.schedule(abd, path=".", recursive=True)

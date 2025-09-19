@@ -101,6 +101,7 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "github": ("https://pygithub.readthedocs.io/en/stable/", None),
     "torch": ("https://pytorch.org/docs/stable/", None),
+    "cyclopts": ("https://cyclopts.readthedocs.io/en/latest/", None),
 }
 
 # sphinx.ext.autodoc & autoapi.extension
