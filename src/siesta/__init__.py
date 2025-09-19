@@ -2,7 +2,7 @@
 r"""
 .. _siesta-cli-tutorial:
 
-siesta CLI Tutorial
+``siesta`` CLI Tutorial
 -------------------
 
 **Siesta Is Entalpic'S Terminal Assistant.**
@@ -66,7 +66,7 @@ For brand new projects, use the ``project`` command:
 
     # Look at your options
     $ siesta project quickstart --help
-    # Then you would typically use the --with-defaults flag
+    # Then you would typically use the `--with-defaults` flag
     $ siesta project quickstart
 
 What happens is the following:
@@ -74,9 +74,14 @@ What happens is the following:
 1. A new Python project is created in the current directory using ``uv``.
 2. Using ``uv add``, common development dependencies are added to the project.
 3. Pre-commit hooks to format and lint the code with ``ruff`` are added.
-4. The Sphinx documentation to automatically render docstrings is initialized with ``siesta docs init`` to create a ``docs/`` folder
+4. A testing infrastructure is added with ``pytest`` and automated execution with ``GitHub Actions``.
+5. The Sphinx documentation to automatically render your project's docstrings is initialized with ``siesta docs init`` to create a ``docs/`` folder
    and install the necessary dependencies for documentation.
 
+.. tip::
+
+    ``siesta`` also sets up this new Python project with ``ipdb`` as default debugger. This means that when you call ``breakpoint()``
+    an improved debugger will be launched instead of the default ``pdb``. `Learn more <https://hasil-sharma.github.io/2017-05-13-python-ipdb/>`_ about ``ipdb``.
 
 Docs Only
 =========

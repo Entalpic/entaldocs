@@ -1,6 +1,6 @@
 .. Copyright 2025 Entalpic
-Entalpic's Documentation Guide
-==============================
+Documentation At Entalpic
+=========================
 
 *Documentation* refers to the content that you produce to help others understand your code. 
 
