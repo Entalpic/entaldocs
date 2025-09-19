@@ -191,7 +191,7 @@ def skip_submodules(app, what, name, obj, skip, options):
     """
     if what == "attribute":
         if obj.is_undoc_member:
-            print(f"  • Skipping {what} {name} because it is not documented.")
+            print(f"[siesta]  • Skipping {what} {name} because it is not documented.")
             return True
     return skip
 

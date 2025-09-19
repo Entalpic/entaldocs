@@ -40,7 +40,6 @@ from textwrap import dedent
 from typing import Optional
 
 from cyclopts import App
-from rich import print
 from watchdog.observers import Observer
 
 from siesta.utils.common import (
@@ -182,11 +181,11 @@ def show_deps(as_pip: bool = False):
     """
     deps = load_deps()
     if as_pip:
-        print(" ".join([d for k in deps for d in deps[k]]))
+        logger.print(" ".join([d for k in deps for d in deps[k]]))
     else:
-        print("Dependencies:")
+        logger.print("Dependencies:")
         for scope in deps:
-            print("  • " + scope + ": " + " ".join(deps[scope]))
+            logger.print("  • " + scope + ": " + " ".join(deps[scope]))
 
 
 @docs_app.command(name="init")
@@ -276,29 +275,31 @@ def init_docs(
 
     # Where the docs will be stored, typically `$CWD/docs`
     path = resolve_path(path)
-    print(f"[blue]Initializing docs at path:[/blue] {path}")
+    logger.info(f"Initializing docs at path: {path}")
     if path.exists():
         # docs folder already exists
         if not overwrite:
             # user doesn't want to overwrite -> abort
-            print(f"Path already exists: {path}")
-            print("Use --overwrite to overwrite.")
+            logger.warning(f"Path already exists: {path}")
+            logger.warning("Use --overwrite to overwrite.")
             logger.abort("Aborting.", exit=1)
         # user wants to overwrite -> remove the folder and warn
-        print("🚧 Overwriting path.")
+        logger.warning("🚧 Overwriting path.")
         rmtree(path)
 
     # Create the docs folder
     path.mkdir(parents=True)
-    print("Initialized.")
+    logger.success("Initialized.")
 
     # Setting defaults
     if with_defaults:
         if deps is not None:
-            print("Ignoring deps argument because you are using --with-defaults.")
+            logger.warning(
+                "Ignoring deps argument because you are using --with-defaults."
+            )
         deps = True
         if as_main_deps is not None:
-            print(
+            logger.warning(
                 "Ignoring as_main_deps argument because you are using --with-defaults."
             )
         as_main_deps = False
@@ -320,15 +321,15 @@ def init_docs(
             )
         else:
             if uv:
-                print(
+                logger.warning(
                     "uv.lock not found. Skipping uv dependencies, installing with pip."
                 )
-        print(f"Installing dependencies{' with uv.' if with_uv else '.'}..")
+        logger.info(f"Installing dependencies{' with uv.' if with_uv else '.'}..")
         # Execute the command to install dependencies
         install_dependencies(with_uv, with_uv and not as_main_deps)
-        print("[green]Dependencies installed.[green]")
+        logger.success("Dependencies installed.")
     else:
-        print("Skipping dependency installation.")
+        logger.info("Skipping dependency installation.")
 
     # Download and copy siesta pre-filled folder structure to the target directory
     copy_boilerplate(
@@ -361,14 +362,17 @@ def init_docs(
             f"Building your docs with [r] cd docs && {' '.join(command)} [/r]..."
         )
         run(command, cwd=str(path), check=True)
-        print(
-            f"🚀 [blue]Docs built![/blue] Open {path / 'build/html/index.html'} to see them."
+        logger.success(
+            f"🚀 Docs built! Open {path / 'build/html/index.html'} to see them."
         )
-        logger.success("[green]Happy documenting![/green]")
+        logger.success(
+            "Or run [r]$ siesta docs open[/r] to open them in the default browser."
+        )
+        logger.success("Happy documenting!")
     except Exception as e:
         logger.warning("Failed to build the docs.")
         logger.warning(e)
-        print()
+        logger.print()
         logger.info(
             "You can try to build the docs manually by running the above command."
         )
@@ -478,7 +482,7 @@ def build_docs(path: str = "./docs"):
         if result.returncode != 0:
             logger.error(result.stderr)
             logger.abort("Failed to build the docs.")
-        print(result.stdout)
+        logger.print(result.stdout)
     logger.info(
         "Ask Victor if you want to automatically build and deploy the docs to ReadTheDocs."
     )
@@ -522,7 +526,7 @@ def watch_docs(
     except KeyboardInterrupt:
         observer.stop()
         observer.join()
-    print()
+    logger.print()
     logger.warning("Watching stopped. Bye bye 👋")
 
 

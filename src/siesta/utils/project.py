@@ -1,3 +1,6 @@
+# Copyright 2025 Entalpic
+"""Utility functions related to the ``siesta project`` subcommand."""
+
 from pathlib import Path
 from textwrap import dedent
 

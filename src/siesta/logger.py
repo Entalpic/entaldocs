@@ -277,3 +277,15 @@ class Logger(BaseLogger):
             The message to print.
         """
         return self.console.status(message)
+
+    def print(self, *args, **kwargs) -> None:
+        """Print a message.
+
+        Parameters
+        ----------
+        *args :
+            The arguments to print.
+        **kwargs :
+            The keyword arguments to print.
+        """
+        self.console.print(*args, **kwargs)
