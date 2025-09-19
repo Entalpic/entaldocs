@@ -32,6 +32,7 @@ from rich import print
 from watchdog.observers import Observer
 
 from siesta.utils.common import (
+    get_project_name,
     load_deps,
     logger,
     resolve_path,
@@ -51,7 +52,6 @@ from siesta.utils.docs import (
 from siesta.utils.github import get_user_pat
 from siesta.utils.project import (
     add_ipdb_as_debugger,
-    get_project_name,
     write_test_actions_config,
     write_tests_infra,
 )
@@ -566,21 +566,10 @@ def quickstart_project(
         deps = logger.confirm("Would you like to install recommended dependencies?")
     if deps:
         dev_deps = load_deps()["dev"]
-        # Check which dependencies are already installed
-        missing_deps = []
-        for dep in dev_deps:
-            try:
-                __import__(dep.split("[")[0])  # Handle cases like package[extra]
-            except ImportError:
-                missing_deps.append(dep)
-
-        if missing_deps:
-            installed = run_command(["uv", "add", "--dev"] + missing_deps)
-            if installed is False:
-                logger.abort("Failed to install the dev dependencies.")
-            logger.success("Dev dependencies installed.")
-        else:
-            logger.info("All dev dependencies already installed.")
+        installed = run_command(["uv", "add", "--dev"] + dev_deps)
+        if installed is False:
+            logger.abort("Failed to install the dev dependencies.")
+        logger.success("Dev dependencies installed.")
 
     if precommit is None:
         precommit = logger.confirm(
