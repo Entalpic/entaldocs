@@ -6,19 +6,31 @@ Learn how to use with:
 
 .. code-block:: bash
 
-    $ siesta --help
-    $ siesta docs --help
-    $ siesta docs init --help
-    $ siesta docs update --help
-    $ siesta project --help
-    $ siesta project quickstart --help
-    $ siesta set-github-pat --help
-    $ siesta show-deps --help
+    # Top-level commands, add --help to any of them
+    # to understand what they do and their options their options.
+
+    $ siesta # shows help
+
+    $ siesta docs # shows help
+    $ siesta docs init
+    $ siesta docs open
+    $ siesta docs build
+    $ siesta docs update
+    $ siesta docs watch
+
+    $ siesta project # shows help
+    $ siesta project quickstart
+
+    $ siesta set-github-pat
+    $ siesta show-deps
 
 You can also refer to the :ref:`siesta-cli-tutorial` for more information.
 """
 
 import getpass
+import os
+import platform
+import subprocess
 import time
 from importlib import metadata
 from pathlib import Path
@@ -512,6 +524,29 @@ def watch_docs(
         observer.join()
     print()
     logger.warning("Watching stopped. Bye bye 👋")
+
+
+@docs_app.command(name="open")
+def open_docs(path: str = "./docs"):
+    """Open the locally-built docs in the default browser.
+
+    Parameters
+    ----------
+    path : str, optional
+        The path to your documentation folder.
+    """
+    path = resolve_path(path)
+    index = path / "build/html/index.html"
+    if not index.exists():
+        logger.abort(f"Index file not found: {index}", exit=1)
+
+    logger.info(f"Opening {index} in the default browser.")
+    if platform.system() == "Darwin":  # macOS
+        subprocess.call(("open", str(index)))
+    elif platform.system() == "Windows":  # Windows
+        os.startfile(str(index))
+    else:  # Linux variants
+        subprocess.call(("xdg-open", str(index)))
 
 
 @project_app.command(name="quickstart")

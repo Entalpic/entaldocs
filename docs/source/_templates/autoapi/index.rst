@@ -8,13 +8,6 @@ The API reference was auto-generated with ``autoapi`` [#f1]_.
 
 You can see the source code on `Github <https://github.com/Entalpic/siesta>`_ and explore the rendered documentation here ⬇️
 
-.. toctree::
-   :titlesonly:
-
-   {% for page in pages|selectattr("is_top_level_object") %}
-   {{ page.include_path }}
-   {% endfor %}
-
 Installation
 ------------
 
@@ -54,6 +47,14 @@ Contributing
    uv tool install -e ./siesta
    # or
    pip install -e ./siesta
+
+
+.. toctree::
+   :titlesonly:
+
+   {% for page in pages|selectattr("is_top_level_object") %}
+   {{ page.include_path }}
+   {% endfor %}
 
 
 .. [#f1] Created with `sphinx-autoapi <https://github.com/readthedocs/sphinx-autoapi>`_

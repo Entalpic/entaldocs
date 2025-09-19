@@ -48,6 +48,9 @@ TL;DR
     # Build docs locally
     $ siesta docs build
 
+    # Open locally-built docs in the default browser
+    $ siesta docs open
+
     # Watch for changes and auto-rebuild
     $ siesta docs watch
 
