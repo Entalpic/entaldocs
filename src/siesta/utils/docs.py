@@ -12,8 +12,10 @@ from tempfile import TemporaryDirectory
 from rich import print
 from watchdog.events import FileSystemEvent, RegexMatchingEventHandler
 
-from siesta.utils.all import (
+from siesta.utils.common import (
     ROOT,
+    get_project_name,
+    get_pyver,
     load_deps,
     logger,
     resolve_path,
@@ -157,26 +159,6 @@ def write_rtd_config() -> None:
     logger.info("ReadTheDocs file written.")
 
 
-def get_pyver():
-    """Get the Python version from the user.
-
-    Returns
-    -------
-    str
-        The Python version.
-    """
-    python_version_file = Path(".python-version")
-    if python_version_file.exists():
-        return python_version_file.read_text().strip()
-    if run_command(["which", "uv"]):
-        # e.g. "Python 3.12.1"
-        full_version = run_command(["uv", "run", "python", "--version"]).stdout.strip()
-        version = full_version.split()[1]
-        major, minor, _ = version.split(".")
-        return f"{major}.{minor}"
-    return "3.12"
-
-
 def update_conf_py(dest: Path, branch: str = "main"):
     """Update the ``conf.py`` file with the latest content from the boilerplate.
 
@@ -263,26 +245,6 @@ def make_empty_folders(dest: Path):
     (dest / "source/_templates").mkdir(parents=True, exist_ok=True)
 
 
-def get_project_name(with_defaults) -> str:
-    """Get the current project's name from the user.
-
-    Prompts the user for the project name, with the default being the current
-    directory's name.
-
-    Parameters
-    ----------
-    with_defaults : bool
-        Whether to trust the defaults and skip all prompts.
-
-    Returns
-    -------
-    str
-        The project name.
-    """
-    default = resolve_path(".").name
-    return default if with_defaults else logger.prompt("Project name", default=default)
-
-
 def discover_packages(dest: Path, with_defaults: str) -> str:
     """Discover packages in the current directory.
 
@@ -358,21 +320,23 @@ def get_repo_url(with_defaults: bool) -> str:
         return url
 
 
-def overwrite_docs_files(dest: Path, with_defaults: bool):
+def overwrite_docs_files(dest: Path, with_defaults: bool, project_name: str = None):
     """Overwrite the conf.py file with the project name.
 
     Parameters
     ----------
     dest : Path
-        The path to the conf.py file.
+        The path to the ``conf.py`` file.
     with_defaults : bool
         Whether to trust the defaults and skip all prompts.
+    project_name : str, optional
+        The project's name. If not provided, it will be prompted (or discovered if ``with_defaults`` is ``True``).
     """
     dest = resolve_path(dest)
     # get the packages to list in autoapi_dirs
     packages = discover_packages(dest, with_defaults)
     # get project name from $CWD or user prompt
-    project = get_project_name(with_defaults)
+    project = project_name or get_project_name(with_defaults)
     # get repo URL from git or user prompt
     url = get_repo_url(with_defaults)
 
@@ -416,7 +380,7 @@ def has_python_files(path: Path = Path(".")) -> bool:
     return False
 
 
-class AutoBuild(RegexMatchingEventHandler):
+class AutoBuildDocs(RegexMatchingEventHandler):
     """Automatically build the docs when they are changed.
 
     Parameters

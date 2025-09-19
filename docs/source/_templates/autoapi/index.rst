@@ -1,6 +1,6 @@
 .. Copyright 2025 Entalpic
-API Reference
-=============
+Siesta User Guide
+=================
 
 This page contains leads to the documentation of the ``siesta`` package.
 

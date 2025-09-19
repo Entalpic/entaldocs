@@ -9,7 +9,7 @@ from github.Auth import Token
 from github.Repository import Repository
 from keyring import get_password
 
-from siesta.utils.all import logger, resolve_path
+from siesta.utils.common import logger, resolve_path
 
 
 def get_user_pat():
@@ -72,7 +72,7 @@ def search_contents(
             contents.extend(repo.get_contents(file_content.path, ref=branch))
         else:
             logger.clear_line()
-            print(f"Getting contents of '{file_content.path}'", end="\r")
+            print(f"Downloading contents of '{file_content.path}'", end="\r")
             # adjust file path
             new_relative_path = file_content.path.replace(extra_path, "")
             if new_relative_path.startswith("/"):

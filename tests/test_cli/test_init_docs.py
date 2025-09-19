@@ -10,7 +10,7 @@ def test_init_docs_basic(temp_project_with_git_and_remote, monkeypatch):
     monkeypatch.chdir(temp_project_with_git_and_remote)
 
     try:
-        app(["docs init", "--with-defaults", "--local"])
+        app(["docs", "init", "--with-defaults", "--local"])
     except SystemExit as e:
         assert e.code == 0
 
@@ -37,7 +37,7 @@ def test_init_docs_no_overwrite(
 
     with pytest.raises(SystemExit) as exc_info:
         with capture_output() as output:
-            app(["docs init", "--local"])
+            app(["docs", "init", "--local"])
         assert "Path already exists" in output.getvalue()
 
     assert exc_info.value.code == 1
@@ -55,7 +55,7 @@ def test_init_docs_with_overwrite(
     (docs_dir / "marker.txt").write_text("original content")
 
     with capture_output() as output:
-        app(["docs init", "--overwrite", "--with-defaults", "--local"])
+        app(["docs", "init", "--overwrite", "--with-defaults", "--local"])
     assert "Failed to build the docs" not in output.getvalue()
 
     assert not (docs_dir / "marker.txt").exists()
@@ -69,7 +69,7 @@ def test_init_docs_package_discovery(
     monkeypatch.chdir(temp_project_with_git_and_remote)
 
     with capture_output() as output:
-        app(["docs init", "--with-defaults", "--local"])
+        app(["docs", "init", "--with-defaults", "--local"])
     assert "Failed to build the docs" not in output.getvalue()
 
     # Check conf.py contains discovered package
@@ -85,7 +85,7 @@ def test_init_docs_project_name(
     monkeypatch.chdir(temp_project_with_git_and_remote)
 
     with capture_output() as output:
-        app(["docs init", "--with-defaults", "--local"])
+        app(["docs", "init", "--with-defaults", "--local"])
     assert "Failed to build the docs" not in output.getvalue()
 
     # Check project name in conf.py
@@ -116,7 +116,7 @@ def test_init_docs_no_python_files(tmp_path, monkeypatch, capture_output):
 
     with pytest.raises(SystemExit) as exc_info:
         with capture_output() as output:
-            app(["docs init", "--local"])
+            app(["docs", "init", "--local"])
         assert "No Python files found in project" in output.getvalue()
 
     assert exc_info.value.code == 1

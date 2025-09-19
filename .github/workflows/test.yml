@@ -31,11 +31,11 @@ jobs:
                   uv tool install -e .
                   uv pip install keyrings.alt
 
-            # - name: Configure Git
-            #   run: |
-            #       git config --global user.email "test@example.com"
-            #       git config --global user.name "Test User"
+            - name: Configure Git
+              run: |
+                  git config --global user.email "test@example.com"
+                  git config --global user.name "Test User"
 
-            # - name: Run tests
-            #   run: |
-            #       uv run pytest tests/ -v --cov=siesta --cov-report=term-missing
+            - name: Run tests
+              run: |
+                  uv run pytest tests/ -v --cov=siesta --cov-report=term-missing

@@ -1,6 +1,6 @@
 # Copyright 2025 Entalpic
 from siesta.cli import app
-from siesta.utils import load_deps
+from siesta.utils.common import load_deps
 
 
 def test_show_deps(capture_output):

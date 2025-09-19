@@ -31,7 +31,8 @@ from cyclopts import App
 from rich import print
 from watchdog.observers import Observer
 
-from siesta.utils.all import (
+from siesta.utils.common import (
+    get_project_name,
     load_deps,
     logger,
     resolve_path,
@@ -39,7 +40,7 @@ from siesta.utils.all import (
     write_or_update_pre_commit_file,
 )
 from siesta.utils.docs import (
-    AutoBuild,
+    AutoBuildDocs,
     copy_boilerplate,
     has_python_files,
     install_dependencies,
@@ -49,6 +50,11 @@ from siesta.utils.docs import (
     write_rtd_config,
 )
 from siesta.utils.github import get_user_pat
+from siesta.utils.project import (
+    add_ipdb_as_debugger,
+    write_test_actions_config,
+    write_tests_infra,
+)
 
 app = App(
     help=dedent(
@@ -116,6 +122,7 @@ def init_docs(
     branch: str = "main",
     contents: str = "src/siesta/boilerplate",
     local: bool = False,
+    project_name: str = None,
 ):
     """Initialize a Sphinx documentation project with Entalpic's standard configuration (also called within ``siesta project quickstart``).
 
@@ -165,7 +172,8 @@ def init_docs(
     local : bool, optional
         Use local boilerplate docs assets instead of fetching from the repository.
         May update to outdated contents so avoid using this option.
-
+    project_name : str, optional
+        The project's name. If not provided, it will be prompted.
     Raises
     ------
     sys.exit(1)
@@ -189,7 +197,7 @@ def init_docs(
         logger.abort("Aborting.", exit=1)
 
     path = resolve_path(path)
-    print(f"[blue]Initializing at path:[/blue] {path}")
+    print(f"[blue]Initializing docs at path:[/blue] {path}")
     if path.exists():
         # docs folder already exists
         if not overwrite:
@@ -250,7 +258,7 @@ def init_docs(
     # make empty dirs (_build and _static) in target directory
     make_empty_folders(path)
     # update defaults from user config
-    overwrite_docs_files(path, with_defaults)
+    overwrite_docs_files(path, with_defaults, project_name)
 
     has_rtd = Path(".readthedocs.yaml").exists()
     if not has_rtd:
@@ -428,6 +436,9 @@ def quickstart_project(
     branch: str = "main",
     contents: str = "src/siesta/boilerplate",
     local: bool = False,
+    ipdb: bool | None = None,
+    tests: bool | None = None,
+    actions: bool | None = None,
 ):
     """Start a ``uv``-based Python project from scratch, with initial project structure and docs.
 
@@ -489,6 +500,12 @@ def quickstart_project(
     local : bool, optional
         Use local boilerplate docs assets instead of fetching from the repository.
         May update to outdated contents so avoid using this option.
+    ipdb: bool, optional
+        Whether to add ipdb as debugger, by default ``None`` (i.e. prompt the user).
+    tests: bool, optional
+        Whether to initialize (pytest) tests infra, by default ``None`` (i.e. prompt the user).
+    actions: bool, optional
+        Whether to initialize GitHub Actions, by default ``None`` (i.e. prompt the user).
     """
     if as_app and as_pkg:
         logger.abort("Cannot use both --as-app and --as-pkg flags.")
@@ -498,6 +515,8 @@ def quickstart_project(
         logger.abort(
             "uv not found. Please install it first -> https://docs.astral.sh/uv/getting-started/installation/"
         )
+
+    project_name = get_project_name(with_defaults)
 
     if with_defaults:
         if precommit is not None:
@@ -512,10 +531,20 @@ def quickstart_project(
         if as_main_deps is not None:
             logger.warning("Ignoring as_main_deps argument because of --with-defaults.")
         as_main_deps = False
+        if ipdb is not None:
+            logger.warning("Ignoring ipdb argument because of --with-defaults.")
+        ipdb = True
+        if tests is not None:
+            logger.warning("Ignoring tests argument because of --with-defaults.")
+        tests = True
+        if actions is not None:
+            logger.warning("Ignoring actions argument because of --with-defaults.")
+        actions = True
 
     has_uv_lock = Path("uv.lock").exists()
     if not has_uv_lock:
         cmd = ["uv", "init"]
+        cmd.append(f"--name={project_name}")
         if as_app:
             # Initialize as app (no src/ directory)
             pass
@@ -537,21 +566,10 @@ def quickstart_project(
         deps = logger.confirm("Would you like to install recommended dependencies?")
     if deps:
         dev_deps = load_deps()["dev"]
-        # Check which dependencies are already installed
-        missing_deps = []
-        for dep in dev_deps:
-            try:
-                __import__(dep.split("[")[0])  # Handle cases like package[extra]
-            except ImportError:
-                missing_deps.append(dep)
-
-        if missing_deps:
-            installed = run_command(["uv", "add", "--dev"] + missing_deps)
-            if installed is False:
-                logger.abort("Failed to install the dev dependencies.")
-            logger.success("Dev dependencies installed.")
-        else:
-            logger.info("All dev dependencies already installed.")
+        installed = run_command(["uv", "add", "--dev"] + dev_deps)
+        if installed is False:
+            logger.abort("Failed to install the dev dependencies.")
+        logger.success("Dev dependencies installed.")
 
     if precommit is None:
         precommit = logger.confirm(
@@ -563,6 +581,19 @@ def quickstart_project(
         if pre_commit_installed is False:
             logger.abort("Failed to install pre-commit hooks.")
         logger.success("Pre-commit hooks installed.")
+
+    if ipdb is None:
+        ipdb = logger.confirm("Would you like to add ipdb as debugger?")
+    if ipdb:
+        add_ipdb_as_debugger()
+    if tests is None:
+        tests = logger.confirm("Would you like to initialize (pytest) tests infra?")
+    if tests:
+        write_tests_infra(project_name)
+    if actions is None:
+        actions = logger.confirm("Would you like to initialize GitHub Actions?")
+    if actions:
+        write_test_actions_config()
 
     if docs is None:
         docs = logger.confirm("Would you like to initialize the docs?")
@@ -577,10 +608,7 @@ def quickstart_project(
             contents=contents,
             local=local,
         )
-    logger.info(
-        "Ask Victor if you want to automatically build and deploy the docs to ReadTheDocs."
-    )
-    logger.success("Done.")
+    logger.success("🔥 Done, happy coding! 👋")
 
 
 @docs_app.command(name="build")
@@ -640,9 +668,9 @@ def watch_docs(
     """
     build_docs(path)
     patterns = [p.strip() for p in patterns.split(";")]
-    ab = AutoBuild(patterns, build_docs, path=path)
+    abd = AutoBuildDocs(patterns, build_docs, path=path)
     observer = Observer()
-    observer.schedule(ab, path=".", recursive=True)
+    observer.schedule(abd, path=".", recursive=True)
     observer.start()
     here = Path().resolve()
     logger.info(f"Watching {here}. Press Ctrl+C to stop.")

@@ -20,7 +20,9 @@ def mock_user_pat():
 
     This fixture is automatically used in all tests.
     """
-    with patch("siesta.utils.get_user_pat", return_value="fake-github-pat-for-testing"):
+    with patch(
+        "siesta.utils.github.get_user_pat", return_value="fake-github-pat-for-testing"
+    ):
         yield
 
 
@@ -87,3 +89,14 @@ def module_test_path(tmp_path_factory):
     finally:
         os.chdir(current_dir)  # Always restore original directory
     return tmp_path
+
+
+@pytest.fixture
+def tmp_path_chdir(tmp_path):
+    """Change the current directory to the temporary path."""
+    current_dir = Path.cwd()
+    test_path = tmp_path / "test_siesta"
+    test_path.mkdir(parents=True, exist_ok=True)
+    os.chdir(test_path)
+    yield test_path
+    os.chdir(current_dir)

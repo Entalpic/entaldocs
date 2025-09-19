@@ -12,8 +12,10 @@
         "matplotlib>=3.10.6"
     ],
     "dev": [
+        "ipdb",
         "ipython",
         "pytest",
+        "pytest-cov",
         "ruff",
         "pre-commit"
     ]
