@@ -22,7 +22,7 @@ def write_test_actions_config() -> None:
     test_config = {
         "name": "Tests",
         "on": {
-            "pull_request": "",
+            "pull_request": None,
             "push": {
                 "branches": ["main"],
             },
@@ -93,13 +93,17 @@ def write_tests_infra(project_name: str):
         The name of the project.
     """
     tests_dir = Path("tests")
+    project_name = project_name.replace("-", "_")
     if tests_dir.exists():
         logger.warning("Tests directory already exists. Skipping.")
         return
     tests_dir.mkdir(parents=True, exist_ok=True)
-    test_example = dedent(f'''
+    test_example = dedent(rf'''
+    # Copyright 2025 Entalpic
     import pytest
-    
+    from pathlib import Path
+
+
     @pytest.fixture(autouse=True)
     def mock_variable():
         """Mock some variable."""
@@ -112,6 +116,24 @@ def write_tests_infra(project_name: str):
     def test_import():
         """Test the project's import."""
         import {project_name}  # noqa: F401
+
+    def test_copyrights():
+        src = Path(__file__).resolve().parent.parent
+        no_copyrights = []
+        for file in (
+            list(src.rglob("*.py"))
+            + list(src.rglob("*.rst"))
+            + list(src.rglob("*.yaml"))
+            + list(src.rglob("*.yml"))
+        ):
+            if ".venv" in str(file):
+                continue
+            first_line = file.read_text().split("\n")[0]
+            if "Copyright" not in first_line or "Entalpic" not in first_line:
+                no_copyrights.append(
+                    f"Copyright not found in {{file}} ; first line: {{first_line}}"
+                )
+        assert len(no_copyrights) == 0, "\n".join(no_copyrights)
     ''')
     (tests_dir / "test_import.py").write_text(test_example)
 
@@ -137,6 +159,7 @@ def add_ipdb_as_debugger():
         first_init.read_text()
         + dedent(
             """
+
             try:
                 import os
 
@@ -152,4 +175,4 @@ def add_ipdb_as_debugger():
             """
         )
     )
-    logger.info("ipdb added as debugger.")
+    logger.info("[r]ipdb[/r] added as debugger.")
