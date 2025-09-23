@@ -12,6 +12,7 @@ Home
    :maxdepth: 4
 
    self
+   about
 
 Documentation
 =============
