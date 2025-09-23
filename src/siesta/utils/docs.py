@@ -223,8 +223,8 @@ def install_dependencies(uv: bool, dev: bool):
     cmd.extend(load_deps()["docs"])
     # capture error and output
     output = run_command(cmd)
-    if output is not False:
-        logger.print(output.stdout.strip())
+    if output is not False and (out := output.stdout.strip()):
+        logger.print(out)
 
 
 def make_empty_folders(dest: Path):
