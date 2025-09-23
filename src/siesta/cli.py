@@ -35,7 +35,6 @@ import time
 from importlib import metadata
 from pathlib import Path
 from shutil import rmtree
-from subprocess import run
 from textwrap import dedent
 from typing import Optional
 
@@ -273,9 +272,22 @@ def init_docs(
         logger.warning("Run [r]$ siesta set-github-pat --help[/r] to learn how to.")
         logger.abort("Aborting.", exit=1)
 
+    # Setting defaults
+    if with_defaults:
+        if deps is not None:
+            logger.warning(
+                "Ignoring deps argument because you are using --with-defaults."
+            )
+        deps = True
+        if as_main_deps is not None:
+            logger.warning(
+                "Ignoring as_main_deps argument because you are using --with-defaults."
+            )
+        as_main_deps = False
+
     # Where the docs will be stored, typically `$CWD/docs`
     path = resolve_path(path)
-    logger.info(f"Initializing docs at path: {path}")
+    logger.info(f"Initializing docs at path: [r]{path}[/r]")
     if path.exists():
         # docs folder already exists
         if not overwrite:
@@ -289,20 +301,7 @@ def init_docs(
 
     # Create the docs folder
     path.mkdir(parents=True)
-    logger.success("Initialized.")
-
-    # Setting defaults
-    if with_defaults:
-        if deps is not None:
-            logger.warning(
-                "Ignoring deps argument because you are using --with-defaults."
-            )
-        deps = True
-        if as_main_deps is not None:
-            logger.warning(
-                "Ignoring as_main_deps argument because you are using --with-defaults."
-            )
-        as_main_deps = False
+    logger.success("Docs initialized 📄")
 
     # Whether to install dependencies
     should_install = deps is not None or logger.confirm(
@@ -324,12 +323,12 @@ def init_docs(
                 logger.warning(
                     "uv.lock not found. Skipping uv dependencies, installing with pip."
                 )
-        logger.info(f"Installing dependencies{' with uv.' if with_uv else '.'}..")
+        logger.info(f"Installing docs dependencies{' with uv.' if with_uv else '.'}..")
         # Execute the command to install dependencies
         install_dependencies(with_uv, with_uv and not as_main_deps)
-        logger.success("Dependencies installed.")
+        logger.info("Docs dependencies installed.")
     else:
-        logger.info("Skipping dependency installation.")
+        logger.warning("Skipping dependency installation.")
 
     # Download and copy siesta pre-filled folder structure to the target directory
     copy_boilerplate(
@@ -349,33 +348,11 @@ def init_docs(
         logger.info("ReadTheDocs config already exists.")
 
     logger.info(
-        "Now go to your newly created docs folder and update placehodlers in"
-        + " [r] conf.py [/r] with the appropriate values.",
+        "Now go to your newly created docs folder and update placeholders in"
+        + " [r]conf.py[/r] with the appropriate values.",
     )
 
-    # Build the docs
-    try:
-        command = ["make", "html"]
-        if with_uv:
-            command = ["uv", "run"] + command
-        logger.info(
-            f"Building your docs with [r] cd docs && {' '.join(command)} [/r]..."
-        )
-        run(command, cwd=str(path), check=True)
-        logger.success(
-            f"🚀 Docs built! Open {path / 'build/html/index.html'} to see them."
-        )
-        logger.success(
-            "Or run [r]$ siesta docs open[/r] to open them in the default browser."
-        )
-        logger.success("Happy documenting!")
-    except Exception as e:
-        logger.warning("Failed to build the docs.")
-        logger.warning(e)
-        logger.print()
-        logger.info(
-            "You can try to build the docs manually by running the above command."
-        )
+    build_docs(path)
 
 
 @docs_app.command(name="update")
@@ -476,17 +453,29 @@ def build_docs(path: str = "./docs"):
     with_uv = Path("uv.lock").exists()
     if with_uv:
         commands = [["uv", "run"] + command for command in commands]
-    for command in commands:
+    for c, command in enumerate(commands):
         with logger.loading(f"Running {' '.join(command)}..."):
             result = run_command(command, cwd=str(path), check=False)
         if result.returncode != 0:
-            logger.error(result.stderr)
+            logger.error(result.stderr, title="Build Error", as_panel=True)
             logger.abort("Failed to build the docs.")
-        logger.print(result.stdout)
+
+        if c == 0:
+            continue
+
+        logger.info(result.stdout, title="Build Output", as_panel=True)
+        if result.stderr:
+            logger.warning(
+                result.stderr,
+                title=f"Warnings executing [r]{' '.join(command)}[/r]",
+                as_panel=True,
+            )
     logger.info(
         "Ask Victor if you want to automatically build and deploy the docs to ReadTheDocs."
     )
-    logger.success(f"Local docs built in {path / 'build/html/index.html'}")
+    docs_path = (path / "build/html/index.html").relative_to(Path.cwd())
+    logger.info(f"Local docs built in {docs_path}")
+    logger.success("Open locally with [r]siesta docs open[/r]")
 
 
 @docs_app.command(name="watch")
@@ -693,7 +682,7 @@ def quickstart_project(
         initialized = run_command(cmd)
         if initialized is False:
             logger.abort("Failed to initialize the project.")
-        logger.success("Project initialized with uv.")
+        logger.info("Project initialized with uv.")
     else:
         logger.info("Project already initialized with uv.")
 
@@ -705,7 +694,7 @@ def quickstart_project(
         installed = run_command(["uv", "add", "--dev"] + dev_deps)
         if installed is False:
             logger.abort("Failed to install the dev dependencies.")
-        logger.success("Dev dependencies installed.")
+        logger.info("Dev dependencies installed.")
 
     # Install pre-commit hooks
     if precommit is None:
@@ -717,7 +706,7 @@ def quickstart_project(
         pre_commit_installed = run_command(["uv", "run", "pre-commit", "install"])
         if pre_commit_installed is False:
             logger.abort("Failed to install pre-commit hooks.")
-        logger.success("Pre-commit hooks installed.")
+        logger.info("Pre-commit hooks installed.")
 
     if ipdb is None:
         ipdb = logger.confirm("Would you like to add ipdb as debugger?")
@@ -745,4 +734,5 @@ def quickstart_project(
             contents=contents,
             local=local,
         )
-    logger.success("🔥 Done, happy coding! 👋")
+    logger.info("Project initialized.")
+    logger.success("🔥 Happy coding! 👋")
