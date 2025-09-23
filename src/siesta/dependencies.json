@@ -1,6 +1,6 @@
 {
     "docs": [
-        "shibuya>=2024.10.15",
+        "shibuya>=2025.9.23",
         "sphinx-autoapi>=3.3.2",
         "sphinx-autodoc-typehints>=2.5.0",
         "sphinx-code-include>=1.4.0",
@@ -11,12 +11,5 @@
         "myst-parser>=4.0.1",
         "matplotlib>=3.10.6"
     ],
-    "dev": [
-        "ipdb",
-        "ipython",
-        "pytest",
-        "pytest-cov",
-        "ruff",
-        "pre-commit"
-    ]
+    "dev": ["ipdb", "ipython", "pytest", "pytest-cov", "ruff", "pre-commit"]
 }

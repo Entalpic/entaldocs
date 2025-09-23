@@ -101,6 +101,7 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "github": ("https://pygithub.readthedocs.io/en/stable/", None),
     "torch": ("https://pytorch.org/docs/stable/", None),
+    "cyclopts": ("https://cyclopts.readthedocs.io/en/latest/", None),
 }
 
 # sphinx.ext.autodoc & autoapi.extension
@@ -190,7 +191,7 @@ def skip_submodules(app, what, name, obj, skip, options):
     """
     if what == "attribute":
         if obj.is_undoc_member:
-            print(f"  • Skipping {what} {name} because it is not documented.")
+            print(f"[siesta]  • Skipping {what} {name} because it is not documented.")
             return True
     return skip
 

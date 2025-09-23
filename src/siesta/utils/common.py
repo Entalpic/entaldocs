@@ -152,7 +152,7 @@ def write_or_update_pre_commit_file() -> None:
 
         # Write updated config
         safe_dump(current, pre_commit)
-        logger.info("pre-commit file updated.")
+        logger.info("Pre-commit file updated.")
         return
 
     # Copy reference file if no existing config

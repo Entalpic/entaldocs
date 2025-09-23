@@ -67,7 +67,7 @@ def test_build_docs_successful(module_test_path, monkeypatch, capture_output):
 
     # Verify success message
     assert a_in_b_str_no_space(
-        f"Local docs built in {module_test_path / 'docs/build/html/index.html'}",
+        "Local docs built in docs/build/html/index.html",
         output.getvalue(),
     )
 
@@ -84,7 +84,7 @@ def test_build_docs_with_uv(module_test_path, monkeypatch, capture_output):
 
     # Verify success message
     assert a_in_b_str_no_space(
-        f"Local docs built in {module_test_path / 'docs/build/html/index.html'}",
+        "Local docs built in docs/build/html/index.html",
         output.getvalue(),
     )
 

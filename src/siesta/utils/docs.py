@@ -1,5 +1,5 @@
 # Copyright 2025 Entalpic
-"""Utility functions for the ``docs`` subcommand."""
+"""Utility functions for the ``siesta docs`` subcommand."""
 
 import json
 import re
@@ -9,7 +9,6 @@ from pathlib import Path
 from shutil import copy2, copytree
 from tempfile import TemporaryDirectory
 
-from rich import print
 from watchdog.events import FileSystemEvent, RegexMatchingEventHandler
 
 from siesta.utils.common import (
@@ -224,8 +223,8 @@ def install_dependencies(uv: bool, dev: bool):
     cmd.extend(load_deps()["docs"])
     # capture error and output
     output = run_command(cmd)
-    if output is not False:
-        print(output.stdout.strip())
+    if output is not False and (out := output.stdout.strip()):
+        logger.print(out)
 
 
 def make_empty_folders(dest: Path):

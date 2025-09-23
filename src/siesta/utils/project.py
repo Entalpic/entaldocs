@@ -1,3 +1,6 @@
+# Copyright 2025 Entalpic
+"""Utility functions related to the ``siesta project`` subcommand."""
+
 from pathlib import Path
 from textwrap import dedent
 
@@ -5,6 +8,11 @@ from siesta.utils.common import get_pyver, logger, safe_dump
 
 
 def write_test_actions_config() -> None:
+    """
+    Write the test actions config to the ``.github/workflows/test.yml`` file.
+
+    Basically this will allow you to run tests automatically on Github on any PR or push to the main branch.
+    """
     github_dir = Path(".github")
     workflows_dir = github_dir / "workflows"
     if workflows_dir.exists():
@@ -14,7 +22,7 @@ def write_test_actions_config() -> None:
     test_config = {
         "name": "Tests",
         "on": {
-            "pull_request": "",
+            "pull_request": None,
             "push": {
                 "branches": ["main"],
             },
@@ -75,14 +83,27 @@ def write_test_actions_config() -> None:
 
 
 def write_tests_infra(project_name: str):
+    """Write the tests infrastructure to the ``tests/`` directory.
+
+    This will create a ``test_import.py`` file that will test that the project can be imported.
+
+    Parameters
+    ----------
+    project_name : str
+        The name of the project.
+    """
     tests_dir = Path("tests")
+    project_name = project_name.replace("-", "_")
     if tests_dir.exists():
         logger.warning("Tests directory already exists. Skipping.")
         return
     tests_dir.mkdir(parents=True, exist_ok=True)
-    test_example = dedent(f'''
+    test_example = dedent(rf'''
+    # Copyright 2025 Entalpic
     import pytest
-    
+    from pathlib import Path
+
+
     @pytest.fixture(autouse=True)
     def mock_variable():
         """Mock some variable."""
@@ -95,6 +116,24 @@ def write_tests_infra(project_name: str):
     def test_import():
         """Test the project's import."""
         import {project_name}  # noqa: F401
+
+    def test_copyrights():
+        src = Path(__file__).resolve().parent.parent
+        no_copyrights = []
+        for file in (
+            list(src.rglob("*.py"))
+            + list(src.rglob("*.rst"))
+            + list(src.rglob("*.yaml"))
+            + list(src.rglob("*.yml"))
+        ):
+            if ".venv" in str(file):
+                continue
+            first_line = file.read_text().split("\n")[0]
+            if "Copyright" not in first_line or "Entalpic" not in first_line:
+                no_copyrights.append(
+                    f"Copyright not found in {{file}} ; first line: {{first_line}}"
+                )
+        assert len(no_copyrights) == 0, "\n".join(no_copyrights)
     ''')
     (tests_dir / "test_import.py").write_text(test_example)
 
@@ -102,6 +141,11 @@ def write_tests_infra(project_name: str):
 
 
 def add_ipdb_as_debugger():
+    """Set ``ipdb`` as default debugger to the project.
+
+    This will set ``ipdb`` as default debugger when calling ``breakpoint()`` by setting the
+    ``PYTHONBREAKPOINT`` environment variable to ``ipdb.set_trace``.
+    """
     inits = list(Path("src/").glob("**/__init__.py"))
     if not inits:
         logger.warning("No __init__.py files found. Skipping ipdb debugger.")
@@ -115,6 +159,7 @@ def add_ipdb_as_debugger():
         first_init.read_text()
         + dedent(
             """
+
             try:
                 import os
 
@@ -130,4 +175,4 @@ def add_ipdb_as_debugger():
             """
         )
     )
-    logger.info("ipdb added as debugger.")
+    logger.info("[r]ipdb[/r] added as debugger.")

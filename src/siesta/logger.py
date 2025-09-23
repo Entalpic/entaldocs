@@ -27,6 +27,7 @@ from datetime import datetime
 
 from rich import print
 from rich.console import Console
+from rich.panel import Panel
 
 
 class BaseLogger:
@@ -220,45 +221,85 @@ class Logger(BaseLogger):
         print(f"{self.prefix}[red]{message}[/red]")
         sys.exit(exit)
 
-    def success(self, message: str):
+    def success(self, message: str, title: str = "Success", as_panel: bool = False):
         """Print a success message.
 
         Parameters
         ----------
         message : str
             The message to print.
+        title : str, optional
+            The title of the panel, by default ``"Success"``.
+        as_panel : bool, optional
+            Whether to print the message in a panel, by default ``False``.
         """
-        print(f"{self.prefix}[green]{message}[/green]")
+        if as_panel:
+            content = Panel(
+                message, subtitle=self.prefix, title=title, border_style="green"
+            )
+        else:
+            content = f"{self.prefix}[green]{message}[/green]"
+        self.console.print(content)
 
-    def warning(self, message: str):
+    def warning(self, message: str, title: str = "Warning", as_panel: bool = False):
         """Print a warning message.
 
         Parameters
         ----------
         message : str
             The message to print.
+        title : str, optional
+            The title of the panel, by default ``"Warning"``.
+        as_panel : bool, optional
+            Whether to print the message in a panel, by default ``False``.
         """
-        print(f"{self.prefix}[yellow]{message}[/yellow]")
+        if as_panel:
+            content = Panel(
+                message, subtitle=self.prefix, title=title, border_style="yellow"
+            )
+        else:
+            content = f"{self.prefix}[yellow]{message}[/yellow]"
+        self.console.print(content)
 
-    def error(self, message: str):
+    def error(self, message: str, title: str = "Error", as_panel: bool = False):
         """Print an error message.
 
         Parameters
         ----------
         message : str
             The message to print.
+        title : str, optional
+            The title of the panel, by default ``"Error"``.
+        as_panel : bool, optional
+            Whether to print the message in a panel, by default False.
         """
-        print(f"{self.prefix}[red]{message}[/red]")
+        if as_panel:
+            content = Panel(
+                message, subtitle=self.prefix, title=title, border_style="red"
+            )
+        else:
+            content = f"{self.prefix}[red]{message}[/red]"
+        self.console.print(content)
 
-    def info(self, message: str):
+    def info(self, message: str, title: str = "Info", as_panel: bool = False):
         """Print an info message.
 
         Parameters
         ----------
         message : str
             The message to print.
+        title : str, optional
+            The title of the panel, by default ``"Info"``.
+        as_panel : bool, optional
+            Whether to print the message in a panel, by default ``False``.
         """
-        print(f"{self.prefix}[blue]{message}[/blue]")
+        if as_panel:
+            content = Panel(
+                message, subtitle=self.prefix, title=title, border_style="blue"
+            )
+        else:
+            content = f"{self.prefix}[blue]{message}[/blue]"
+        self.console.print(content)
 
     def clear_line(self):
         """Clear the current line."""
@@ -277,3 +318,15 @@ class Logger(BaseLogger):
             The message to print.
         """
         return self.console.status(message)
+
+    def print(self, *args, **kwargs) -> None:
+        """Print a message.
+
+        Parameters
+        ----------
+        *args :
+            The arguments to print.
+        **kwargs :
+            The keyword arguments to print.
+        """
+        self.console.print(self.prefix, *args, **kwargs)
