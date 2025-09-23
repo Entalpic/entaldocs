@@ -1,3 +1,4 @@
+# Copyright 2025 Entalpic
 from siesta.utils.common import safe_load
 from siesta.utils.project import (
     add_ipdb_as_debugger,
