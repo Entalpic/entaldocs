@@ -343,7 +343,7 @@ def init_docs(
     has_rtd = Path(".readthedocs.yaml").exists()
     if not has_rtd:
         write_rtd_config()
-        logger.success("ReadTheDocs config written.")
+        logger.info("ReadTheDocs config written.")
     else:
         logger.info("ReadTheDocs config already exists.")
 
@@ -712,14 +712,17 @@ def quickstart_project(
         ipdb = logger.confirm("Would you like to add ipdb as debugger?")
     if ipdb:
         add_ipdb_as_debugger()
+        logger.info("[r]ipdb[/r] added as debugger.")
     if tests is None:
         tests = logger.confirm("Would you like to initialize (pytest) tests infra?")
     if tests:
         write_tests_infra(project_name)
+        logger.info("Tests infra written.")
     if actions is None:
         actions = logger.confirm("Would you like to initialize GitHub Actions?")
     if actions:
         write_test_actions_config()
+        logger.info("Test actions config written.")
 
     if docs is None:
         docs = logger.confirm("Would you like to initialize the docs?")

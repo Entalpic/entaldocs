@@ -169,7 +169,7 @@ class Logger(BaseLogger):
         else:
             prefix += self.now()
         if prefix:
-            return f"[grey50 bold]\\[{prefix}][/grey50 bold] "
+            return rf"[grey50 bold]\[{prefix}][/grey50 bold] "
         return prefix
 
     def prompt(self, message: str, default: str = None) -> str:
