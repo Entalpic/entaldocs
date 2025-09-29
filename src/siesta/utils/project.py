@@ -79,7 +79,6 @@ def write_test_actions_config() -> None:
         },
     }
     safe_dump(test_config, workflows_dir / "test.yml")
-    logger.info("Test actions config written.")
 
 
 def write_tests_infra(project_name: str):
@@ -136,8 +135,6 @@ def write_tests_infra(project_name: str):
         assert len(no_copyrights) == 0, "\n".join(no_copyrights)
     ''')
     (tests_dir / "test_import.py").write_text(test_example)
-
-    logger.info("Tests infra written.")
 
 
 def add_ipdb_as_debugger():
