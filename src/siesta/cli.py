@@ -20,6 +20,7 @@ Learn how to use with:
 
     $ siesta project # shows help
     $ siesta project quickstart
+    $ siesta project tree
 
     $ siesta set-github-pat
     $ siesta show-deps
@@ -34,11 +35,12 @@ import subprocess
 import time
 from importlib import metadata
 from pathlib import Path
-from shutil import rmtree
+from shutil import get_terminal_size, rmtree
 from textwrap import dedent
 from typing import Optional
 
 from cyclopts import App
+from gitignore_parser import parse_gitignore
 from watchdog.observers import Observer
 
 from siesta.utils.common import (
@@ -66,6 +68,7 @@ from siesta.utils.project import (
     write_test_actions_config,
     write_tests_infra,
 )
+from siesta.utils.tree import make_labeled_tree
 
 # Main app
 app = App(
@@ -751,5 +754,42 @@ def quickstart_project(
             contents=contents,
             local=local,
         )
+
+    tree_project(".")
     logger.info("Project initialized.")
     logger.success("🔥 Happy coding! 👋")
+
+
+@project_app.command(name="tree")
+def tree_project(path: str = ".", ignore_from_gitignore: bool = True):
+    """Show a project's tree, i.e. its directory structure.
+
+    Additionally displays labels to explain the purpose of useful files / directories.
+
+    Parameters
+    ----------
+    path : str, optional
+        The path to the project.
+    ignore_from_gitignore : bool, optional
+        Whether to ignore files from the ``.gitignore`` file in ``path``.
+        Only useful if ``path`` is a git repository.
+    """
+    path = resolve_path(path)
+    if not path.exists():
+        logger.abort(f"Path not found: {path}", exit=1)
+    gitignore_path = path / ".gitignore"
+    if ignore_from_gitignore and gitignore_path.exists():
+        ignore = parse_gitignore(gitignore_path)
+    else:
+        ignore = None
+    term_cols = get_terminal_size().columns
+    logger.info(
+        ".\n"
+        + make_labeled_tree(
+            path,
+            ignore,
+            max_line_length=term_cols - 4,  # account for panel borders
+        ),
+        as_panel=True,
+        title="Your project's directory structure",
+    )
