@@ -319,14 +319,23 @@ class Logger(BaseLogger):
         """
         return self.console.status(message)
 
-    def print(self, *args, **kwargs) -> None:
+    def print(self, *args, title: str = None, as_panel: bool = False, **kwargs) -> None:
         """Print a message.
 
         Parameters
         ----------
         *args :
             The arguments to print.
+        title : str, optional
+            The title of the panel, by default None.
+        as_panel : bool, optional
+            Whether to print the message in a panel, by default False.
         **kwargs :
             The keyword arguments to print.
         """
-        self.console.print(self.prefix, *args, **kwargs)
+        if as_panel:
+            self.console.print(
+                Panel(*args, **kwargs, subtitle=self.prefix, title=title)
+            )
+        else:
+            self.console.print(self.prefix, *args, **kwargs)
