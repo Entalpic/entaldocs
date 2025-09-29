@@ -4,6 +4,8 @@
 from pathlib import Path
 from textwrap import dedent
 
+import requests
+
 from siesta.utils.common import get_pyver, logger, safe_dump
 
 
@@ -172,4 +174,24 @@ def add_ipdb_as_debugger():
             """
         )
     )
-    logger.info("[r]ipdb[/r] added as debugger.")
+
+
+def download_python_gitignore() -> str:
+    """Download the gitignore file from the ``.gitignore`` file."""
+    gitignore_url = (
+        "https://raw.githubusercontent.com/github/gitignore/main/Python.gitignore"
+    )
+    response = requests.get(gitignore_url)
+    return response.text
+
+
+def write_gitignore() -> None:
+    """Write the gitignore file to the ``.gitignore`` file."""
+    gitignore_path = Path(".gitignore")
+    python_gitignore = download_python_gitignore()
+    gitignore = dedent("""
+    # Custom
+    .vscode/
+    .DS_Store
+    """)
+    gitignore_path.write_text(gitignore + python_gitignore)

@@ -62,6 +62,7 @@ from siesta.utils.docs import (
 from siesta.utils.github import get_user_pat
 from siesta.utils.project import (
     add_ipdb_as_debugger,
+    write_gitignore,
     write_test_actions_config,
     write_tests_infra,
 )
@@ -559,6 +560,7 @@ def quickstart_project(
     ipdb: bool | None = None,
     tests: bool | None = None,
     actions: bool | None = None,
+    gitignore: bool | None = None,
 ):
     """Start a ``uv``-based Python project from scratch, with initial project structure and docs.
 
@@ -626,6 +628,8 @@ def quickstart_project(
         Whether to initialize (pytest) tests infra, by default ``None`` (i.e. prompt the user).
     actions: bool, optional
         Whether to initialize GitHub Actions, by default ``None`` (i.e. prompt the user).
+    gitignore: bool, optional
+        Whether to initialize the ``.gitignore`` file, by default ``None`` (i.e. prompt the user).
     """
     if as_app and as_pkg:
         logger.abort("Cannot use both --as-app and --as-pkg flags.")
@@ -663,6 +667,9 @@ def quickstart_project(
         if actions is not None:
             logger.warning("Ignoring actions argument because of --with-defaults.")
         actions = True
+        if gitignore is not None:
+            logger.warning("Ignoring gitignore argument because of --with-defaults.")
+        gitignore = True
 
     # Check if the project is already initialized
     has_uv_lock = Path("uv.lock").exists()
@@ -723,6 +730,13 @@ def quickstart_project(
     if actions:
         write_test_actions_config()
         logger.info("Test actions config written.")
+    if gitignore is None:
+        gitignore = logger.confirm(
+            "Would you like to initialize the ``.gitignore`` file?"
+        )
+    if gitignore:
+        write_gitignore()
+        logger.info("Gitignore written.")
 
     if docs is None:
         docs = logger.confirm("Would you like to initialize the docs?")
